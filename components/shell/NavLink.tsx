@@ -12,7 +12,9 @@ export function NavLink({ href, children }: NavLinkProps) {
   const pathname = usePathname();
   // Exact match for /app dashboard; prefix match for all other routes
   const isActive =
-    href === '/app' ? pathname === '/app' : pathname.startsWith(href);
+    href === '/app'
+      ? pathname === '/app'
+      : pathname === href || pathname.startsWith(href + '/');
 
   return (
     <Link
