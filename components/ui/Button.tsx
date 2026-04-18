@@ -26,7 +26,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center gap-2 transition-colors ${VARIANT[variant]} ${SIZE[size]} ${className}`}
+      className={`inline-flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${VARIANT[variant]} ${SIZE[size]} ${className}`}
       {...props}
     />
   );
