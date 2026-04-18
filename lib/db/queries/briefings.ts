@@ -123,5 +123,6 @@ export async function listDeliveries(
   return db
     .select()
     .from(briefingDeliveries)
-    .where(eq(briefingDeliveries.briefingId, briefingId));
+    .where(eq(briefingDeliveries.briefingId, briefingId))
+    .orderBy(asc(briefingDeliveries.sentAt));
 }
