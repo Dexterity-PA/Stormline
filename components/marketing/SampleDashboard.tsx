@@ -32,7 +32,17 @@ function DeltaBadge({
   );
 }
 
-function PercentileBar({ value }: { value: number }) {
+function PercentileBar({
+  value,
+  direction,
+}: {
+  value: number;
+  direction: DashboardTileMock["direction"];
+}) {
+  const high = direction === "cost" ? "var(--sl-warn)" : "var(--sl-good)";
+  const low = direction === "cost" ? "var(--sl-good)" : "var(--sl-warn)";
+  const barColor = value >= 80 ? high : value <= 25 ? low : "var(--sl-accent)";
+
   return (
     <div className="mt-3">
       <div className="flex items-center justify-between mb-1">
@@ -47,15 +57,7 @@ function PercentileBar({ value }: { value: number }) {
       >
         <div
           className="h-full rounded-full"
-          style={{
-            width: `${value}%`,
-            background:
-              value >= 80
-                ? "var(--sl-warn)"
-                : value <= 25
-                  ? "var(--sl-good)"
-                  : "var(--sl-accent)",
-          }}
+          style={{ width: `${value}%`, background: barColor }}
         />
       </div>
     </div>
@@ -80,7 +82,7 @@ function DashboardTile({ tile }: { tile: DashboardTileMock }) {
         />
         <span className="ml-2 text-xs text-fg-muted">/ wk</span>
       </div>
-      <PercentileBar value={tile.percentile5yr} />
+      <PercentileBar value={tile.percentile5yr} direction={tile.direction} />
       <p className="mt-3 text-xs text-fg-muted border-t border-border pt-2">
         {tile.source}
       </p>
