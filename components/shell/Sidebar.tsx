@@ -1,0 +1,55 @@
+import Link from 'next/link';
+import { UserButton } from '@clerk/nextjs';
+import { NavLink } from './NavLink';
+
+const NAV_MAIN = [
+  { href: '/app', label: 'Dashboard' },
+  { href: '/app/briefings', label: 'Briefings' },
+  { href: '/app/alerts', label: 'Alerts' },
+  { href: '/app/indicators', label: 'Indicators' },
+] as const;
+
+const NAV_SETTINGS = [
+  { href: '/app/settings/profile', label: 'Profile' },
+  { href: '/app/settings/notifications', label: 'Notifications' },
+  { href: '/app/settings/billing', label: 'Billing' },
+] as const;
+
+export function Sidebar() {
+  return (
+    <aside className="hidden md:flex w-60 flex-shrink-0 flex-col h-screen bg-bg border-r border-border sticky top-0">
+      <div className="px-4 py-5 border-b border-border">
+        <Link
+          href="/app"
+          className="font-display text-base font-semibold tracking-tight text-fg"
+        >
+          Stormline
+        </Link>
+      </div>
+
+      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+        {NAV_MAIN.map((item) => (
+          <NavLink key={item.href} href={item.href}>
+            {item.label}
+          </NavLink>
+        ))}
+
+        <div className="pt-5 pb-1 px-3">
+          <span className="text-xs text-fg-muted uppercase tracking-wider font-medium">
+            Settings
+          </span>
+        </div>
+
+        {NAV_SETTINGS.map((item) => (
+          <NavLink key={item.href} href={item.href}>
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="px-4 py-4 border-t border-border">
+        <UserButton />
+      </div>
+    </aside>
+  );
+}
