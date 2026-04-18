@@ -6,13 +6,14 @@ export default function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link
           href="/"
+          aria-label="Stormline home"
           className="font-display text-lg font-semibold tracking-tight text-fg"
         >
           Stormline
         </Link>
 
         <nav
-          aria-label="Main"
+          aria-label="Main navigation"
           className="hidden items-center gap-8 text-sm text-fg-muted sm:flex"
         >
           <Link href="/pricing" className="transition-colors hover:text-fg">
