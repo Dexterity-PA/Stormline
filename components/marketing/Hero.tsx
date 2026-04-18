@@ -14,7 +14,7 @@ function TickerPanel() {
   return (
     <div className="hidden w-72 shrink-0 rounded-lg border border-border bg-bg-elev p-4 font-mono text-xs md:block">
       <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-fg-muted">
-        Live indicators — FRED / EIA / USDA
+        Key indicators — FRED / EIA / USDA
       </p>
       <div className="space-y-2.5">
         {TICKER_ROWS.map((row) => (
@@ -41,7 +41,7 @@ export default function Hero() {
     <section className="relative overflow-hidden border-b border-border bg-bg">
       {/* Data-grid background */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-0 opacity-[0.035]"
         style={{
           backgroundImage: `
