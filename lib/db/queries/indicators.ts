@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
+import { and, arrayContains, asc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import {
@@ -28,7 +28,7 @@ export type UpsertIndicatorInput = z.infer<typeof UpsertIndicatorInput>;
 export const InsertIndicatorValueInput = z.object({
   indicatorId: z.string().uuid(),
   observedAt: z.date(),
-  value: z.string().min(1),
+  value: z.string().refine((v) => !Number.isNaN(Number(v)), { message: 'value must be a numeric string' }),
 });
 export type InsertIndicatorValueInput = z.infer<typeof InsertIndicatorValueInput>;
 
@@ -50,7 +50,7 @@ export async function listIndicatorsByIndustry(
   return db
     .select()
     .from(indicators)
-    .where(sql`${indicators.industryTags} @> ARRAY[${industry}]::text[]`);
+    .where(arrayContains(indicators.industryTags, [industry]));
 }
 
 export async function upsertIndicator(
@@ -113,7 +113,7 @@ export async function getLatestValues(
       subq,
       and(
         eq(indicatorValues.indicatorId, subq.indicatorId),
-        eq(indicatorValues.observedAt, sql`${subq.maxObservedAt}`),
+        eq(indicatorValues.observedAt, subq.maxObservedAt),
       ),
     );
 }
@@ -123,6 +123,7 @@ export async function getSeries(
   since: Date,
   until: Date,
 ): Promise<Array<{ observedAt: Date; value: string }>> {
+  if (since > until) throw new Error('getSeries: since must be <= until');
   return db
     .select({
       observedAt: indicatorValues.observedAt,
