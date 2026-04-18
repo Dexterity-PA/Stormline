@@ -6,12 +6,16 @@ import type { InferSelectModel } from 'drizzle-orm';
 
 export type Member = InferSelectModel<typeof members>;
 
-export const UpdateNotificationPrefsInput = z.object({
-  emailBriefing: z.boolean().optional(),
-  emailAlerts: z.boolean().optional(),
-  smsAlerts: z.boolean().optional(),
-  phone: z.string().nullable().optional(),
-});
+export const UpdateNotificationPrefsInput = z
+  .object({
+    emailBriefing: z.boolean().optional(),
+    emailAlerts: z.boolean().optional(),
+    smsAlerts: z.boolean().optional(),
+    phone: z.string().nullable().optional(),
+  })
+  .refine((v) => Object.values(v).some((x) => x !== undefined), {
+    message: 'At least one preference field is required',
+  });
 export type UpdateNotificationPrefsInput = z.infer<
   typeof UpdateNotificationPrefsInput
 >;
