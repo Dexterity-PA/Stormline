@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Stormline design tokens — §16 */
+:root {
+  --sl-bg: #0a0e13;
+  --sl-bg-elev: #11161d;
+  --sl-fg: #e8ecf1;
+  --sl-fg-muted: #8a94a3;
+  --sl-accent: #4ea8ff;
+  --sl-warn: #ffb547;
+  --sl-crit: #ff5c5c;
+  --sl-good: #4ade80;
+  --sl-border: #1e2631;
+
+  --sl-radius-sm: 6px;
+  --sl-radius-md: 10px;
+  --sl-radius-lg: 16px;
+
+  --sl-font-display: "Söhne", "Inter", system-ui, sans-serif;
+  --sl-font-body: "Inter", system-ui, sans-serif;
+  --sl-font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-bg: var(--sl-bg);
+  --color-bg-elev: var(--sl-bg-elev);
+  --color-fg: var(--sl-fg);
+  --color-fg-muted: var(--sl-fg-muted);
+  --color-accent: var(--sl-accent);
+  --color-warn: var(--sl-warn);
+  --color-crit: var(--sl-crit);
+  --color-good: var(--sl-good);
+  --color-border: var(--sl-border);
+
+  --radius-sm: var(--sl-radius-sm);
+  --radius-md: var(--sl-radius-md);
+  --radius-lg: var(--sl-radius-lg);
+
+  --font-display: var(--sl-font-display);
+  --font-body: var(--sl-font-body);
+  --font-mono: var(--sl-font-mono);
+}
+
+html,
+body {
+  background: var(--sl-bg);
+  color: var(--sl-fg);
+  font-family: var(--sl-font-body);
+}
