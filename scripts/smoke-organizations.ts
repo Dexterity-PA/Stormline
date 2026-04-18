@@ -31,6 +31,7 @@ async function main() {
   if (!data.some((o) => o.id === org.id)) throw new Error('listOrgs missing row');
   console.log('listOrgs length:', data.length, 'nextCursor:', nextCursor);
 
+  await db.$client.end?.();
   console.log('smoke-organizations: PASSED');
 }
 
