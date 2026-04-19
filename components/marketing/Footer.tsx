@@ -1,7 +1,4 @@
-'use client'
-
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
 
 const DISCLAIMER =
   'Stormline provides market intelligence, not financial, legal, or tax advice. Every claim is linked to a primary public data source. Consult licensed professionals for decisions specific to your business.'
@@ -59,54 +56,15 @@ const COLS: readonly { title: string; links: readonly LinkRow[] }[] = [
 ]
 
 function Wordmark() {
-  const ref = useRef<HTMLDivElement | null>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) if (e.isIntersecting) setVisible(true)
-      },
-      { threshold: 0.3 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
   return (
-    <div
-      ref={ref}
-      className="relative select-none"
-      aria-label="Stormline"
-    >
-      <div
-        className="font-display text-[clamp(4rem,14vw,10rem)] font-semibold leading-[0.9] tracking-[-0.04em]"
-        style={{
-          background:
-            'linear-gradient(120deg, color-mix(in oklab, var(--sl-fg) 100%, transparent) 0%, color-mix(in oklab, var(--sl-fg-muted) 100%, transparent) 45%, color-mix(in oklab, var(--sl-accent) 70%, transparent) 50%, color-mix(in oklab, var(--sl-fg-muted) 100%, transparent) 55%, color-mix(in oklab, var(--sl-fg) 100%, transparent) 100%)',
-          backgroundSize: '300% 100%',
-          backgroundPosition: visible ? '0% 50%' : '100% 50%',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-          transition: 'background-position 2.4s var(--sl-ease-out-expo)',
-        }}
-      >
-        Stormline
-      </div>
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-full h-px origin-left"
-        style={{
-          background:
-            'linear-gradient(90deg, var(--sl-accent), transparent 80%)',
-          transform: visible ? 'scaleX(1)' : 'scaleX(0)',
-          transition: 'transform 1200ms var(--sl-ease-out-expo) 400ms',
-        }}
-      />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element -- SVG, no benefit from next/image
+    <img
+      src="/brand/logo.svg"
+      alt="Stormline"
+      width={360}
+      height={72}
+      className="h-[clamp(3rem,9vw,6rem)] w-auto select-none"
+    />
   )
 }
 

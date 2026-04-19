@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="72" viewBox="0 0 360 72" fill="none" role="img" aria-label="Stormline">
+  <style>
+    .sl-word {
+      font-family: "Inter Tight", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-weight: 600;
+      font-size: 52px;
+      letter-spacing: -0.02em;
+      fill: #e8ecf1;
+    }
+  </style>
+  <text x="0" y="52" class="sl-word">storm</text>
+  <text x="149" y="52" class="sl-word">ine</text>
+  <path d="M 213 63 L 148 63 Q 141 63 141 56 L 141 14" stroke="#4ea8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
