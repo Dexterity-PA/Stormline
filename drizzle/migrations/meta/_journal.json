@@ -29,6 +29,13 @@
       "when": 1776581893432,
       "tag": "0003_rich_tyger_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776623206457,
+      "tag": "0004_faulty_quentin_quire",
+      "breakpoints": true
     }
   ]
 }
