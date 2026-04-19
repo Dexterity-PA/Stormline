@@ -1,19 +1,22 @@
-import Link from 'next/link';
-import { UserButton } from '@clerk/nextjs';
-import { NavLink } from './NavLink';
-import { AskStormline } from '@/components/sidebar/AskStormline';
+import { Suspense } from "react";
+import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
+import { NavLink } from "./NavLink";
+import { TodayCard } from "@/components/sidebar/TodayCard";
+import { WatchlistModule } from "@/components/sidebar/WatchlistModule";
+import { AskStormline } from "@/components/sidebar/AskStormline";
 
 const NAV_MAIN = [
-  { href: '/app', label: 'Dashboard' },
-  { href: '/app/briefings', label: 'Briefings' },
-  { href: '/app/alerts', label: 'Alerts' },
-  { href: '/app/indicators', label: 'Indicators' },
+  { href: "/app", label: "Dashboard" },
+  { href: "/app/briefings", label: "Briefings" },
+  { href: "/app/alerts", label: "Alerts" },
+  { href: "/app/indicators", label: "Indicators" },
 ] as const;
 
 const NAV_SETTINGS = [
-  { href: '/app/settings/profile', label: 'Profile' },
-  { href: '/app/settings/notifications', label: 'Notifications' },
-  { href: '/app/settings/billing', label: 'Billing' },
+  { href: "/app/settings/profile", label: "Profile" },
+  { href: "/app/settings/notifications", label: "Notifications" },
+  { href: "/app/settings/billing", label: "Billing" },
 ] as const;
 
 export function Sidebar() {
@@ -51,6 +54,20 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="px-3 pb-3 space-y-3">
+        <Suspense
+          fallback={
+            <div className="h-20 rounded-[var(--radius-sm)] border border-border bg-bg-elev animate-pulse" />
+          }
+        >
+          <TodayCard />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <WatchlistModule />
+        </Suspense>
+      </div>
 
       <AskStormline />
 
