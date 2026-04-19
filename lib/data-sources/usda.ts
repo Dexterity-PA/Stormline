@@ -11,7 +11,10 @@ import {
 const NASS_BASE_URL = "https://quickstats.nass.usda.gov/api/api_GET/";
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_BASE_BACKOFF_MS = 500;
-const DEFAULT_TIMEOUT_MS = 15_000;
+const DEFAULT_TIMEOUT_MS = 30_000;
+// NASS returns decades of rows by default, which can time out. When no `since`
+// is supplied, cap history to this many years back to keep requests bounded.
+const DEFAULT_HISTORY_YEARS = 10;
 
 // Maps compact sourceId keys to NASS QuickStats query parameters.
 // To add a new series, add an entry here and a registry entry in lib/indicators/registry.ts.
@@ -132,7 +135,9 @@ export class UsdaAdapter implements DataSourceAdapter {
       );
     }
 
-    const url = this.buildUrl(params, options.since);
+    const since =
+      options.since ?? yearsAgo(DEFAULT_HISTORY_YEARS);
+    const url = this.buildUrl(params, since);
     const payload = await this.fetchJsonWithRetry(url, options.signal);
 
     const parsed = nassResponseSchema.safeParse(payload);
@@ -165,15 +170,13 @@ export class UsdaAdapter implements DataSourceAdapter {
 
   private buildUrl(
     params: Readonly<Record<string, string>>,
-    since?: Date,
+    since: Date,
   ): string {
     const qs = new URLSearchParams({ key: this.apiKey, format: "JSON" });
     for (const [k, v] of Object.entries(params)) {
       qs.set(k, v);
     }
-    if (since) {
-      qs.set("year__GE", String(since.getUTCFullYear()));
-    }
+    qs.set("year__GE", String(since.getUTCFullYear()));
     return `${NASS_BASE_URL}?${qs.toString()}`;
   }
 
@@ -248,6 +251,17 @@ function parseNassDate(year: string, periodDesc: string): Date | null {
   if (m === null) return null;
   const date = new Date(Date.UTC(y, m - 1, 1));
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function yearsAgo(years: number): Date {
+  const now = new Date();
+  return new Date(
+    Date.UTC(
+      now.getUTCFullYear() - years,
+      now.getUTCMonth(),
+      now.getUTCDate(),
+    ),
+  );
 }
 
 function sleep(ms: number): Promise<void> {
