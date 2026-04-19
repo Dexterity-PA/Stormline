@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { IndustryContent } from "@/app/(marketing)/industries/[slug]/content";
 
 type Props = {
@@ -26,12 +27,12 @@ export default function IndustryHero({ content }: Props) {
           </p>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <a
+            <Link
               href="/sign-up"
               className="inline-flex items-center justify-center rounded-md bg-accent px-6 py-3 text-sm font-semibold text-bg transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               {content.ctaText}
-            </a>
+            </Link>
             <span className="text-sm text-fg-muted">
               No credit card required. 14-day full access.
             </span>
