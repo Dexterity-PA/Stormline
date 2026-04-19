@@ -35,7 +35,7 @@ export default function LandingPage() {
       <Section11Pricing />
       <Section12FAQ />
       <Section13FinalCTA />
-      {/* Section 14 (footer) lands in subsequent commit. */}
+      {/* Section 14 — Footer — is rendered by the marketing layout. */}
     </main>
   )
 }
