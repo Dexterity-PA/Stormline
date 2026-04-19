@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs";
 import { NavLink } from "./NavLink";
 import { TodayCard } from "@/components/sidebar/TodayCard";
 import { WatchlistModule } from "@/components/sidebar/WatchlistModule";
+import { AskStormline } from "@/components/sidebar/AskStormline";
 
 const NAV_MAIN = [
   { href: "/app", label: "Dashboard" },
@@ -67,6 +68,8 @@ export function Sidebar() {
           <WatchlistModule />
         </Suspense>
       </div>
+
+      <AskStormline />
 
       <div className="px-4 py-4 border-t border-border">
         <UserButton />
