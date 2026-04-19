@@ -50,14 +50,13 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
       <TopMovers movers={data.topMovers} />
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6">
-        <TileGrid
-          tiles={data.tiles}
-          pinned={prefs.pinned}
-          density={prefs.density}
-        />
-        <AlertsRail alerts={data.alerts} />
-      </div>
+      <AlertsRail alerts={data.alerts} />
+
+      <TileGrid
+        tiles={data.tiles}
+        pinned={prefs.pinned}
+        density={prefs.density}
+      />
 
       <p className="text-[11px] text-fg-muted border-t border-border pt-4">
         Stormline provides market intelligence, not financial, legal, or tax

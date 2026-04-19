@@ -43,14 +43,14 @@ export function TopMovers({ movers }: TopMoversProps) {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+      <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
         {movers.map((m) => {
           const sign = m.deltaPercent > 0 ? "+" : "";
           return (
             <Link
               key={m.code}
               href={`/app/indicators/${encodeURIComponent(m.code)}`}
-              className="block rounded-[var(--radius-sm)] border border-border bg-bg-elev px-3 py-2.5 hover:border-accent/40 transition-colors"
+              className="block flex-none w-[min(200px,72vw)] snap-start rounded-[var(--radius-sm)] border border-border bg-bg-elev px-3 py-2.5 hover:border-accent/40 transition-colors"
             >
               <p className="text-[11px] text-fg-muted line-clamp-1 mb-1">
                 {m.name}
