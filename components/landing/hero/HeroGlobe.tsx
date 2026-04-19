@@ -67,13 +67,10 @@ function FresnelAtmosphere() {
 }
 
 function EarthSurface() {
-  const texture = useTexture(EARTH_TEXTURE_URL)
-
-  useEffect(() => {
-    if (!texture) return
-    texture.colorSpace = THREE.SRGBColorSpace
-    texture.anisotropy = 8
-  }, [texture])
+  const texture = useTexture(EARTH_TEXTURE_URL, (t) => {
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 8
+  })
 
   return (
     <mesh>
