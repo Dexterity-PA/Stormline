@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { anthropic, buildAskContext, extractCitedCodes } from '@/lib/ai/ask/handler';
+import { getAnthropicClient, buildAskContext, extractCitedCodes } from '@/lib/ai/ask/handler';
 import { countAiQueriesInLastHour, insertAiQuery } from '@/lib/db/queries/ai-queries';
 
 const RATE_LIMIT = 20;
@@ -42,7 +42,7 @@ export async function POST(request: Request): Promise<Response> {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const messageStream = await anthropic.messages.create({
+        const messageStream = await getAnthropicClient().messages.create({
           model: MODEL,
           max_tokens: 1024,
           system: systemPrompt,
