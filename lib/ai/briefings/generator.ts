@@ -89,18 +89,23 @@ export async function generateDraft(
   const indicators = await fetchSnapshots(industry, region);
   const { weekStart, weekEnd } = currentWeekRange();
 
+  // Stream D hook: once feat/onboarding-flow merges, import getOnboardingState
+  // and set: industryProfile = os?.industryProfile ? JSON.stringify(os.industryProfile) : undefined
+  // Table: onboarding_state.industry_profile (jsonb), keyed on org_id = org.id
+  const industryProfile: string | undefined = undefined;
+
   const ctx: BriefingContext = {
     industry,
     region,
     weekStart,
     weekEnd,
     indicators,
-    // industryProfile not yet in schema — omitted
+    industryProfile,
   };
 
   const client = new Anthropic();
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-sonnet-4',
     max_tokens: 2048,
     system: buildSystemPrompt(industry),
     messages: [{ role: 'user', content: buildUserMessage(ctx) }],
