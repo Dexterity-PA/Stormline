@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useOrganizationList } from '@clerk/nextjs';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Toggle } from '@/components/ui/Toggle';
@@ -10,6 +11,8 @@ import {
   type ProfileField,
 } from '@/components/onboarding/DynamicProfileForm';
 import {
+  createClerkOrgAction,
+  provisionDbOrgAction,
   upsertOnboardingStateAction,
   runProfilerAction,
   getIndustryIndicatorsAction,
@@ -35,6 +38,7 @@ interface WizardProps {
 export function OnboardingWizard({ initialStep, initialState, profileSchemas }: WizardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { setActive } = useOrganizationList();
 
   const [step, setStep] = useState<Step>(initialStep);
   const [industry, setIndustry] = useState<Industry | null>(
@@ -69,7 +73,9 @@ export function OnboardingWizard({ initialStep, initialState, profileSchemas }: 
   function handleIndustrySelect(ind: Industry) {
     startTransition(async () => {
       try {
-        await upsertOnboardingStateAction({ step: 'region', selectedIndustry: ind });
+        const clerkOrgId = await createClerkOrgAction(ind);
+        if (!setActive) throw new Error('Clerk setActive not available');
+        await setActive({ organization: clerkOrgId });
         setIndustry(ind);
         setStep('region');
       } catch (err) {
@@ -79,11 +85,10 @@ export function OnboardingWizard({ initialStep, initialState, profileSchemas }: 
   }
 
   function handleRegionNext() {
-    if (!regionState) return;
+    if (!regionState || !industry) return;
     startTransition(async () => {
       try {
-        const regions = regionMetro ? [regionState, regionMetro] : [regionState];
-        await upsertOnboardingStateAction({ step: 'profile', selectedRegions: regions });
+        await provisionDbOrgAction(industry, regionState, regionMetro || undefined);
         setStep('profile');
       } catch (err) {
         console.error('[handleRegionNext] failed:', err);
