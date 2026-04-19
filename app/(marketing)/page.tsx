@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Section01Hero from '@/components/landing/sections/Section01Hero'
 import Section02Ticker from '@/components/landing/sections/Section02Ticker'
 import Section03Indictment from '@/components/landing/sections/Section03Indictment'
+import Section04Pillars from '@/components/landing/sections/Section04Pillars'
 
 export const metadata: Metadata = {
   title: 'Stormline — Macro Intelligence for Operators',
@@ -15,7 +16,8 @@ export default function LandingPage() {
       <Section01Hero />
       <Section02Ticker />
       <Section03Indictment />
-      {/* Sections 04–14 land in subsequent commits. */}
+      <Section04Pillars />
+      {/* Sections 05–14 land in subsequent commits. */}
     </main>
   )
 }
