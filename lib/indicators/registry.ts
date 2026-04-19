@@ -425,6 +425,251 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     frequency: "monthly",
   },
 
+  // ════════════════════════════════════════════════════════════════════════
+  // CONSTRUCTION — PROMPT 2 expansion (~165 new construction-tagged entries)
+  // Target operators: residential remodel, custom-home GC, small commercial,
+  // specialty trades (roofing, HVAC, electrical, plumbing), storm-chaser /
+  // restoration contractors. Roofing & disaster-risk coverage is emphasized.
+  // Series IDs verified via scripts/verify-construction-series.ts (FRED API).
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — lumber & wood
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU0811", source: "fred", sourceId: "WPU0811", name: "PPI: Softwood Lumber", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:WPU0812", source: "fred", sourceId: "WPU0812", name: "PPI: Hardwood Lumber", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:WPU083", source: "fred", sourceId: "WPU083", name: "PPI: Plywood", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:WPU0831", source: "fred", sourceId: "WPU0831", name: "PPI: Softwood Veneer & Plywood", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:PCU321219321219", source: "fred", sourceId: "PCU321219321219", name: "PPI: Reconstituted Wood Product Mfg (NAICS 321219)", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:PCU321113321113", source: "fred", sourceId: "PCU321113321113", name: "PPI: Sawmills (NAICS 321113)", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — concrete, cement, aggregate
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU132", source: "fred", sourceId: "WPU132", name: "PPI: Concrete Ingredients & Related Products", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU133", source: "fred", sourceId: "WPU133", name: "PPI: Concrete Products", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU1331", source: "fred", sourceId: "WPU1331", name: "PPI: Concrete Block & Brick", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU1322", source: "fred", sourceId: "WPU1322", name: "PPI: Hydraulic Cement", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU134", source: "fred", sourceId: "WPU134", name: "PPI: Clay Construction Products (ex. refractories)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU327331327331", source: "fred", sourceId: "PCU327331327331", name: "PPI: Concrete Block & Brick Mfg (NAICS 327331)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU327390327390", source: "fred", sourceId: "PCU327390327390", name: "PPI: Other Concrete Product Mfg (NAICS 327390)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU327310327310", source: "fred", sourceId: "PCU327310327310", name: "PPI: Cement Mfg (NAICS 327310)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU212321212321", source: "fred", sourceId: "PCU212321212321", name: "PPI: Construction Sand & Gravel Mining (NAICS 212321)", unit: "index", industryTags: ["construction"], costBucket: "aggregate", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — drywall, gypsum, insulation
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU1371", source: "fred", sourceId: "WPU1371", name: "PPI: Gypsum Products", unit: "index", industryTags: ["construction"], costBucket: "drywall", frequency: "monthly" },
+  { code: "FRED:WPU137101", source: "fred", sourceId: "WPU137101", name: "PPI: Gypsum Products — detailed", unit: "index", industryTags: ["construction"], costBucket: "drywall", frequency: "monthly" },
+  { code: "FRED:PCU327420327420", source: "fred", sourceId: "PCU327420327420", name: "PPI: Gypsum Product Mfg (NAICS 327420)", unit: "index", industryTags: ["construction"], costBucket: "drywall", frequency: "monthly" },
+  { code: "FRED:WPU1392", source: "fred", sourceId: "WPU1392", name: "PPI: Insulation Materials", unit: "index", industryTags: ["construction"], costBucket: "insulation", frequency: "monthly" },
+  { code: "FRED:PCU327993327993", source: "fred", sourceId: "PCU327993327993", name: "PPI: Mineral Wool Mfg (NAICS 327993)", unit: "index", industryTags: ["construction"], costBucket: "insulation", frequency: "monthly" },
+  { code: "FRED:PCU326150326150", source: "fred", sourceId: "PCU326150326150", name: "PPI: Urethane & Other Foam Product Mfg (NAICS 326150)", unit: "index", industryTags: ["construction"], costBucket: "insulation", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — steel, iron, fabricated metal
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU101704", source: "fred", sourceId: "WPU101704", name: "PPI: Hot-Rolled Steel Bars, Plates & Structural Shapes", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:WPU101706", source: "fred", sourceId: "WPU101706", name: "PPI: Steel Pipe & Tube", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:WPU10170502", source: "fred", sourceId: "WPU10170502", name: "PPI: Steel Wire, Stainless Steel", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:PCU332312332312", source: "fred", sourceId: "PCU332312332312", name: "PPI: Fabricated Structural Metal Mfg (NAICS 332312)", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:PCU331110331110", source: "fred", sourceId: "PCU331110331110", name: "PPI: Iron & Steel Mills & Ferroalloy Mfg (NAICS 331110)", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:PCU332322332322", source: "fred", sourceId: "PCU332322332322", name: "PPI: Sheet Metal Work Mfg (NAICS 332322)", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:WPU1026", source: "fred", sourceId: "WPU1026", name: "PPI: Nonferrous Wire & Cable", unit: "index", industryTags: ["construction"], costBucket: "wire", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — roofing & restoration (storm-chaser edge)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU324122324122", source: "fred", sourceId: "PCU324122324122", name: "PPI: Asphalt Shingle & Coating Materials Mfg (NAICS 324122)", unit: "index", industryTags: ["construction"], costBucket: "roofing", frequency: "monthly" },
+  { code: "FRED:PCU324121324121", source: "fred", sourceId: "PCU324121324121", name: "PPI: Asphalt Paving Mixture & Block Mfg (NAICS 324121)", unit: "index", industryTags: ["construction"], costBucket: "roofing", frequency: "monthly" },
+  { code: "FRED:PCU327992327992", source: "fred", sourceId: "PCU327992327992", name: "PPI: Ground or Treated Mineral & Earths Mfg (roofing granules)", unit: "index", industryTags: ["construction"], costBucket: "roofing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — windows, doors, glass, millwork
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU332321332321", source: "fred", sourceId: "PCU332321332321", name: "PPI: Metal Window & Door Mfg (NAICS 332321)", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU332321332321B", source: "fred", sourceId: "PCU332321332321B", name: "PPI: Metal Molding, Trim & Store Fronts", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU321911321911", source: "fred", sourceId: "PCU321911321911", name: "PPI: Wood Window & Door Mfg (NAICS 321911)", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU327211327211", source: "fred", sourceId: "PCU327211327211", name: "PPI: Flat Glass Mfg (NAICS 327211)", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU326199326199A", source: "fred", sourceId: "PCU326199326199A", name: "PPI: All Other Plastics Product Mfg — Reinforced/Fiberglass", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — flooring & interior finishes
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU321918321918", source: "fred", sourceId: "PCU321918321918", name: "PPI: Other Millwork, Including Flooring (NAICS 321918)", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:PCU326199326199C", source: "fred", sourceId: "PCU326199326199C", name: "PPI: All Other Plastics Product Mfg — Consumer/Commercial", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:PCU327120327120", source: "fred", sourceId: "PCU327120327120", name: "PPI: Clay Building Material & Refractories Mfg (NAICS 327120)", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:WPU0383", source: "fred", sourceId: "WPU0383", name: "PPI: Industrial & Fabricated Textile Products", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:PCU314110314110", source: "fred", sourceId: "PCU314110314110", name: "PPI: Carpet & Rug Mills (NAICS 314110)", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — paint, coatings, adhesives
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU0621", source: "fred", sourceId: "WPU0621", name: "PPI: Prepared Paint", unit: "index", industryTags: ["construction"], costBucket: "paint", frequency: "monthly" },
+  { code: "FRED:PCU325510325510", source: "fred", sourceId: "PCU325510325510", name: "PPI: Paint & Coating Mfg (NAICS 325510)", unit: "index", industryTags: ["construction"], costBucket: "paint", frequency: "monthly" },
+  { code: "FRED:PCU325520325520", source: "fred", sourceId: "PCU325520325520", name: "PPI: Adhesive Mfg (NAICS 325520)", unit: "index", industryTags: ["construction"], costBucket: "paint", frequency: "monthly" },
+  { code: "FRED:WPU0711", source: "fred", sourceId: "WPU0711", name: "PPI: Synthetic Rubber (SBR / EPDM)", unit: "index", industryTags: ["construction"], costBucket: "sealants", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — plumbing
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU331420331420", source: "fred", sourceId: "PCU331420331420", name: "PPI: Copper Rolling, Drawing, Extruding & Alloying (NAICS 331420)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+  { code: "FRED:PCU331420331420B", source: "fred", sourceId: "PCU331420331420B", name: "PPI: Copper & Alloy Mill Shapes (except wire/cable)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+  { code: "FRED:PCU326122326122", source: "fred", sourceId: "PCU326122326122", name: "PPI: Plastics Pipe & Pipe Fitting Mfg (NAICS 326122)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+  { code: "FRED:PCU332913332913", source: "fred", sourceId: "PCU332913332913", name: "PPI: Plumbing Fixture Fitting & Trim Mfg (NAICS 332913)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — electrical
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU335931335931", source: "fred", sourceId: "PCU335931335931", name: "PPI: Current-Carrying Wiring Device Mfg (NAICS 335931)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335932335932", source: "fred", sourceId: "PCU335932335932", name: "PPI: Noncurrent-Carrying Wiring Device Mfg (NAICS 335932)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335313335313", source: "fred", sourceId: "PCU335313335313", name: "PPI: Switchgear & Switchboard Apparatus Mfg (NAICS 335313)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335911335911", source: "fred", sourceId: "PCU335911335911", name: "PPI: Battery Mfg (NAICS 335911)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335122335122", source: "fred", sourceId: "PCU335122335122", name: "PPI: Nonresidential Electric Lighting Fixture Mfg (NAICS 335122)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU332618332618", source: "fred", sourceId: "PCU332618332618", name: "PPI: Other Fabricated Wire Product Mfg (NAICS 332618)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335110335110", source: "fred", sourceId: "PCU335110335110", name: "PPI: Electric Lamp Bulb & Part Mfg (NAICS 335110)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:WPU1175", source: "fred", sourceId: "WPU1175", name: "PPI: Switchgear, Switchboard & Industrial Controls Equipment", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — HVAC / mechanical
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU333415333415", source: "fred", sourceId: "PCU333415333415", name: "PPI: AC, Refrigeration & Forced-Air Heating Equipment Mfg (NAICS 333415)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU333415333415A", source: "fred", sourceId: "PCU333415333415A", name: "PPI: AC Equipment Mfg — Compressors (ex. automotive)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU333414333414", source: "fred", sourceId: "PCU333414333414", name: "PPI: Heating Equipment Mfg (except warm-air furnaces, NAICS 333414)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU325120325120", source: "fred", sourceId: "PCU325120325120", name: "PPI: Industrial Gas Mfg (NAICS 325120) — refrigerant proxy", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU333912333912", source: "fred", sourceId: "PCU333912333912", name: "PPI: Air & Gas Compressor Mfg (NAICS 333912)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — hardware & fasteners
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU332722332722", source: "fred", sourceId: "PCU332722332722", name: "PPI: Bolt, Nut, Screw, Rivet & Washer Mfg (NAICS 332722)", unit: "index", industryTags: ["construction"], costBucket: "hardware", frequency: "monthly" },
+  { code: "FRED:PCU332510332510", source: "fred", sourceId: "PCU332510332510", name: "PPI: Hardware Mfg (NAICS 332510)", unit: "index", industryTags: ["construction"], costBucket: "hardware", frequency: "monthly" },
+  { code: "FRED:PCU332721332721", source: "fred", sourceId: "PCU332721332721", name: "PPI: Precision Turned Product Mfg (NAICS 332721)", unit: "index", industryTags: ["construction"], costBucket: "hardware", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction labor — national employment by subsector
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:USCONS", source: "fred", sourceId: "USCONS", name: "All Employees: Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023600001", source: "fred", sourceId: "CES2023600001", name: "All Employees: Construction of Buildings", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023610001", source: "fred", sourceId: "CES2023610001", name: "All Employees: Residential Building Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023620001", source: "fred", sourceId: "CES2023620001", name: "All Employees: Nonresidential Building Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023700001", source: "fred", sourceId: "CES2023700001", name: "All Employees: Heavy & Civil Engineering Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023800001", source: "fred", sourceId: "CES2023800001", name: "All Employees: Specialty Trade Contractors", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CEU2023700001", source: "fred", sourceId: "CEU2023700001", name: "All Employees, Heavy & Civil Engineering Construction (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CEU2023800001", source: "fred", sourceId: "CEU2023800001", name: "All Employees, Specialty Trade Contractors (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:AWHAECON", source: "fred", sourceId: "AWHAECON", name: "Avg Weekly Hours: Construction", unit: "hours", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:ECICONWAG", source: "fred", sourceId: "ECICONWAG", name: "Employment Cost Index: Wages & Salaries — Construction", unit: "index", industryTags: ["construction"], costBucket: "labor", frequency: "quarterly" },
+  { code: "FRED:LNU04032231", source: "fred", sourceId: "LNU04032231", name: "Unemployment Rate: Construction (NSA)", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:LNU03032231", source: "fred", sourceId: "LNU03032231", name: "Unemployment Level: Construction (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction labor — JOLTS (openings, hires, quits, separations)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:JTS2300JOL", source: "fred", sourceId: "JTS2300JOL", name: "JOLTS: Construction — Job Openings (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300HIL", source: "fred", sourceId: "JTS2300HIL", name: "JOLTS: Construction — Hires (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300QUL", source: "fred", sourceId: "JTS2300QUL", name: "JOLTS: Construction — Quits (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300TSL", source: "fred", sourceId: "JTS2300TSL", name: "JOLTS: Construction — Total Separations (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300JOR", source: "fred", sourceId: "JTS2300JOR", name: "JOLTS: Construction — Job Openings Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300HIR", source: "fred", sourceId: "JTS2300HIR", name: "JOLTS: Construction — Hires Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300QUR", source: "fred", sourceId: "JTS2300QUR", name: "JOLTS: Construction — Quits Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300TSR", source: "fred", sourceId: "JTS2300TSR", name: "JOLTS: Construction — Total Separations Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction labor — state employment (TX, FL, CA, AZ, NC)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:TXCONS", source: "fred", sourceId: "TXCONS", name: "All Employees: Construction in Texas (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:FLCONS", source: "fred", sourceId: "FLCONS", name: "All Employees: Construction in Florida (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CACONS", source: "fred", sourceId: "CACONS", name: "All Employees: Construction in California (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:AZCONS", source: "fred", sourceId: "AZCONS", name: "All Employees: Construction in Arizona (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:NCCONS", source: "fred", sourceId: "NCCONS", name: "All Employees: Construction in North Carolina (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:TXCONSN", source: "fred", sourceId: "TXCONSN", name: "All Employees: Construction in Texas (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:FLCONSN", source: "fred", sourceId: "FLCONSN", name: "All Employees: Construction in Florida (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CACONSN", source: "fred", sourceId: "CACONSN", name: "All Employees: Construction in California (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:AZCONSN", source: "fred", sourceId: "AZCONSN", name: "All Employees: Construction in Arizona (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:NCCONSN", source: "fred", sourceId: "NCCONSN", name: "All Employees: Construction in North Carolina (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:SMU04000002000000008", source: "fred", sourceId: "SMU04000002000000008", name: "Avg Hourly Earnings of Production Employees: Construction in Arizona", unit: "USD/hour", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — housing starts & permits (national + regional)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:HOUST1F", source: "fred", sourceId: "HOUST1F", name: "Housing Starts: Single-Family Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUST2F", source: "fred", sourceId: "HOUST2F", name: "Housing Starts: Units in Buildings with 2-4 Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUST5F", source: "fred", sourceId: "HOUST5F", name: "Housing Starts: Units in Buildings with 5+ Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTNE", source: "fred", sourceId: "HOUSTNE", name: "Housing Starts: Northeast", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTMW", source: "fred", sourceId: "HOUSTMW", name: "Housing Starts: Midwest", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTS", source: "fred", sourceId: "HOUSTS", name: "Housing Starts: South", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTW", source: "fred", sourceId: "HOUSTW", name: "Housing Starts: West", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PERMIT1", source: "fred", sourceId: "PERMIT1", name: "Building Permits: Single-Family Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PERMIT5", source: "fred", sourceId: "PERMIT5", name: "Building Permits: Units in Buildings with 5+ Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PERMITNSA", source: "fred", sourceId: "PERMITNSA", name: "Building Permits: Total Units (NSA)", unit: "thousands of units", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — home sales, supply, prices
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:HSN1F", source: "fred", sourceId: "HSN1F", name: "New One-Family Houses Sold: US", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:EXHOSLUSM495S", source: "fred", sourceId: "EXHOSLUSM495S", name: "Existing Home Sales", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:HOSSUPUSM673N", source: "fred", sourceId: "HOSSUPUSM673N", name: "Existing Home Sales: Months Supply", unit: "months", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MSPUS", source: "fred", sourceId: "MSPUS", name: "Median Sales Price of Houses Sold: US", unit: "USD", industryTags: ["construction"], costBucket: "housing", frequency: "quarterly" },
+  { code: "FRED:ASPUS", source: "fred", sourceId: "ASPUS", name: "Average Sales Price of Houses Sold: US", unit: "USD", industryTags: ["construction"], costBucket: "housing", frequency: "quarterly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — Case-Shiller national & 10/20-city composites
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:CSUSHPISA", source: "fred", sourceId: "CSUSHPISA", name: "S&P Case-Shiller US National Home Price Index (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SPCS20RSA", source: "fred", sourceId: "SPCS20RSA", name: "S&P Case-Shiller 20-City Composite HPI", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SPCS10RSA", source: "fred", sourceId: "SPCS10RSA", name: "S&P Case-Shiller 10-City Composite HPI", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — Case-Shiller metro HPI (17 metros)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:DAXRSA", source: "fred", sourceId: "DAXRSA", name: "Case-Shiller HPI — Dallas, TX (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MIXRSA", source: "fred", sourceId: "MIXRSA", name: "Case-Shiller HPI — Miami, FL (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:LXXRSA", source: "fred", sourceId: "LXXRSA", name: "Case-Shiller HPI — Los Angeles, CA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:PHXRSA", source: "fred", sourceId: "PHXRSA", name: "Case-Shiller HPI — Phoenix, AZ (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CRXRSA", source: "fred", sourceId: "CRXRSA", name: "Case-Shiller HPI — Charlotte, NC (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:ATXRSA", source: "fred", sourceId: "ATXRSA", name: "Case-Shiller HPI — Atlanta, GA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:TPXRSA", source: "fred", sourceId: "TPXRSA", name: "Case-Shiller HPI — Tampa, FL (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SFXRSA", source: "fred", sourceId: "SFXRSA", name: "Case-Shiller HPI — San Francisco, CA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CHXRSA", source: "fred", sourceId: "CHXRSA", name: "Case-Shiller HPI — Chicago, IL (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:DNXRSA", source: "fred", sourceId: "DNXRSA", name: "Case-Shiller HPI — Denver, CO (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:BOXRSA", source: "fred", sourceId: "BOXRSA", name: "Case-Shiller HPI — Boston, MA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:NYXRSA", source: "fred", sourceId: "NYXRSA", name: "Case-Shiller HPI — New York, NY (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:WDXRSA", source: "fred", sourceId: "WDXRSA", name: "Case-Shiller HPI — Washington, DC (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SEXRSA", source: "fred", sourceId: "SEXRSA", name: "Case-Shiller HPI — Seattle, WA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:POXRSA", source: "fred", sourceId: "POXRSA", name: "Case-Shiller HPI — Portland, OR (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:LVXRSA", source: "fred", sourceId: "LVXRSA", name: "Case-Shiller HPI — Las Vegas, NV (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MNXRSA", source: "fred", sourceId: "MNXRSA", name: "Case-Shiller HPI — Minneapolis, MN (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CEXRSA", source: "fred", sourceId: "CEXRSA", name: "Case-Shiller HPI — Cleveland, OH (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — spending by segment (Census Value Put In Place)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:TLRESCONS", source: "fred", sourceId: "TLRESCONS", name: "Total Construction Spending: Residential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PRRESCONS", source: "fred", sourceId: "PRRESCONS", name: "Total Private Construction Spending: Residential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PNRESCONS", source: "fred", sourceId: "PNRESCONS", name: "Total Private Construction Spending: Nonresidential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:TLNRESCONS", source: "fred", sourceId: "TLNRESCONS", name: "Total Construction Spending: Nonresidential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction financing — mortgage rates & short-rate proxies
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:MORTGAGE15US", source: "fred", sourceId: "MORTGAGE15US", name: "15-Year Fixed Rate Mortgage Average", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "weekly" },
+  { code: "FRED:OBMMIFHA30YF", source: "fred", sourceId: "OBMMIFHA30YF", name: "30-Year Fixed Rate FHA Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIVA30YF", source: "fred", sourceId: "OBMMIVA30YF", name: "30-Year Fixed Rate VA Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIJUMBO30YF", source: "fred", sourceId: "OBMMIJUMBO30YF", name: "30-Year Fixed Rate Jumbo Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIC30YF", source: "fred", sourceId: "OBMMIC30YF", name: "30-Year Fixed Rate Conforming Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIC15YF", source: "fred", sourceId: "OBMMIC15YF", name: "15-Year Fixed Rate Conforming Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:DGS30", source: "fred", sourceId: "DGS30", name: "30-Year Treasury Constant Maturity Rate", unit: "%", industryTags: ["construction"], costBucket: "interest_rates", frequency: "daily" },
+  { code: "FRED:DPRIME", source: "fred", sourceId: "DPRIME", name: "Bank Prime Loan Rate (Daily)", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:MPRIME", source: "fred", sourceId: "MPRIME", name: "Bank Prime Loan Rate (Monthly)", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "monthly" },
+  { code: "FRED:TERMCBAUTO48NS", source: "fred", sourceId: "TERMCBAUTO48NS", name: "Commercial Bank Consumer Installment Loan Rate: 48-mo New Auto (HELOC proxy)", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "monthly" },
+  { code: "FRED:TERMCBCCALLNS", source: "fred", sourceId: "TERMCBCCALLNS", name: "Commercial Bank Credit Card Interest Rate: All Accounts", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction fuel & energy — diesel/fuel oil (truck fleets, heaters)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU057", source: "fred", sourceId: "WPU057", name: "PPI: Refined Petroleum Products (broad)", unit: "index", industryTags: ["construction"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:WPU0573", source: "fred", sourceId: "WPU0573", name: "PPI: Light Fuel Oils (diesel / heating oil)", unit: "index", industryTags: ["construction"], costBucket: "fuel", frequency: "monthly" },
+
   // ────────────────────────────────────────────────────────────────────────
   // Retail — demand, consumer health, input costs
   // ────────────────────────────────────────────────────────────────────────
@@ -760,6 +1005,15 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     costBucket: "weather",
     frequency: "daily",
   },
+  // Construction-specific alert types — storm-chaser / restoration signal.
+  // High Wind, Red Flag, Severe Thunderstorm, Flood, Winter Storm are the
+  // leading indicators for roofing claims, siding damage, pipe bursts, and
+  // wildfire-adjacent restoration demand.
+  { code: "NOAA:NWS:ALERTS:ACTIVE:High Wind Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:High Wind Warning", name: "NWS Active Alerts — High Wind Warnings", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Red Flag Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Red Flag Warning", name: "NWS Active Alerts — Red Flag Warnings (wildfire risk)", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Severe Thunderstorm Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Severe Thunderstorm Warning", name: "NWS Active Alerts — Severe Thunderstorm Warnings (hail proxy)", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Flood Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Flood Warning", name: "NWS Active Alerts — Flood Warnings", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Winter Storm Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Winter Storm Warning", name: "NWS Active Alerts — Winter Storm Warnings", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
 
   // ────────────────────────────────────────────────────────────────────────
   // Census — international trade, monthly imports by HS2 commodity
@@ -895,6 +1149,14 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     costBucket: "policy",
     frequency: "weekly",
   },
+  // Construction-specific policy signals: OSHA rulemaking, building-code
+  // amendments, contractor licensing notices, Davis-Bacon prevailing-wage
+  // determinations, and broad construction-related publications.
+  { code: "FEDERAL_REGISTER:osha", source: "federal_register", sourceId: "osha", name: "Federal Register: Weekly OSHA Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:building code", source: "federal_register", sourceId: "building code", name: "Federal Register: Weekly Building-Code Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:construction", source: "federal_register", sourceId: "construction", name: "Federal Register: Weekly Construction Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:contractor", source: "federal_register", sourceId: "contractor", name: "Federal Register: Weekly Contractor-Related Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:davis-bacon", source: "federal_register", sourceId: "davis-bacon", name: "Federal Register: Weekly Davis-Bacon (Prevailing Wage) Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
 
   // ────────────────────────────────────────────────────────────────────────
   // FHFA — House Price Index, CSV-sourced
@@ -953,6 +1215,11 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     costBucket: "disaster_risk",
     frequency: "monthly",
   },
+  // Construction-specific disaster types — restoration contractor demand.
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Severe Storm", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Severe Storm", name: "FEMA Disaster Declarations — Severe Storms Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Flood", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Flood", name: "FEMA Disaster Declarations — Floods Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Tornado", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Tornado", name: "FEMA Disaster Declarations — Tornadoes Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Fire", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Fire", name: "FEMA Disaster Declarations — Fires Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
 
   // ════════════════════════════════════════════════════════════════════════
   // RETAIL INDICATORS — PROMPT 3 expansion (~156 new retail-tagged entries)
