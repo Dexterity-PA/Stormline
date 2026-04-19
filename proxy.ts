@@ -10,6 +10,8 @@ const isProtectedRoute = createRouteMatcher([
   "/onboarding(.*)",
 ]);
 
+// Only /app/* is guarded — /onboarding is intentionally excluded to prevent
+// an infinite redirect loop for users who are authed but have no org yet.
 const isOnboardingGuardedRoute = createRouteMatcher(["/app(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
