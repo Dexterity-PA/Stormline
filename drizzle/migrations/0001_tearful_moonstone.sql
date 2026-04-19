@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "dashboard_snapshots_industry_region_date_unique" ON "dashboard_snapshots" USING btree ("industry","region","snapshot_date");
