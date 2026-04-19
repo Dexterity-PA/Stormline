@@ -1,7 +1,10 @@
+import { sql } from "drizzle-orm";
 import {
   bigserial,
   boolean,
   date,
+  index,
+  integer,
   jsonb,
   numeric,
   pgEnum,
@@ -52,7 +55,7 @@ export const frequencyEnum = pgEnum("frequency", [
 
 export const briefingStatusEnum = pgEnum("briefing_status", [
   "draft",
-  "review",
+  "in_review",
   "published",
 ]);
 
@@ -82,6 +85,30 @@ export const feedbackTargetEnum = pgEnum("feedback_target", [
   "briefing",
   "alert",
   "dashboard_tile",
+]);
+
+export const alertConditionEnum = pgEnum("alert_condition", [
+  "above",
+  "below",
+  "pct_change_above",
+  "pct_change_below",
+  "percentile_above",
+  "percentile_below",
+]);
+
+export const deliveryStatusEnum = pgEnum("delivery_status", [
+  "pending",
+  "sent",
+  "failed",
+]);
+
+export const onboardingStepEnum = pgEnum("onboarding_step", [
+  "industry",
+  "region",
+  "profile",
+  "indicators",
+  "channels",
+  "complete",
 ]);
 
 export const organizations = pgTable("organizations", {
@@ -166,6 +193,11 @@ export const briefings = pgTable("briefings", {
   headline: text("headline").notNull(),
   bodyMd: text("body_md").notNull(),
   status: briefingStatusEnum("status").notNull().default("draft"),
+  systemPromptVersion: text("system_prompt_version"),
+  model: text("model"),
+  inputSnapshot: jsonb("input_snapshot"),
+  rawOutput: text("raw_output"),
+  editedOutput: text("edited_output"),
   generatedBy: text("generated_by").notNull(),
   reviewedBy: text("reviewed_by"),
   publishedAt: timestamp("published_at", { withTimezone: true }),
@@ -279,3 +311,148 @@ export const auditLog = pgTable("audit_log", {
     .notNull()
     .defaultNow(),
 });
+
+export const newsItems = pgTable(
+  "news_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    source: text("source").notNull(),
+    sourceUrl: text("source_url").notNull().unique(),
+    headline: text("headline").notNull(),
+    summary: text("summary"),
+    publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
+    industry: industryEnum("industry"),
+    region: text("region"),
+    linkedIndicatorCode: text("linked_indicator_code"),
+    whyItMatters: text("why_it_matters"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("news_items_industry_published_at_idx").on(
+      t.industry,
+      t.publishedAt.desc(),
+    ),
+    index("news_items_published_at_idx").on(t.publishedAt.desc()),
+  ],
+);
+
+export const alertRules = pgTable(
+  "alert_rules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    indicatorCode: text("indicator_code").notNull(),
+    condition: alertConditionEnum("condition").notNull(),
+    threshold: numeric("threshold").notNull(),
+    windowDays: integer("window_days"),
+    channels: text("channels").array().notNull().default([]),
+    active: boolean("active").notNull().default(true),
+    createdBy: text("created_by").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("alert_rules_org_active_idx").on(t.orgId, t.active),
+    index("alert_rules_indicator_active_idx").on(t.indicatorCode, t.active),
+  ],
+);
+
+export const alertEvents = pgTable(
+  "alert_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ruleId: uuid("rule_id")
+      .notNull()
+      .references(() => alertRules.id, { onDelete: "cascade" }),
+    indicatorCode: text("indicator_code"),
+    triggeredAt: timestamp("triggered_at", { withTimezone: true }).notNull(),
+    triggerValue: numeric("trigger_value"),
+    contextSnapshot: jsonb("context_snapshot"),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+    deliveryStatus: deliveryStatusEnum("delivery_status")
+      .notNull()
+      .default("pending"),
+    deliveryError: text("delivery_error"),
+  },
+  (t) => [
+    index("alert_events_rule_triggered_idx").on(
+      t.ruleId,
+      t.triggeredAt.desc(),
+    ),
+    index("alert_events_pending_idx")
+      .on(t.deliveryStatus)
+      .where(sql`delivery_status = 'pending'`),
+  ],
+);
+
+export const onboardingState = pgTable("onboarding_state", {
+  orgId: uuid("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  step: onboardingStepEnum("step").notNull().default("industry"),
+  selectedIndustry: industryEnum("selected_industry"),
+  selectedRegions: text("selected_regions").array().notNull().default([]),
+  businessDescription: text("business_description"),
+  industryProfile: jsonb("industry_profile"),
+  keyInputs: text("key_inputs").array().notNull().default([]),
+  aiProfileTags: jsonb("ai_profile_tags"),
+  aiRecommendedIndicators: text("ai_recommended_indicators")
+    .array()
+    .notNull()
+    .default([]),
+  pinnedIndicatorCodes: text("pinned_indicator_codes")
+    .array()
+    .notNull()
+    .default([]),
+  notificationChannels: text("notification_channels")
+    .array()
+    .notNull()
+    .default([]),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const industryProfileSchemas = pgTable("industry_profile_schemas", {
+  industry: industryEnum("industry").primaryKey(),
+  schemaVersion: integer("schema_version").notNull().default(1),
+  fields: jsonb("fields").notNull(),
+});
+
+export const aiQueries = pgTable(
+  "ai_queries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    question: text("question").notNull(),
+    industry: industryEnum("industry"),
+    region: text("region"),
+    inputSnapshot: jsonb("input_snapshot"),
+    answer: text("answer"),
+    citedIndicatorCodes: text("cited_indicator_codes")
+      .array()
+      .notNull()
+      .default([]),
+    model: text("model"),
+    tokensIn: integer("tokens_in"),
+    tokensOut: integer("tokens_out"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("ai_queries_org_created_idx").on(t.orgId, t.createdAt.desc()),
+  ],
+);
