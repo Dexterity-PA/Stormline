@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import IndustryHero from "@/components/marketing/IndustryHero";
 import SampleDashboard from "@/components/marketing/SampleDashboard";
 import SampleBriefing from "@/components/marketing/SampleBriefing";
@@ -60,18 +61,18 @@ export default async function IndustryPage({
             Monday briefing lands in your inbox the morning after you sign up.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <a
+            <Link
               href="/sign-up"
               className="inline-flex items-center justify-center rounded-md bg-accent px-8 py-3 text-sm font-semibold text-bg transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               {content.ctaText}
-            </a>
-            <a
+            </Link>
+            <Link
               href="/pricing"
               className="text-sm text-fg-muted hover:text-fg transition-colors"
             >
               See pricing →
-            </a>
+            </Link>
           </div>
           <p className="mt-6 text-xs text-fg-muted">
             Then $199/mo for one industry. Pro plan ($399/mo) adds SMS alerts,
