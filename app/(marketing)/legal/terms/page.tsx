@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Stormline',
+  robots: { index: false, follow: false },
 }
 
 export default function TermsPage() {
