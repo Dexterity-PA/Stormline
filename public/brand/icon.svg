@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Stormline mark">
+  <rect x="0" y="0" width="64" height="64" rx="14" ry="14" fill="#0a0e13"/>
+  <path d="M 50 44 L 24 44 Q 20 44 20 40 L 20 16" stroke="#4ea8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M 24 34 L 28 30 L 32 32 L 36 26 L 40 28 L 44 22 L 48 18" stroke="#4ea8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95"/>
+  <circle cx="48" cy="18" r="1.8" fill="#4ea8ff"/>
+</svg>

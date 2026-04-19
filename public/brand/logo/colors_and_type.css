@@ -1,0 +1,206 @@
+/* =============================================================
+   Stormline Design System — Colors & Type
+   All tokens prefixed --sl-*. Never use raw hex in components.
+   Source: Stormline repo styles/globals.css §16 spec.
+   ============================================================= */
+
+:root {
+  /* ---------- Surfaces & foreground ---------- */
+  --sl-bg:        #0a0e13;   /* page background — near-black, slight blue */
+  --sl-bg-elev:   #11161d;   /* elevated card / tile surface */
+  --sl-bg-sunk:   #070a0e;   /* deeper wells (code, terminal, charts) */
+  --sl-fg:        #e8ecf1;   /* primary foreground text */
+  --sl-fg-muted:  #8a94a3;   /* secondary / metadata / captions */
+  --sl-fg-dim:    #5a6472;   /* disabled / tertiary */
+  --sl-border:    #1e2631;   /* default hairline border */
+  --sl-border-strong: #2a3340; /* emphasized borders, dividers */
+
+  /* ---------- Semantic accents ----------
+     accent = signal/information (blue)
+     warn   = cost-elevated / amber — "high = bad"
+     crit   = critical / breaking red
+     good   = favorable / demand-up / low-cost green */
+  --sl-accent:      #4ea8ff;
+  --sl-accent-dim:  #2d6ab3;
+  --sl-warn:        #ffb547;
+  --sl-warn-dim:    #a07120;
+  --sl-crit:        #ff5c5c;
+  --sl-crit-dim:    #a63b3b;
+  --sl-good:        #4ade80;
+  --sl-good-dim:    #2a8c50;
+
+  /* ---------- Alpha tints (for chips, bar fills, hover bgs) ---------- */
+  --sl-accent-tint: color-mix(in srgb, var(--sl-accent) 12%, transparent);
+  --sl-warn-tint:   color-mix(in srgb, var(--sl-warn)   12%, transparent);
+  --sl-crit-tint:   color-mix(in srgb, var(--sl-crit)   12%, transparent);
+  --sl-good-tint:   color-mix(in srgb, var(--sl-good)   12%, transparent);
+
+  /* ---------- Radii ---------- */
+  --sl-radius-sm: 6px;
+  --sl-radius-md: 10px;
+  --sl-radius-lg: 16px;
+  --sl-radius-pill: 9999px;
+
+  /* ---------- Spacing scale (4px base) ---------- */
+  --sl-space-1: 4px;
+  --sl-space-2: 8px;
+  --sl-space-3: 12px;
+  --sl-space-4: 16px;
+  --sl-space-5: 20px;
+  --sl-space-6: 24px;
+  --sl-space-8: 32px;
+  --sl-space-10: 40px;
+  --sl-space-12: 48px;
+  --sl-space-16: 64px;
+  --sl-space-20: 80px;
+  --sl-space-24: 96px;
+
+  /* ---------- Shadows (subtle — institutional) ---------- */
+  --sl-shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --sl-shadow-md: 0 4px 12px rgba(0,0,0,0.45);
+  --sl-shadow-lg: 0 12px 32px rgba(0,0,0,0.55);
+  --sl-ring-accent: 0 0 0 3px color-mix(in srgb, var(--sl-accent) 32%, transparent);
+
+  /* ---------- Type families ---------- */
+  --sl-font-display: "Inter Tight", "Söhne", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --sl-font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono:    "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* ---------- Type scale ---------- */
+  --sl-text-xxs: 10px;
+  --sl-text-xs:  12px;
+  --sl-text-sm:  14px;
+  --sl-text-base: 16px;
+  --sl-text-lg:  18px;
+  --sl-text-xl:  22px;
+  --sl-text-2xl: 28px;
+  --sl-text-3xl: 36px;
+  --sl-text-4xl: 48px;
+  --sl-text-5xl: 64px;
+
+  /* ---------- Weights ---------- */
+  --sl-weight-regular: 400;
+  --sl-weight-medium: 500;
+  --sl-weight-semibold: 600;
+
+  /* ---------- Line heights ---------- */
+  --sl-leading-tight: 1.1;
+  --sl-leading-snug: 1.25;
+  --sl-leading-normal: 1.5;
+  --sl-leading-relaxed: 1.7;
+
+  /* ---------- Tracking (letter-spacing) ---------- */
+  --sl-tracking-tight: -0.02em;
+  --sl-tracking-normal: 0;
+  --sl-tracking-wide: 0.02em;
+  --sl-tracking-widest: 0.18em; /* used heavily on eyebrow labels */
+
+  /* ---------- Motion ---------- */
+  --sl-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --sl-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --sl-dur-fast: 120ms;
+  --sl-dur-base: 180ms;
+  --sl-dur-slow: 320ms;
+}
+
+/* ==================== SEMANTIC ELEMENT STYLES ==================== */
+
+html, body {
+  background: var(--sl-bg);
+  color: var(--sl-fg);
+  font-family: var(--sl-font-body);
+  font-size: var(--sl-text-base);
+  line-height: var(--sl-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display / headings — tight tracking, semibold, display face */
+.sl-h1 {
+  font-family: var(--sl-font-display);
+  font-weight: var(--sl-weight-semibold);
+  font-size: clamp(40px, 5.6vw, var(--sl-text-5xl));
+  line-height: var(--sl-leading-tight);
+  letter-spacing: var(--sl-tracking-tight);
+  color: var(--sl-fg);
+}
+
+.sl-h2 {
+  font-family: var(--sl-font-display);
+  font-weight: var(--sl-weight-semibold);
+  font-size: clamp(26px, 3vw, var(--sl-text-3xl));
+  line-height: var(--sl-leading-snug);
+  letter-spacing: var(--sl-tracking-tight);
+  color: var(--sl-fg);
+}
+
+.sl-h3 {
+  font-family: var(--sl-font-display);
+  font-weight: var(--sl-weight-semibold);
+  font-size: var(--sl-text-xl);
+  line-height: var(--sl-leading-snug);
+  letter-spacing: var(--sl-tracking-tight);
+  color: var(--sl-fg);
+}
+
+.sl-h4 {
+  font-family: var(--sl-font-display);
+  font-weight: var(--sl-weight-semibold);
+  font-size: var(--sl-text-base);
+  line-height: var(--sl-leading-snug);
+  color: var(--sl-fg);
+}
+
+/* Body / paragraph */
+.sl-p {
+  font-family: var(--sl-font-body);
+  font-size: var(--sl-text-base);
+  line-height: var(--sl-leading-relaxed);
+  color: var(--sl-fg-muted);
+}
+
+.sl-p-lead {
+  font-family: var(--sl-font-body);
+  font-size: var(--sl-text-lg);
+  line-height: var(--sl-leading-relaxed);
+  color: var(--sl-fg-muted);
+}
+
+.sl-small {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-fg-muted);
+}
+
+/* Eyebrow — the workhorse label above every section.
+   Small mono caps, widest tracking, accent color. */
+.sl-eyebrow {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-xs);
+  font-weight: var(--sl-weight-semibold);
+  letter-spacing: var(--sl-tracking-widest);
+  text-transform: uppercase;
+  color: var(--sl-accent);
+}
+
+/* Mono: numbers, tickers, source attribution, metadata */
+.sl-mono {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.sl-tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--sl-font-mono);
+}
+
+/* Inline code */
+.sl-code {
+  font-family: var(--sl-font-mono);
+  font-size: 0.9em;
+  background: var(--sl-bg-sunk);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-sm);
+  padding: 1px 6px;
+  color: var(--sl-fg);
+}
