@@ -1,11 +1,13 @@
 'use client'
 
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, useTexture } from '@react-three/drei'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { MARKERS, MARKER_COLOR, MARKER_PULSE_COLOR, latLngToVec3 } from './markers'
 import LivePulse from '@/components/motion/LivePulse'
+import { usePrefersReducedMotion } from '@/components/motion/usePrefersReducedMotion'
 
 const RADIUS = 1.4
 // NASA Blue Marble (natural earth daytime imagery), served from the
@@ -91,7 +93,7 @@ function EarthSurface() {
   )
 }
 
-function EarthGroup() {
+function EarthGroup({ markersOn }: { markersOn: boolean }) {
   const ref = useRef<THREE.Group>(null)
   useFrame((_, delta) => {
     if (!ref.current) return
@@ -109,25 +111,71 @@ function EarthGroup() {
         <EarthSurface />
       </Suspense>
       <FresnelAtmosphere />
-      <Markers />
+      <Markers visible={markersOn} />
     </group>
   )
 }
 
-function Markers() {
+// Cinematic opening: camera starts close (z≈1.2) angled 15° around y, then
+// pulls back to z=3.0 over 2.4s with ease-out-expo while orbiting back to 0°.
+// Markers fade in once the camera settles (staggered 80ms).
+function CameraIntro({
+  onSettled,
+}: {
+  onSettled: (v: boolean) => void
+}) {
+  const { camera } = useThree()
+  const prefersReduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    if (prefersReduced) {
+      camera.position.set(0, 0.3, 3.0)
+      camera.lookAt(0, 0, 0)
+      onSettled(true)
+      return
+    }
+    const state = { angle: -(Math.PI * 15) / 180, dist: 1.2, y: 0 }
+    const apply = () => {
+      camera.position.set(
+        Math.sin(state.angle) * state.dist,
+        state.y,
+        Math.cos(state.angle) * state.dist,
+      )
+      camera.lookAt(0, 0, 0)
+    }
+    apply()
+    const tl = gsap.timeline({ onComplete: () => onSettled(true) })
+    tl.to(state, {
+      angle: 0,
+      dist: 3.0,
+      y: 0.3,
+      duration: 2.4,
+      ease: 'expo.out',
+      onUpdate: apply,
+    })
+    return () => {
+      tl.kill()
+    }
+  }, [camera, prefersReduced, onSettled])
+
+  return null
+}
+
+function Markers({ visible }: { visible: boolean }) {
   const [hovered, setHovered] = useState<string | null>(null)
 
   return (
     <>
-      {MARKERS.map((m) => {
+      {MARKERS.map((m, i) => {
         const pos = latLngToVec3(m.lat, m.lng, RADIUS + 0.02)
         const color = MARKER_COLOR[m.kind]
         const isHovered = hovered === m.id
+        const delayMs = i * 80
         return (
-          <group key={m.id} position={pos}>
+          <group key={m.id} position={pos} visible={visible}>
             <mesh>
               <sphereGeometry args={[0.018, 12, 12]} />
-              <meshBasicMaterial color={color} />
+              <meshBasicMaterial color={color} transparent opacity={visible ? 1 : 0} />
             </mesh>
             <Html
               center
@@ -139,7 +187,13 @@ function Markers() {
                 onPointerEnter={() => setHovered(m.id)}
                 onPointerLeave={() => setHovered((h) => (h === m.id ? null : h))}
                 className="relative"
-                style={{ width: 28, height: 28 }}
+                style={{
+                  width: 28,
+                  height: 28,
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? 'scale(1)' : 'scale(0.6)',
+                  transition: `opacity 600ms var(--sl-ease-out-expo) ${delayMs}ms, transform 600ms var(--sl-ease-out-expo) ${delayMs}ms`,
+                }}
               >
                 <div
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -222,11 +276,12 @@ function Stars() {
 }
 
 export default function HeroGlobe() {
+  const [settled, setSettled] = useState(false)
   return (
     <Canvas
       dpr={[1, 1.6]}
       gl={{ antialias: true, alpha: true }}
-      camera={{ position: [0, 0.3, 3.0], fov: 45 }}
+      camera={{ position: [0, 0, 1.2], fov: 45 }}
       style={{ width: '100%', height: '100%' }}
     >
       {/* Ambient lifts the night side so continents stay readable; the
@@ -235,9 +290,10 @@ export default function HeroGlobe() {
       <ambientLight intensity={0.55} />
       <directionalLight position={[3, 2, 4]} intensity={1.2} color="#ffffff" />
       <directionalLight position={[-3, 1, -2]} intensity={0.18} color="#7aa9ff" />
+      <CameraIntro onSettled={setSettled} />
       <Suspense fallback={null}>
         <Stars />
-        <EarthGroup />
+        <EarthGroup markersOn={settled} />
       </Suspense>
     </Canvas>
   )
