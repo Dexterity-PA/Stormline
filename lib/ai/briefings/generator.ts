@@ -105,7 +105,7 @@ export async function generateDraft(
 
   const client = new Anthropic();
   const response = await client.messages.create({
-    model: 'claude-sonnet-4',
+    model: 'claude-sonnet-4-6',
     max_tokens: 2048,
     system: buildSystemPrompt(industry),
     messages: [{ role: 'user', content: buildUserMessage(ctx) }],

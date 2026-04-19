@@ -1,5 +1,5 @@
 export const PROMPT_VERSION = 'v1.0';
-export const GENERATED_BY_TAG = `claude-sonnet-4@prompt-${PROMPT_VERSION}`;
+export const GENERATED_BY_TAG = `claude-sonnet-4-6@prompt-${PROMPT_VERSION}`;
 
 export type IndicatorSnapshot = {
   code: string;
