@@ -22,7 +22,10 @@ export default clerkMiddleware(async (auth, req) => {
     if (req.cookies.has("sl-ob")) return NextResponse.next();
 
     const { orgId: clerkOrgId } = await auth();
-    if (!clerkOrgId) return NextResponse.next();
+    // Authed but no active org → send to onboarding to create one
+    if (!clerkOrgId) {
+      return NextResponse.redirect(new URL("/onboarding", req.url));
+    }
 
     const [org] = await db
       .select({ id: organizations.id })
