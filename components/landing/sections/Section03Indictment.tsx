@@ -165,7 +165,7 @@ function DiagramMarkupSplit({ progress }: { progress: number }) {
   )
 }
 
-function DiagramLumberDrawdown({ drawActive }: { drawActive: boolean }) {
+function DiagramLumberDrawdown({ progress }: { progress: number }) {
   const pathRef = useRef<SVGPathElement | null>(null)
   const [pathLen, setPathLen] = useState(0)
   const prefersReduced = usePrefersReducedMotion()
@@ -199,9 +199,13 @@ function DiagramLumberDrawdown({ drawActive }: { drawActive: boolean }) {
   }, [])
 
   const dashArray = pathLen || 1200
-  const offsetActive = prefersReduced || drawActive ? 0 : dashArray
-  const regionOpacity = prefersReduced ? 1 : drawActive ? 1 : 0
-  const regionDelayMs = prefersReduced ? 0 : 1400
+  // Linear interpolation tied to scroll. Path draws fully over the entire
+  // scrub range (progress 0 → 1). Drawdown shading fades in over 0.7 → 1.0.
+  const drawT = prefersReduced ? 1 : Math.max(0, Math.min(1, progress))
+  const offsetActive = dashArray * (1 - drawT)
+  const regionOpacity = prefersReduced
+    ? 1
+    : Math.max(0, Math.min(1, (progress - 0.7) / 0.3))
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%" className="w-full">
@@ -217,12 +221,7 @@ function DiagramLumberDrawdown({ drawActive }: { drawActive: boolean }) {
           opacity={0.5}
         />
       ))}
-      <g
-        style={{
-          opacity: regionOpacity,
-          transition: `opacity 600ms var(--sl-ease-out-expo) ${regionDelayMs}ms`,
-        }}
-      >
+      <g style={{ opacity: regionOpacity }}>
         <rect
           x={drawdownStart}
           y={40}
@@ -271,9 +270,6 @@ function DiagramLumberDrawdown({ drawActive }: { drawActive: boolean }) {
         style={{
           strokeDasharray: dashArray,
           strokeDashoffset: offsetActive,
-          transition: prefersReduced
-            ? undefined
-            : 'stroke-dashoffset 1400ms var(--sl-ease-out-expo)',
         }}
       />
       <text x={20} y={30} fontSize="11" fill="var(--sl-fg-muted)" fontFamily="var(--sl-font-mono)">
@@ -361,7 +357,7 @@ function Scene({ index, eyebrow, headline, body, sideLabel, diagramKind }: Scene
     ) : diagramKind === 'b' ? (
       <DiagramMarkupSplit progress={progress} />
     ) : (
-      <DiagramLumberDrawdown drawActive={pinned} />
+      <DiagramLumberDrawdown progress={progress} />
     )
 
   return (
