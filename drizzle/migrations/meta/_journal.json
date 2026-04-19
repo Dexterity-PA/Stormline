@@ -15,6 +15,13 @@
       "when": 1776556825606,
       "tag": "0001_tearful_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776573252736,
+      "tag": "0002_faulty_slipstream",
+      "breakpoints": true
     }
   ]
 }
