@@ -7,7 +7,15 @@ import {
 import { listIndicatorsByIndustry } from "@/lib/indicators/registry";
 import type { Industry } from "@/lib/indicators/types";
 
-const client = new Anthropic();
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!_client) {
+    const key = process.env.ANTHROPIC_API_KEY;
+    if (!key) throw new Error('ANTHROPIC_API_KEY not configured');
+    _client = new Anthropic({ apiKey: key });
+  }
+  return _client;
+}
 const MAX_INDICATORS = 80;
 
 export interface TagResult {
@@ -51,7 +59,7 @@ export async function tagHeadline(
     .slice(0, MAX_INDICATORS)
     .map((d) => ({ code: d.code, name: d.name }));
 
-  const message = await client.messages.create({
+  const message = await getClient().messages.create({
     model: NEWS_TAGGER_MODEL,
     max_tokens: 256,
     messages: [

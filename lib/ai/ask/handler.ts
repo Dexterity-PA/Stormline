@@ -4,7 +4,15 @@ import { listIndicatorsByIndustry, getLatestValues } from '@/lib/db/queries/indi
 import { buildSystemPrompt, type SnapshotEntry } from './prompts';
 import type { Organization } from '@/lib/db/queries/organizations';
 
-export const anthropic = new Anthropic();
+let _anthropic: Anthropic | null = null;
+export function getAnthropicClient(): Anthropic {
+  if (!_anthropic) {
+    const key = process.env.ANTHROPIC_API_KEY;
+    if (!key) throw new Error('ANTHROPIC_API_KEY not configured');
+    _anthropic = new Anthropic({ apiKey: key });
+  }
+  return _anthropic;
+}
 
 export interface AskContext {
   org: Organization;

@@ -6,7 +6,15 @@ import type { AlertRule } from '@/lib/db/schema/alert-rules';
 import type { Member } from '@/lib/db/queries/members';
 import type { Organization } from '@/lib/db/queries/organizations';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) throw new Error('RESEND_API_KEY not configured');
+    _resend = new Resend(key);
+  }
+  return _resend;
+}
 
 function getTwilioClient() {
   const sid = process.env.TWILIO_ACCOUNT_SID;
@@ -73,7 +81,7 @@ export async function deliverAlert(
     const emailTargets = targets.filter((t) => t.email);
     if (emailTargets.length === 0) return 'skipped';
     try {
-      await resend.emails.send({
+      await getResend().emails.send({
         from: process.env.RESEND_FROM_EMAIL ?? 'alerts@stormline.io',
         to: emailTargets.map((t) => t.email),
         subject: formatAlertSubject(rule, triggeredValue),
