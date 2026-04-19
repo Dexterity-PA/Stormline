@@ -1,5 +1,10 @@
+// app/api/inngest/route.ts
 export const runtime = "nodejs";
 
-export async function POST() {
-  return new Response("Not implemented", { status: 501 });
-}
+import { serve } from "inngest/next";
+import { inngest, functions } from "@/inngest";
+
+export const { GET, POST, PUT } = serve({
+  client: inngest,
+  functions,
+});
