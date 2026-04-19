@@ -18,7 +18,7 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 const NASS_SERIES: Readonly<Record<string, Readonly<Record<string, string>>>> =
   {
     EGGS_TABLE_PRICE_MONTHLY: {
-      commodity_desc: "EGGS, TABLE",
+      commodity_desc: "EGGS",
       statisticcat_desc: "PRICE RECEIVED",
       unit_desc: "$ / DOZEN",
       freq_desc: "MONTHLY",
@@ -39,7 +39,7 @@ const NASS_SERIES: Readonly<Record<string, Readonly<Record<string, string>>>> =
       agg_level_desc: "NATIONAL",
     },
     BROILERS_PRICE_MONTHLY: {
-      commodity_desc: "BROILERS",
+      commodity_desc: "CHICKENS",
       statisticcat_desc: "PRICE RECEIVED",
       unit_desc: "$ / LB",
       freq_desc: "MONTHLY",
