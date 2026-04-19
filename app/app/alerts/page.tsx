@@ -1,5 +1,15 @@
+import Link from 'next/link';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 import { AlertCard } from '@/components/alert/AlertCard';
 import type { AlertCardData } from '@/components/alert/AlertCard';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { getOrgByClerkId } from '@/lib/db/queries/organizations';
+import { listAlertRules } from '@/lib/db/queries/alerts';
+import type { AlertRule } from '@/lib/db/schema/alert-rules';
+
+// ── Editorial alerts (mock until admin publishes real ones) ───────────────────
 
 const MOCK_ALERTS: AlertCardData[] = [
   {
@@ -48,17 +58,70 @@ const MOCK_ALERTS: AlertCardData[] = [
   },
 ];
 
-export default function AlertsPage() {
+// ── My Rules section ──────────────────────────────────────────────────────────
+
+const CONDITION_LABELS: Record<AlertRule['condition'], string> = {
+  above: 'Above',
+  below: 'Below',
+  pct_change_above: '% change above',
+  pct_change_below: '% change below',
+  percentile_above: 'Percentile above',
+  percentile_below: 'Percentile below',
+};
+
+function RuleRow({ rule }: { rule: AlertRule }) {
+  const conditionLabel = CONDITION_LABELS[rule.condition];
+  const channels = rule.channels as string[];
+
+  return (
+    <div className="flex items-center justify-between gap-4 py-3 border-b border-border last:border-0">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-fg truncate">{rule.name}</p>
+        <p className="text-xs text-fg-muted mt-0.5">
+          {conditionLabel} {rule.threshold}
+          {rule.windowDays ? ` · ${rule.windowDays}d window` : ''}
+          {' · '}
+          {channels.join(', ')}
+        </p>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <span
+          className={`inline-block w-1.5 h-1.5 rounded-full ${
+            rule.isActive ? 'bg-green-500' : 'bg-fg-muted'
+          }`}
+        />
+        <Link
+          href={`/app/alerts/${rule.id}/edit`}
+          className="text-xs text-fg-muted hover:text-fg transition-colors"
+        >
+          Edit
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default async function AlertsPage() {
+  const { orgId: clerkOrgId } = await auth();
+
+  let rules: AlertRule[] = [];
+  if (clerkOrgId) {
+    const org = await getOrgByClerkId(clerkOrgId);
+    if (org) {
+      rules = await listAlertRules(org.id);
+    }
+  }
+
   const unread = MOCK_ALERTS.filter((a) => !a.read);
   const read = MOCK_ALERTS.filter((a) => a.read);
 
   return (
     <div>
+      {/* ── Editorial alerts ── */}
       <div className="mb-6">
         <h1 className="text-xl font-display font-semibold text-fg">Alerts</h1>
         <p className="text-sm text-fg-muted mt-0.5">
-          Event-driven intelligence on hurricanes, tariffs, FOMC decisions, and
-          commodity moves.
+          Event-driven intelligence on hurricanes, tariffs, FOMC decisions, and commodity moves.
         </p>
       </div>
 
@@ -76,7 +139,7 @@ export default function AlertsPage() {
       )}
 
       {read.length > 0 && (
-        <section>
+        <section className="mb-8">
           <h2 className="text-xs font-medium text-fg-muted uppercase tracking-wider mb-3">
             Earlier
           </h2>
@@ -88,10 +151,44 @@ export default function AlertsPage() {
         </section>
       )}
 
-      <p className="mt-8 text-xs text-fg-muted border-t border-border pt-4">
-        Stormline provides market intelligence, not financial, legal, or tax advice.
-        Consult licensed professionals for decisions specific to your business.
+      <p className="mb-10 text-xs text-fg-muted border-t border-border pt-4">
+        Stormline provides market intelligence, not financial, legal, or tax advice. Consult
+        licensed professionals for decisions specific to your business.
       </p>
+
+      {/* ── My Rules ── */}
+      <div className="border-t border-border pt-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-display font-semibold text-fg">My Rules</h2>
+            <p className="text-xs text-fg-muted mt-0.5">
+              Get notified when an indicator crosses a threshold you define.
+            </p>
+          </div>
+          <Link href="/app/alerts/new">
+            <Button variant="outline" size="sm">
+              + New rule
+            </Button>
+          </Link>
+        </div>
+
+        {rules.length === 0 ? (
+          <div className="bg-bg-elev border border-border rounded-[var(--radius-md)] p-6 text-center">
+            <p className="text-sm text-fg-muted mb-3">No rules yet.</p>
+            <Link href="/app/alerts/new">
+              <Button variant="primary" size="sm">
+                Create your first rule
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-bg-elev border border-border rounded-[var(--radius-md)] px-4">
+            {rules.map((rule) => (
+              <RuleRow key={rule.id} rule={rule} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,13 +1,20 @@
-import { and, arrayOverlaps, asc, desc, eq, gt, lt, or } from 'drizzle-orm';
+import { and, arrayOverlaps, asc, desc, eq, gt, gte, lt, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import {
   alertCategoryEnum,
   alertDeliveries,
   alerts,
+  indicatorValues,
   severityEnum,
 } from '@/lib/db/schema';
+import {
+  alertConditionEnum,
+  alertEvents,
+  alertRules,
+} from '@/lib/db/schema/alert-rules';
 import type { InferSelectModel } from 'drizzle-orm';
+import type { AlertEvent, AlertRule } from '@/lib/db/schema/alert-rules';
 
 export type Alert = InferSelectModel<typeof alerts>;
 export type AlertDelivery = InferSelectModel<typeof alertDeliveries>;
@@ -100,4 +107,147 @@ export async function listAlertDeliveries(
     .from(alertDeliveries)
     .where(eq(alertDeliveries.alertId, alertId))
     .orderBy(asc(alertDeliveries.sentAt));
+}
+
+// ── Alert Rules ──────────────────────────────────────────────────────────────
+
+export { AlertEvent, AlertRule };
+
+export const CreateAlertRuleInput = z.object({
+  indicatorId: z.string().uuid(),
+  name: z.string().min(1).max(200),
+  condition: z.enum(alertConditionEnum.enumValues),
+  threshold: z.string().refine((v) => !Number.isNaN(Number(v)), {
+    message: 'threshold must be numeric',
+  }),
+  windowDays: z.number().int().min(1).max(3650).nullable(),
+  channels: z.array(z.enum(['email', 'sms', 'in_app'])).min(1),
+});
+export type CreateAlertRuleInput = z.infer<typeof CreateAlertRuleInput>;
+
+export const UpdateAlertRuleInput = z.object({
+  name: z.string().min(1).max(200).optional(),
+  condition: z.enum(alertConditionEnum.enumValues).optional(),
+  threshold: z
+    .string()
+    .refine((v) => !Number.isNaN(Number(v)), { message: 'threshold must be numeric' })
+    .optional(),
+  windowDays: z.number().int().min(1).max(3650).nullable().optional(),
+  channels: z.array(z.enum(['email', 'sms', 'in_app'])).min(1).optional(),
+  isActive: z.boolean().optional(),
+});
+export type UpdateAlertRuleInput = z.infer<typeof UpdateAlertRuleInput>;
+
+export async function createAlertRule(
+  orgId: string,
+  createdBy: string,
+  input: CreateAlertRuleInput,
+): Promise<AlertRule> {
+  const parsed = CreateAlertRuleInput.parse(input);
+  const [row] = await db
+    .insert(alertRules)
+    .values({ orgId, createdBy, ...parsed })
+    .returning();
+  if (!row) throw new Error('Insert did not return a row');
+  return row;
+}
+
+export async function updateAlertRule(
+  id: string,
+  orgId: string,
+  input: UpdateAlertRuleInput,
+): Promise<AlertRule> {
+  const parsed = UpdateAlertRuleInput.parse(input);
+  const [row] = await db
+    .update(alertRules)
+    .set({ ...parsed, updatedAt: new Date() })
+    .where(and(eq(alertRules.id, id), eq(alertRules.orgId, orgId)))
+    .returning();
+  if (!row) throw new Error('Alert rule not found or access denied');
+  return row;
+}
+
+export async function deleteAlertRule(id: string, orgId: string): Promise<void> {
+  const result = await db
+    .delete(alertRules)
+    .where(and(eq(alertRules.id, id), eq(alertRules.orgId, orgId)));
+  if (result.rowCount === 0) throw new Error('Alert rule not found or access denied');
+}
+
+export async function listAlertRules(orgId: string): Promise<AlertRule[]> {
+  return db
+    .select()
+    .from(alertRules)
+    .where(eq(alertRules.orgId, orgId))
+    .orderBy(desc(alertRules.createdAt));
+}
+
+export async function listActiveAlertRules(): Promise<AlertRule[]> {
+  return db
+    .select()
+    .from(alertRules)
+    .where(eq(alertRules.isActive, true))
+    .orderBy(asc(alertRules.createdAt));
+}
+
+export async function getAlertRuleById(
+  id: string,
+  orgId: string,
+): Promise<AlertRule | undefined> {
+  const [row] = await db
+    .select()
+    .from(alertRules)
+    .where(and(eq(alertRules.id, id), eq(alertRules.orgId, orgId)))
+    .limit(1);
+  return row;
+}
+
+// ── Alert Events ─────────────────────────────────────────────────────────────
+
+export async function createAlertEvent(input: {
+  ruleId: string;
+  triggeredValue: string;
+  emailStatus?: string | null;
+  smsStatus?: string | null;
+  inAppStatus?: string | null;
+}): Promise<AlertEvent> {
+  const [row] = await db
+    .insert(alertEvents)
+    .values(input)
+    .returning();
+  if (!row) throw new Error('Insert did not return a row');
+  return row;
+}
+
+export async function updateAlertEventStatus(
+  id: string,
+  patch: Partial<Pick<AlertEvent, 'emailStatus' | 'smsStatus' | 'inAppStatus'>>,
+): Promise<void> {
+  await db.update(alertEvents).set(patch).where(eq(alertEvents.id, id));
+}
+
+export async function listAlertEvents(ruleId: string, limit = 20): Promise<AlertEvent[]> {
+  return db
+    .select()
+    .from(alertEvents)
+    .where(eq(alertEvents.ruleId, ruleId))
+    .orderBy(desc(alertEvents.triggeredAt))
+    .limit(limit);
+}
+
+export async function getIndicatorSeries(
+  indicatorId: string,
+  windowDays: number,
+): Promise<Array<{ value: string; observedAt: Date }>> {
+  const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
+  return db
+    .select({ value: indicatorValues.value, observedAt: indicatorValues.observedAt })
+    .from(indicatorValues)
+    .where(
+      and(
+        eq(indicatorValues.indicatorId, indicatorId),
+        gte(indicatorValues.observedAt, since),
+      ),
+    )
+    .orderBy(asc(indicatorValues.observedAt));
 }
