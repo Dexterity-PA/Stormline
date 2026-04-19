@@ -22,7 +22,7 @@ const QAS: readonly QA[] = [
   },
   {
     num: '03',
-    q: 'What\u2019s actually in the Monday briefing?',
+    q: 'What’s actually in the Monday briefing?',
     a: 'A 600\u2013900 word analyst-written read on the inputs, demand signals, and macro shifts that touched your industry last week, framed in historical pattern. Every non-trivial claim links to its primary source. Human editor reviews every briefing \u2014 no auto-publish.',
   },
   {
@@ -43,7 +43,7 @@ const QAS: readonly QA[] = [
   {
     num: '07',
     q: 'Do you offer financial, tax, or legal advice?',
-    a: 'No. Stormline never issues advice. We frame everything in historical pattern \u2014 "operators in similar conditions have," "the prior cycle telegraphed," "historical data indicates." That line isn\u2019t a disclaimer; it\u2019s the product philosophy. For advice, work with a licensed professional.',
+    a: 'No. Stormline never issues advice. We frame everything in historical pattern — "operators in similar conditions have," "the prior cycle telegraphed," "historical data indicates." That line isn’t a disclaimer; it’s the product philosophy. For advice, work with a licensed professional.',
   },
   {
     num: '08',
@@ -97,7 +97,7 @@ export default function Section12FAQ() {
             className="font-display text-[clamp(2rem,4vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-fg"
           />
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-fg-muted md:text-lg">
-            If your question isn\u2019t here, email <a href="mailto:hello@stormline.co" className="underline decoration-fg-dim underline-offset-4 transition-colors hover:decoration-fg">hello@stormline.co</a>. A human answers within a day.
+            If your question isn’t here, email <a href="mailto:hello@stormline.co" className="underline decoration-fg-dim underline-offset-4 transition-colors hover:decoration-fg">hello@stormline.co</a>. A human answers within a day.
           </p>
         </div>
 

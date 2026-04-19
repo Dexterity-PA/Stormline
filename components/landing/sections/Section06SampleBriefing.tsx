@@ -59,11 +59,11 @@ const BRIEFING: readonly Paragraph[] = [
     id: 'b-4',
     kind: 'p',
     text:
-      'Diesel at $3.847/gal eased 0.4% and freight spot rates held at $2.21/mi. Distribution cost pressure is contained this week; the prior two weeks\u2019 tightening has reversed.',
+      'Diesel at $3.847/gal eased 0.4% and freight spot rates held at $2.21/mi. Distribution cost pressure is contained this week; the prior two weeks’ tightening has reversed.',
     annotation: {
       tag: 'Distribution',
       title: 'Diesel + freight = your delivery bill',
-      body: 'Most distributors pass diesel moves within 2 weeks and freight tightness within 1. A stable or easing week in both is the signal your delivery line won\u2019t surprise you at month-end.',
+      body: 'Most distributors pass diesel moves within 2 weeks and freight tightness within 1. A stable or easing week in both is the signal your delivery line won’t surprise you at month-end.',
       source: 'EIA weekly diesel · DAT spot index',
       pattern: 'Two-week rolling window',
     },
@@ -89,7 +89,7 @@ const BRIEFING: readonly Paragraph[] = [
     annotation: {
       tag: 'Demand signal',
       title: 'The 4-week turn is the important line',
-      body: 'Single-week demand prints are noise. The rolling 4-week turning negative is the first durable signal we\u2019ve seen since the February soft patch. Watch traffic, not tickets.',
+      body: 'Single-week demand prints are noise. The rolling 4-week turning negative is the first durable signal we’ve seen since the February soft patch. Watch traffic, not tickets.',
       source: 'OpenTable · U-Michigan',
       pattern: '4-week moving average inflection',
     },
