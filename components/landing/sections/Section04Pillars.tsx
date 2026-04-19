@@ -604,7 +604,14 @@ function AlertsPhone() {
           style={{ color: 'var(--sl-fg-muted)' }}
         >
           <span>9:41</span>
-          <span>Stormline</span>
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG, no benefit from next/image */}
+          <img
+            src="/brand/logo.svg"
+            alt="Stormline"
+            width={360}
+            height={72}
+            className="h-3 w-auto select-none"
+          />
         </div>
 
         <div className="flex flex-col gap-2 px-1 pb-1">
