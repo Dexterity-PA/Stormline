@@ -343,11 +343,8 @@ function Scene({ index, eyebrow, headline, body, sideLabel, diagramKind }: Scene
   // 400ms below. Assumed headline reveal ≈ 1200ms total; 80% ≈ 960ms.
   useEffect(() => {
     if (!pinned) return
-    if (prefersReduced) {
-      setSubheadVisible(true)
-      return
-    }
-    const id = window.setTimeout(() => setSubheadVisible(true), 960)
+    const delay = prefersReduced ? 0 : 960
+    const id = window.setTimeout(() => setSubheadVisible(true), delay)
     return () => window.clearTimeout(id)
   }, [pinned, prefersReduced])
 

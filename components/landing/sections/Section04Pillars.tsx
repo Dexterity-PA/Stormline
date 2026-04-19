@@ -541,7 +541,8 @@ function AlertsPhone() {
   const prefersReduced = usePrefersReducedMotion()
 
   useEffect(() => {
-    setMounted(true)
+    const id = window.setTimeout(() => setMounted(true), 0)
+    return () => window.clearTimeout(id)
   }, [])
 
   useEffect(() => {
