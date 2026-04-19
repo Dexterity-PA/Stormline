@@ -19,7 +19,12 @@ import type { OnboardingState, IndustryProfileSchema } from '@/lib/db/queries/on
 import type { Indicator } from '@/lib/db/queries/indicators';
 import type { Industry } from '@/lib/indicators/types';
 
-type Step = 'industry' | 'region' | 'profile' | 'indicators' | 'channels' | 'complete';
+export type Step = 'industry' | 'region' | 'profile' | 'indicators' | 'channels' | 'complete';
+
+const VALID_INDUSTRIES = ['restaurant', 'construction', 'retail'] as const;
+function isIndustry(v: unknown): v is Industry {
+  return VALID_INDUSTRIES.includes(v as Industry);
+}
 
 interface WizardProps {
   initialStep: Step;
@@ -33,7 +38,7 @@ export function OnboardingWizard({ initialStep, initialState, profileSchemas }: 
 
   const [step, setStep] = useState<Step>(initialStep);
   const [industry, setIndustry] = useState<Industry | null>(
-    (initialState?.selectedIndustry as Industry | null) ?? null,
+    isIndustry(initialState?.selectedIndustry) ? initialState.selectedIndustry : null,
   );
   const [regionState, setRegionState] = useState<string>(
     initialState?.selectedRegions?.[0] ?? '',
@@ -63,18 +68,26 @@ export function OnboardingWizard({ initialStep, initialState, profileSchemas }: 
 
   function handleIndustrySelect(ind: Industry) {
     startTransition(async () => {
-      await upsertOnboardingStateAction({ step: 'region', selectedIndustry: ind });
-      setIndustry(ind);
-      setStep('region');
+      try {
+        await upsertOnboardingStateAction({ step: 'region', selectedIndustry: ind });
+        setIndustry(ind);
+        setStep('region');
+      } catch (err) {
+        console.error('[handleIndustrySelect] failed:', err);
+      }
     });
   }
 
   function handleRegionNext() {
     if (!regionState) return;
     startTransition(async () => {
-      const regions = regionMetro ? [regionState, regionMetro] : [regionState];
-      await upsertOnboardingStateAction({ step: 'profile', selectedRegions: regions });
-      setStep('profile');
+      try {
+        const regions = regionMetro ? [regionState, regionMetro] : [regionState];
+        await upsertOnboardingStateAction({ step: 'profile', selectedRegions: regions });
+        setStep('profile');
+      } catch (err) {
+        console.error('[handleRegionNext] failed:', err);
+      }
     });
   }
 
@@ -126,19 +139,28 @@ export function OnboardingWizard({ initialStep, initialState, profileSchemas }: 
 
   function handleIndicatorsNext() {
     startTransition(async () => {
-      await upsertOnboardingStateAction({ step: 'channels', pinnedIndicatorCodes: pinnedCodes });
-      setStep('channels');
+      try {
+        await upsertOnboardingStateAction({ step: 'channels', pinnedIndicatorCodes: pinnedCodes });
+        setStep('channels');
+      } catch (err) {
+        console.error('[handleIndicatorsNext] failed:', err);
+      }
     });
   }
 
   function handleChannelsNext() {
     startTransition(async () => {
-      const channels: string[] = ['in_app'];
-      if (emailBriefing) channels.push('email');
-      if (smsAlerts) channels.push('sms');
-      await upsertOnboardingStateAction({ step: 'complete', notificationChannels: channels });
-      await completeOnboardingAction(smsAlerts ? phone : undefined);
-      router.push('/app');
+      try {
+        const channels: string[] = [];
+        if (inApp) channels.push('in_app');
+        if (emailBriefing) channels.push('email');
+        if (smsAlerts) channels.push('sms');
+        await upsertOnboardingStateAction({ step: 'complete', notificationChannels: channels });
+        await completeOnboardingAction(smsAlerts ? phone : undefined);
+        router.push('/app');
+      } catch (err) {
+        console.error('[handleChannelsNext] failed:', err);
+      }
     });
   }
 
@@ -462,6 +484,7 @@ function ChannelsStep({
             value={phone}
             onChange={(e) => onPhoneChange(e.target.value)}
             placeholder="+1 (555) 000-0000"
+            aria-label="Phone number"
             className="mt-2 w-full bg-bg-elev border border-border text-fg text-sm rounded-[var(--radius-sm)] px-2 py-1.5 focus:outline-none focus:border-accent"
           />
         )}
