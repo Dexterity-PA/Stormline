@@ -119,7 +119,7 @@ export default function Section01Hero() {
       {/* Globe layer */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div
-          className="relative aspect-square w-full max-w-[min(920px,100vmin)] translate-y-[6%] opacity-0"
+          className="relative aspect-square w-full max-w-[min(600px,65vmin)] translate-y-[4%] opacity-0"
           style={{
             animation:
               'sl-reveal-up 1200ms var(--sl-ease-out-expo) 200ms forwards',

@@ -5,6 +5,8 @@ export type DisruptionMarker = {
   kind: MarkerKind
   lat: number
   lng: number
+  category: string
+  location: string
   title: string
   summary: string
   affects: string
@@ -17,6 +19,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'port',
     lat: 33.74,
     lng: -118.27,
+    category: 'PORT',
+    location: 'LOS ANGELES',
     title: 'Port of Los Angeles',
     summary: '14-day import backlog',
     affects: 'Lumber, electronics, restaurant imports',
@@ -27,6 +31,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'port',
     lat: 31.22,
     lng: 121.47,
+    category: 'PORT',
+    location: 'SHANGHAI',
     title: 'Port of Shanghai',
     summary: 'Container throughput down 8% WoW',
     affects: 'Steel, textiles, consumer goods',
@@ -37,6 +43,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'hurricane',
     lat: 27.5,
     lng: -89.0,
+    category: 'HURRICANE',
+    location: 'GULF COAST',
     title: 'Gulf Basin system',
     summary: 'Cat 2 track converging on refineries',
     affects: 'Diesel, produce freight, gulf imports',
@@ -47,6 +55,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'tariff',
     lat: 50.4,
     lng: 10.2,
+    category: 'TARIFF',
+    location: 'EU',
     title: 'EU tariff bracket — steel',
     summary: 'New 12% duty enters force May 1',
     affects: 'Structural steel, rebar, HVAC units',
@@ -57,6 +67,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'fed',
     lat: 38.9,
     lng: -77.04,
+    category: 'FED',
+    location: 'WASHINGTON DC',
     title: 'FOMC decision window',
     summary: 'Rate path diverges from consensus',
     affects: 'Credit spreads, capex financing',
@@ -67,6 +79,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'spike',
     lat: 31.87,
     lng: -101.9,
+    category: 'SPIKE',
+    location: 'PERMIAN',
     title: 'Permian crude differential',
     summary: 'WTI–Brent spread widening',
     affects: 'Diesel, fertilizer, freight',
@@ -77,6 +91,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'port',
     lat: 51.95,
     lng: 4.14,
+    category: 'PORT',
+    location: 'ROTTERDAM',
     title: 'Port of Rotterdam',
     summary: 'Bunker fuel shortage advisory',
     affects: 'Trans-Atlantic freight timing',
@@ -87,6 +103,8 @@ export const MARKERS: DisruptionMarker[] = [
     kind: 'spike',
     lat: 9.08,
     lng: -79.68,
+    category: 'CANAL',
+    location: 'PANAMA',
     title: 'Panama Canal transit',
     summary: 'Slot auction premiums up 34%',
     affects: 'West-Coast–East-Coast produce',
@@ -100,14 +118,6 @@ export const MARKER_COLOR: Record<MarkerKind, string> = {
   tariff: 'var(--sl-warn)',
   fed: 'var(--sl-cyan)',
   spike: 'var(--sl-accent)',
-}
-
-export const MARKER_PULSE_COLOR: Record<MarkerKind, 'accent' | 'warn' | 'crit' | 'good' | 'cyan'> = {
-  hurricane: 'accent',
-  port: 'crit',
-  tariff: 'warn',
-  fed: 'cyan',
-  spike: 'accent',
 }
 
 export function latLngToVec3(

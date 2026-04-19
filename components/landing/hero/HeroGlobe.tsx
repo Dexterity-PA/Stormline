@@ -5,8 +5,7 @@ import { Html, useTexture } from '@react-three/drei'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import gsap from 'gsap'
-import { MARKERS, MARKER_COLOR, MARKER_PULSE_COLOR, latLngToVec3 } from './markers'
-import LivePulse from '@/components/motion/LivePulse'
+import { MARKERS, MARKER_COLOR, latLngToVec3 } from './markers'
 import { usePrefersReducedMotion } from '@/components/motion/usePrefersReducedMotion'
 
 const RADIUS = 1.4
@@ -44,10 +43,10 @@ const atmosphereFragment = /* glsl */ `
 function FresnelAtmosphere() {
   const uniforms = useMemo(
     () => ({
-      // --sl-accent (#4ea8ff) mixed with bg at ~20% saturation visually
-      uColor: { value: new THREE.Color('#9bc7ff') },
-      uPower: { value: 2.5 },
-      uOpacity: { value: 0.3 },
+      // Neutral near-white halo — subtle frame hint, no blue cast.
+      uColor: { value: new THREE.Color('#ffffff') },
+      uPower: { value: 3.2 },
+      uOpacity: { value: 0.12 },
     }),
     [],
   )
@@ -175,7 +174,6 @@ type MarkerProps = {
 // transition reads as a ~180ms fade instead of a pop.
 function Marker({ m, index, visible, hovered, setHovered }: MarkerProps) {
   const groupRef = useRef<THREE.Group>(null)
-  const meshRef = useRef<THREE.Mesh>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const facingRef = useRef(0)
   const mountedAtRef = useRef<number | null>(null)
@@ -221,10 +219,6 @@ function Marker({ m, index, visible, hovered, setHovered }: MarkerProps) {
 
     const finalOpacity = entrance * facingRef.current
 
-    if (meshRef.current) {
-      const mat = meshRef.current.material as THREE.MeshBasicMaterial
-      mat.opacity = finalOpacity
-    }
     if (wrapperRef.current) {
       wrapperRef.current.style.opacity = String(finalOpacity)
       wrapperRef.current.style.pointerEvents =
@@ -236,10 +230,6 @@ function Marker({ m, index, visible, hovered, setHovered }: MarkerProps) {
 
   return (
     <group ref={groupRef} position={pos}>
-      <mesh ref={meshRef}>
-        <sphereGeometry args={[0.018, 12, 12]} />
-        <meshBasicMaterial color={color} transparent opacity={0} />
-      </mesh>
       <Html
         center
         distanceFactor={8}
@@ -251,17 +241,51 @@ function Marker({ m, index, visible, hovered, setHovered }: MarkerProps) {
           onPointerEnter={() => setHovered(m.id)}
           onPointerLeave={() => setHovered((h) => (h === m.id ? null : h))}
           className="relative"
-          style={{ width: 28, height: 28, opacity: 0 }}
+          style={{ width: 12, height: 12, opacity: 0 }}
         >
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          {/* Crisp SVG dot — sharp core + soft halo, no CSS blur. */}
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 28 28"
             aria-hidden
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              overflow: 'visible',
+              shapeRendering: 'geometricPrecision',
+            }}
           >
-            <LivePulse color={MARKER_PULSE_COLOR[m.kind]} size={10} />
-          </div>
+            <circle cx="14" cy="14" r="11" fill={color} opacity="0.1" />
+            <circle cx="14" cy="14" r="7" fill={color} opacity="0.22" />
+            <circle cx="14" cy="14" r="3" fill={color} />
+          </svg>
+
+          {/* Label — uppercase mono, right of dot, same fade. */}
+          <span
+            aria-hidden
+            className="font-mono whitespace-nowrap pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '100%',
+              top: '50%',
+              marginLeft: '14px',
+              transform: 'translateY(-50%)',
+              fontSize: '11px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--sl-fg-muted)',
+              opacity: 0.6,
+            }}
+          >
+            {m.category} <span style={{ opacity: 0.45 }}>·</span> {m.location}
+          </span>
+
           {isHovered && (
             <div
-              className="absolute left-1/2 top-full mt-2 w-[240px] -translate-x-1/2 rounded-md border p-3 text-left shadow-[var(--sl-glow-accent)]"
+              className="absolute left-1/2 top-full mt-3 w-[240px] -translate-x-1/2 rounded-md border p-3 text-left shadow-[var(--sl-glow-accent)]"
               style={{
                 background: 'var(--sl-surface-glass)',
                 backdropFilter: 'blur(10px)',
