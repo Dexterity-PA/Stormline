@@ -143,10 +143,10 @@ async function main(): Promise<void> {
   for (const row of ROWS) {
     await db
       .insert(industryProfileSchemas)
-      .values(row)
+      .values({ industry: row.industry, schemaVersion: row.schemaVersion, fields: row.fields as ProfileField[] })
       .onConflictDoUpdate({
         target: industryProfileSchemas.industry,
-        set: { fields: row.fields, schemaVersion: row.schemaVersion },
+        set: { fields: row.fields as ProfileField[], schemaVersion: row.schemaVersion },
       });
     console.log(
       `  ${row.industry}: ${row.fields.length} fields (schema_version=${row.schemaVersion})`,
@@ -157,7 +157,7 @@ async function main(): Promise<void> {
   process.exit(0);
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error(err);
   process.exit(1);
 });
