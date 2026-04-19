@@ -9,6 +9,7 @@ import Section07Pipeline from '@/components/landing/sections/Section07Pipeline'
 import Section08WhoItsFor from '@/components/landing/sections/Section08WhoItsFor'
 import Section09Comparison from '@/components/landing/sections/Section09Comparison'
 import Section10StatsBand from '@/components/landing/sections/Section10StatsBand'
+import Section11Pricing from '@/components/landing/sections/Section11Pricing'
 
 export const metadata: Metadata = {
   title: 'Stormline — Macro Intelligence for Operators',
@@ -29,7 +30,8 @@ export default function LandingPage() {
       <Section08WhoItsFor />
       <Section09Comparison />
       <Section10StatsBand />
-      {/* Sections 11–14 land in subsequent commits. */}
+      <Section11Pricing />
+      {/* Sections 12–14 land in subsequent commits. */}
     </main>
   )
 }
