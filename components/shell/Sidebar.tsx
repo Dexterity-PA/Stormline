@@ -19,11 +19,15 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-60 flex-shrink-0 flex-col h-screen bg-bg border-r border-border sticky top-0">
       <div className="px-4 py-5 border-b border-border">
-        <Link
-          href="/app"
-          className="font-display text-base font-semibold tracking-tight text-fg"
-        >
-          Stormline
+        <Link href="/app" aria-label="Stormline home" className="inline-flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG, no benefit from next/image */}
+          <img
+            src="/brand/logo.svg"
+            alt="Stormline"
+            width={360}
+            height={72}
+            className="h-6 w-auto select-none"
+          />
         </Link>
       </div>
 
