@@ -263,26 +263,6 @@ function Marker({ m, index, visible, hovered, setHovered }: MarkerProps) {
             <circle cx="14" cy="14" r="3" fill={color} />
           </svg>
 
-          {/* Label — uppercase mono, right of dot, same fade. */}
-          <span
-            aria-hidden
-            className="font-mono whitespace-nowrap pointer-events-none"
-            style={{
-              position: 'absolute',
-              left: '100%',
-              top: '50%',
-              marginLeft: '14px',
-              transform: 'translateY(-50%)',
-              fontSize: '11px',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: 'var(--sl-fg-muted)',
-              opacity: 0.6,
-            }}
-          >
-            {m.category} <span style={{ opacity: 0.45 }}>·</span> {m.location}
-          </span>
-
           {isHovered && (
             <div
               className="absolute left-1/2 top-full mt-3 w-[240px] -translate-x-1/2 rounded-md border p-3 text-left shadow-[var(--sl-glow-accent)]"
