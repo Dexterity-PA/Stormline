@@ -34,6 +34,12 @@ export const indicatorSourceEnum = pgEnum("indicator_source", [
   "bls",
   "census",
   "nhc",
+  "treasury",
+  "noaa",
+  "usda_ams",
+  "federal_register",
+  "fhfa",
+  "fema",
   "other",
 ]);
 

@@ -519,6 +519,258 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     costBucket: "materials",
     frequency: "monthly",
   },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Treasury FiscalData — sovereign debt & cash position
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "TREASURY:debt_to_penny",
+    source: "treasury",
+    sourceId: "debt_to_penny",
+    name: "Total Public Debt Outstanding",
+    unit: "USD",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "sovereign_debt",
+    frequency: "daily",
+  },
+  {
+    code: "TREASURY:tga_operating_balance",
+    source: "treasury",
+    sourceId: "tga_operating_balance",
+    name: "Treasury General Account: Closing Operating Balance",
+    unit: "USD millions",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "sovereign_debt",
+    frequency: "daily",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // NOAA — active weather alerts (NWS) and climate baselines (NCEI)
+  // NWS alerts are snapshots: one data point per fetch with value = alert count.
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:ALL",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:ALL",
+    name: "NWS Active Alerts — National Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Hurricane Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Hurricane Warning",
+    name: "NWS Active Alerts — Hurricane Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Tornado Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Tornado Warning",
+    name: "NWS Active Alerts — Tornado Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Census — international trade, monthly imports by HS2 commodity
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "CENSUS:IMPORTS:HS2:02",
+    source: "census",
+    sourceId: "IMPORTS:HS2:02",
+    name: "US Imports: Meat & Edible Meat Offal (HS 02)",
+    unit: "USD",
+    industryTags: ["restaurant"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:10",
+    source: "census",
+    sourceId: "IMPORTS:HS2:10",
+    name: "US Imports: Cereals (HS 10)",
+    unit: "USD",
+    industryTags: ["restaurant"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:27",
+    source: "census",
+    sourceId: "IMPORTS:HS2:27",
+    name: "US Imports: Mineral Fuels & Oils (HS 27)",
+    unit: "USD",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:72",
+    source: "census",
+    sourceId: "IMPORTS:HS2:72",
+    name: "US Imports: Iron & Steel (HS 72)",
+    unit: "USD",
+    industryTags: ["construction"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:87",
+    source: "census",
+    sourceId: "IMPORTS:HS2:87",
+    name: "US Imports: Vehicles (HS 87)",
+    unit: "USD",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // USDA AMS — daily wholesale livestock/meat/dairy
+  // Distinct from USDA NASS (farmer-received prices) in lib/data-sources/usda.ts
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "USDA_AMS:NATIONAL_BOXED_BEEF_CHOICE_DAILY",
+    source: "usda_ams",
+    sourceId: "NATIONAL_BOXED_BEEF_CHOICE_DAILY",
+    name: "National Daily Boxed Beef Cutout — Choice (600-900 lb)",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_meat",
+    frequency: "daily",
+  },
+  {
+    code: "USDA_AMS:NATIONAL_BOXED_BEEF_SELECT_DAILY",
+    source: "usda_ams",
+    sourceId: "NATIONAL_BOXED_BEEF_SELECT_DAILY",
+    name: "National Daily Boxed Beef Cutout — Select (600-900 lb)",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_meat",
+    frequency: "daily",
+  },
+  {
+    code: "USDA_AMS:NATIONAL_BONELESS_PROCESSING_BEEF_DAILY",
+    source: "usda_ams",
+    sourceId: "NATIONAL_BONELESS_PROCESSING_BEEF_DAILY",
+    name: "National Daily Boneless Processing Beef — Weighted Average",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_meat",
+    frequency: "daily",
+  },
+  {
+    code: "USDA_AMS:NATIONAL_DAILY_HOG_PURCHASED_SWINE",
+    source: "usda_ams",
+    sourceId: "NATIONAL_DAILY_HOG_PURCHASED_SWINE",
+    name: "National Daily Direct Hog — Barrows & Gilts Weighted Avg Net",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_pork",
+    frequency: "daily",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Federal Register — policy / regulatory event counts, weekly buckets
+  // INTERFACE-FIT: docs, not a time series. Stored as weekly counts where
+  // value = number of matching publications in the ISO week.
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FEDERAL_REGISTER:tariff",
+    source: "federal_register",
+    sourceId: "tariff",
+    name: "Federal Register: Weekly Tariff Publications",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+  {
+    code: "FEDERAL_REGISTER:import duty",
+    source: "federal_register",
+    sourceId: "import duty",
+    name: "Federal Register: Weekly Import-Duty Publications",
+    unit: "count",
+    industryTags: ["restaurant", "retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+  {
+    code: "FEDERAL_REGISTER:trade",
+    source: "federal_register",
+    sourceId: "trade",
+    name: "Federal Register: Weekly Trade Publications",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // FHFA — House Price Index, CSV-sourced
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FHFA:HPI_PO_MONTHLY_USA_SA",
+    source: "fhfa",
+    sourceId: "HPI_PO_MONTHLY_USA_SA",
+    name: "FHFA Purchase-Only HPI — National (SA, Monthly)",
+    unit: "index",
+    industryTags: ["construction", "retail"],
+    costBucket: "housing",
+    frequency: "monthly",
+  },
+  {
+    code: "FHFA:HPI_AT_QUARTERLY_USA_NSA",
+    source: "fhfa",
+    sourceId: "HPI_AT_QUARTERLY_USA_NSA",
+    name: "FHFA All-Transactions HPI — National (NSA, Quarterly)",
+    unit: "index",
+    industryTags: ["construction", "retail"],
+    costBucket: "housing",
+    frequency: "quarterly",
+  },
+  {
+    code: "FHFA:HPI_EXP_QUARTERLY_USA_NSA",
+    source: "fhfa",
+    sourceId: "HPI_EXP_QUARTERLY_USA_NSA",
+    name: "FHFA Expanded-Data HPI — National (NSA, Quarterly)",
+    unit: "index",
+    industryTags: ["construction", "retail"],
+    costBucket: "housing",
+    frequency: "quarterly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // FEMA — monthly disaster declaration counts (risk signal)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US",
+    name: "FEMA Disaster Declarations — US Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Hurricane",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Hurricane",
+    name: "FEMA Disaster Declarations — Hurricanes Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
 ];
 
 const byCode = new Map(INDICATOR_REGISTRY.map((def) => [def.code, def]));
