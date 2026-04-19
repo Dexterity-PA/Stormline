@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { NumberRoll, SplitTextReveal } from '@/components/motion'
+import { usePrefersReducedMotion } from '@/components/motion/usePrefersReducedMotion'
 
 type Stage = {
   num: string
@@ -214,6 +215,7 @@ function StageCard({ stage, mobile = false }: { stage: Stage; mobile?: boolean }
 }
 
 function FlowDesktop() {
+  const prefersReduced = usePrefersReducedMotion()
   return (
     <div className="relative my-10 hidden h-12 w-full lg:block">
       <svg
@@ -231,27 +233,29 @@ function FlowDesktop() {
           strokeWidth={1}
           strokeDasharray="2 6"
         />
-        <g transform="translate(0, 24)">
-          {[0, 0.3, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6].map((d, i) => (
-            <circle
-              key={i}
-              r={2.5}
-              fill="var(--sl-accent)"
-              opacity={0.85}
-              style={{
-                filter:
-                  'drop-shadow(0 0 4px color-mix(in oklab, var(--sl-accent) 60%, transparent))',
-              }}
-            >
-              <animateMotion
-                dur="3.5s"
-                repeatCount="indefinite"
-                begin={`${d}s`}
-                path="M 0 0 L 1000 0"
-              />
-            </circle>
-          ))}
-        </g>
+        {!prefersReduced && (
+          <g transform="translate(0, 24)">
+            {[0, 0.3, 0.6, 1.0, 1.4, 1.8, 2.2, 2.6].map((d, i) => (
+              <circle
+                key={i}
+                r={2.5}
+                fill="var(--sl-accent)"
+                opacity={0.85}
+                style={{
+                  filter:
+                    'drop-shadow(0 0 4px color-mix(in oklab, var(--sl-accent) 60%, transparent))',
+                }}
+              >
+                <animateMotion
+                  dur="3.5s"
+                  repeatCount="indefinite"
+                  begin={`${d}s`}
+                  path="M 0 0 L 1000 0"
+                />
+              </circle>
+            ))}
+          </g>
+        )}
       </svg>
     </div>
   )
