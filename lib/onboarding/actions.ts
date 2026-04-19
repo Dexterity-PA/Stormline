@@ -1,8 +1,10 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { auth } from '@clerk/nextjs/server';
-import { getOrgByClerkId } from '@/lib/db/queries/organizations';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { db } from '@/lib/db';
+import { members } from '@/lib/db/schema';
+import { getOrgByClerkId, upsertOrg } from '@/lib/db/queries/organizations';
 import { getMemberByClerkAndOrg, updateNotificationPrefs } from '@/lib/db/queries/members';
 import { listIndicatorsByIndustry } from '@/lib/db/queries/indicators';
 import {
@@ -14,6 +16,76 @@ import {
 import { runProfiler, type ProfilerInput } from '@/lib/onboarding/profiler';
 import type { Indicator } from '@/lib/db/queries/indicators';
 import type { Industry } from '@/lib/indicators/types';
+
+const INDUSTRY_LABELS: Record<Industry, string> = {
+  restaurant: 'Restaurant',
+  construction: 'Construction',
+  retail: 'Retail',
+};
+
+/**
+ * Step 1: Create the Clerk organization for a new user.
+ * Returns the Clerk org ID so the client can call setActive().
+ * Idempotent: if the user already has an active org (interrupted onboarding),
+ * returns the existing Clerk org ID without creating a duplicate.
+ */
+export async function createClerkOrgAction(industry: Industry): Promise<string> {
+  const { userId, orgId: existingClerkOrgId } = await auth();
+  if (!userId) throw new Error('Not authenticated');
+
+  // Resuming an interrupted onboarding — org already exists in Clerk
+  if (existingClerkOrgId) return existingClerkOrgId;
+
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId);
+  const firstName = user.firstName ?? 'My';
+  const orgName = `${firstName}'s ${INDUSTRY_LABELS[industry]}`;
+
+  const org = await client.organizations.createOrganization({
+    name: orgName,
+    createdBy: userId,
+  });
+
+  return org.id;
+}
+
+/**
+ * Step 2: Provision the DB org, member row, and initial onboarding_state.
+ * Called after the Clerk org exists and setActive() has been called client-side.
+ * Idempotent via upsertOrg (ON CONFLICT DO UPDATE on clerkOrgId).
+ */
+export async function provisionDbOrgAction(
+  industry: Industry,
+  regionState: string,
+  regionMetro?: string,
+): Promise<void> {
+  const { userId: clerkUserId, orgId: clerkOrgId } = await auth();
+  if (!clerkUserId || !clerkOrgId) throw new Error('Not authenticated or no active org');
+
+  const client = await clerkClient();
+  const user = await client.users.getUser(clerkUserId);
+  const firstName = user.firstName ?? 'My';
+  const orgName = `${firstName}'s ${INDUSTRY_LABELS[industry]}`;
+
+  const org = await upsertOrg({
+    clerkOrgId,
+    name: orgName,
+    industry,
+    regionState,
+    regionMetro,
+  });
+
+  const existingMember = await getMemberByClerkAndOrg(clerkUserId, org.id);
+  if (!existingMember) {
+    await db.insert(members).values({ orgId: org.id, clerkUserId, role: 'owner' });
+  }
+
+  await upsertOnboardingState(org.id, {
+    step: 'profile',
+    selectedIndustry: industry,
+    selectedRegions: regionMetro ? [regionState, regionMetro] : [regionState],
+  });
+}
 
 async function resolveOrgId(clerkOrgId?: string | null): Promise<string> {
   const id = clerkOrgId ?? (await auth()).orgId;

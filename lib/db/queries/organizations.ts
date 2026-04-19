@@ -57,6 +57,26 @@ export async function createOrg(input: CreateOrgInput): Promise<Organization> {
   return row;
 }
 
+export async function upsertOrg(input: CreateOrgInput): Promise<Organization> {
+  const parsed = CreateOrgInput.parse(input);
+  const [row] = await db
+    .insert(organizations)
+    .values(parsed)
+    .onConflictDoUpdate({
+      target: organizations.clerkOrgId,
+      set: {
+        name: parsed.name,
+        industry: parsed.industry,
+        regionState: parsed.regionState,
+        regionMetro: parsed.regionMetro ?? null,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
+  if (!row) throw new Error('Upsert did not return a row');
+  return row;
+}
+
 export async function updateOrgTier(
   id: string,
   tier: SubscriptionTier,

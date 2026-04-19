@@ -21,11 +21,13 @@ async function handleUserCreated(data: Record<string, unknown>) {
   console.log("[clerk-webhook] user.created", { userId: data.id });
 }
 
-async function handleOrganizationCreated(_data: Record<string, unknown>) {
-  // TODO: insert DB org + onboarding_state once schema migration lands
-  // (organizations.regionState must be nullable — see design decision Q1)
-  console.log("[clerk-webhook] organization.created — DB provisioning pending schema decision", {
-    clerkOrgId: _data.id,
+async function handleOrganizationCreated(data: Record<string, unknown>) {
+  // DB org is created synchronously in provisionDbOrgAction (wizard Step 2), not here.
+  // organizations.regionState is NOT NULL and regionState is not available in the
+  // organization.created payload — it is only collected in wizard Step 2.
+  // This handler is a hook point for future use (e.g., if schema relaxes the constraint).
+  console.log("[clerk-webhook] organization.created — DB provisioning deferred to wizard Step 2", {
+    clerkOrgId: data.id,
   });
 }
 
