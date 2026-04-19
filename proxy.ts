@@ -20,13 +20,25 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (isOnboardingGuardedRoute(req)) {
-    // Fast path: cookie set by completeOnboardingAction
-    if (req.cookies.has("sl-ob")) return NextResponse.next();
+    const { userId, orgId: clerkOrgId } = await auth();
 
-    const { orgId: clerkOrgId } = await auth();
+    // Fast path: cookie value must match the current userId (not just presence)
+    const cookieValue = req.cookies.get("sl-ob")?.value;
+    const isStale = cookieValue !== undefined && (userId === null || cookieValue !== userId);
+
+    if (cookieValue !== undefined && userId !== null && cookieValue === userId) {
+      return NextResponse.next();
+    }
+
+    // Attach stale-cookie clear to whichever response we return
+    const cleared = (res: NextResponse) => {
+      if (isStale) res.cookies.delete("sl-ob");
+      return res;
+    };
+
     // Authed but no active org → send to onboarding to create one
     if (!clerkOrgId) {
-      return NextResponse.redirect(new URL("/onboarding", req.url));
+      return cleared(NextResponse.redirect(new URL("/onboarding", req.url)));
     }
 
     const [org] = await db
@@ -36,7 +48,7 @@ export default clerkMiddleware(async (auth, req) => {
       .limit(1);
 
     if (!org) {
-      return NextResponse.redirect(new URL("/onboarding", req.url));
+      return cleared(NextResponse.redirect(new URL("/onboarding", req.url)));
     }
 
     const [state] = await db
@@ -46,18 +58,20 @@ export default clerkMiddleware(async (auth, req) => {
       .limit(1);
 
     if (!state || state.step !== "complete") {
-      return NextResponse.redirect(new URL("/onboarding", req.url));
+      return cleared(NextResponse.redirect(new URL("/onboarding", req.url)));
     }
 
-    // Cache completed state to skip DB on future /app/* visits
+    // Cache completed state to skip DB on future /app/* visits — bound to userId
     const res = NextResponse.next();
-    res.cookies.set("sl-ob", "1", {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30,
-    });
+    if (userId !== null) {
+      res.cookies.set("sl-ob", userId, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
     return res;
   }
 });
