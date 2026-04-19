@@ -96,7 +96,7 @@ export default function Section10StatsBand() {
                 suffix={s.suffix ?? ''}
                 decimals={s.decimals ?? 0}
                 duration={1800}
-                className="font-display text-[clamp(3.2rem,7vw,5.5rem)] font-semibold leading-none tracking-[-0.03em] text-fg"
+                className="block whitespace-nowrap font-display text-[clamp(2.6rem,5.4vw,4.6rem)] font-semibold leading-none tracking-[-0.03em] text-fg"
               />
               <div
                 className="mt-4 h-px w-10 transition-all duration-500 group-hover:w-16"

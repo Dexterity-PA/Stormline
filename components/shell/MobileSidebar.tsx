@@ -61,10 +61,18 @@ export function MobileSidebar() {
         <div className="flex items-center justify-between px-4 py-5 border-b border-border">
           <Link
             href="/app"
-            className="font-display text-base font-semibold text-fg"
+            aria-label="Stormline home"
+            className="inline-flex items-center"
             onClick={() => setOpen(false)}
           >
-            Stormline
+            {/* eslint-disable-next-line @next/next/no-img-element -- SVG, no benefit from next/image */}
+            <img
+              src="/brand/logo.svg"
+              alt="Stormline"
+              width={360}
+              height={72}
+              className="h-6 w-auto select-none"
+            />
           </Link>
           <button
             type="button"

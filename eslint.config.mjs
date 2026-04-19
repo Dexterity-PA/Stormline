@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Brand asset design source (not shipped as app code).
+    "public/brand/logo/**",
   ]),
 ]);
 

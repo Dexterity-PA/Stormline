@@ -10,10 +10,17 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <AdminNav />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="shrink-0 border-b border-border px-6 py-3 bg-bg-elev flex items-center justify-between">
-          <span className="font-display text-sm tracking-wide text-fg">
-            Stormline{' '}
-            <span className="font-mono text-xs text-accent ml-1">ADMIN</span>
-          </span>
+          <div className="inline-flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- SVG, no benefit from next/image */}
+            <img
+              src="/brand/logo.svg"
+              alt="Stormline"
+              width={360}
+              height={72}
+              className="h-5 w-auto select-none"
+            />
+            <span className="font-mono text-xs text-accent">ADMIN</span>
+          </div>
           <a
             href="/app"
             className="text-xs text-fg-muted hover:text-fg transition-colors"

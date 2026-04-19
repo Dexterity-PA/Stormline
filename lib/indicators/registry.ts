@@ -160,6 +160,188 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
   },
 
   // ────────────────────────────────────────────────────────────────────────
+  // Restaurants — extended P1
+  // Food inputs (proteins / dairy / grains / produce / oils / beverages),
+  // labor, energy, real estate, consumer demand, credit, macro.
+  // All FRED/EIA IDs verified via API probe. USDA NASS additions deferred
+  // until adapter outage resolves (would add dead rows today).
+  // ────────────────────────────────────────────────────────────────────────
+
+  // --- Food inputs: Proteins — Beef ---
+  { code: "FRED:WPU0111", source: "fred", sourceId: "WPU0111", name: "PPI: Slaughter Cattle", unit: "index", industryTags: ["restaurant"], costBucket: "beef", frequency: "monthly" },
+  { code: "FRED:WPU0212", source: "fred", sourceId: "WPU0212", name: "PPI: Processed Meats", unit: "index", industryTags: ["restaurant"], costBucket: "beef", frequency: "monthly" },
+  { code: "FRED:WPU02", source: "fred", sourceId: "WPU02", name: "PPI: Processed Foods & Feeds", unit: "index", industryTags: ["restaurant"], costBucket: "inflation", frequency: "monthly" },
+  { code: "FRED:CUSR0000SAF112", source: "fred", sourceId: "CUSR0000SAF112", name: "CPI: Meats", unit: "index", industryTags: ["restaurant"], costBucket: "beef", frequency: "monthly" },
+  { code: "FRED:APU0000708111", source: "fred", sourceId: "APU0000708111", name: "Avg Retail: Ground Chuck, 100% Beef, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "beef", frequency: "monthly" },
+
+  // --- Food inputs: Proteins — Poultry & Eggs ---
+  { code: "FRED:WPU0213", source: "fred", sourceId: "WPU0213", name: "PPI: Processed Poultry", unit: "index", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:WPU0221", source: "fred", sourceId: "WPU0221", name: "PPI: Processed Eggs & Egg Products", unit: "index", industryTags: ["restaurant"], costBucket: "eggs", frequency: "monthly" },
+  { code: "FRED:PCU311615311615", source: "fred", sourceId: "PCU311615311615", name: "PPI: Poultry Processing (NAICS 311615)", unit: "index", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:CUSR0000SAF113", source: "fred", sourceId: "CUSR0000SAF113", name: "CPI: Poultry", unit: "index", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:CUSR0000SAF115", source: "fred", sourceId: "CUSR0000SAF115", name: "CPI: Eggs", unit: "index", industryTags: ["restaurant"], costBucket: "eggs", frequency: "monthly" },
+  { code: "FRED:APU000074714", source: "fred", sourceId: "APU000074714", name: "Avg Retail: Chicken, Fresh, Whole, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:APU000074715", source: "fred", sourceId: "APU000074715", name: "Avg Retail: Chicken Breast, Bone-In, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:APU00007471A", source: "fred", sourceId: "APU00007471A", name: "Avg Retail: Chicken Legs, Bone-In, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:APU0000FF1101", source: "fred", sourceId: "APU0000FF1101", name: "Avg Retail: Chicken Breast, Boneless, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "poultry", frequency: "monthly" },
+  { code: "FRED:APU0000FS1101", source: "fred", sourceId: "APU0000FS1101", name: "Avg Retail: Eggs, Grade A, Large, per dozen", unit: "USD/dozen", industryTags: ["restaurant"], costBucket: "eggs", frequency: "monthly" },
+
+  // --- Food inputs: Proteins — Pork ---
+  { code: "FRED:WPU0113", source: "fred", sourceId: "WPU0113", name: "PPI: Slaughter Hogs", unit: "index", industryTags: ["restaurant"], costBucket: "pork", frequency: "monthly" },
+  { code: "FRED:APU0000710211", source: "fred", sourceId: "APU0000710211", name: "Avg Retail: Bacon, Sliced, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "pork", frequency: "monthly" },
+
+  // --- Food inputs: Proteins — Fish & Seafood ---
+  { code: "FRED:PFISHUSDM", source: "fred", sourceId: "PFISHUSDM", name: "Global Price of Fish", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "fish", frequency: "monthly" },
+  { code: "FRED:PSALMUSDM", source: "fred", sourceId: "PSALMUSDM", name: "Global Price of Fish (Salmon)", unit: "USD/kg", industryTags: ["restaurant"], costBucket: "fish", frequency: "monthly" },
+  { code: "FRED:CUSR0000SAF114", source: "fred", sourceId: "CUSR0000SAF114", name: "CPI: Fish & Seafood", unit: "index", industryTags: ["restaurant"], costBucket: "fish", frequency: "monthly" },
+
+  // --- Food inputs: Dairy ---
+  { code: "FRED:APU0000709112", source: "fred", sourceId: "APU0000709112", name: "Avg Retail: Cheese, American, Processed, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+  { code: "FRED:APU0000709212", source: "fred", sourceId: "APU0000709212", name: "Avg Retail: Cheese, Cheddar, Natural, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+  { code: "FRED:APU0000710111", source: "fred", sourceId: "APU0000710111", name: "Avg Retail: Milk, Fresh, Whole, per gallon", unit: "USD/gal", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+  { code: "FRED:APU0000712311", source: "fred", sourceId: "APU0000712311", name: "Avg Retail: Butter, Salted, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+  { code: "FRED:APU0000FJ4101", source: "fred", sourceId: "APU0000FJ4101", name: "Avg Retail: Milk, Fresh, Low Fat, per gallon", unit: "USD/gal", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+  { code: "FRED:CUSR0000SAF116", source: "fred", sourceId: "CUSR0000SAF116", name: "CPI: Dairy & Related Products", unit: "index", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+  { code: "FRED:PCU311513311513", source: "fred", sourceId: "PCU311513311513", name: "PPI: Cheese Manufacturing (NAICS 311513)", unit: "index", industryTags: ["restaurant"], costBucket: "dairy", frequency: "monthly" },
+
+  // --- Food inputs: Grains & Bakery ---
+  { code: "FRED:PMAIZMTUSDM", source: "fred", sourceId: "PMAIZMTUSDM", name: "Global Price of Corn", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "grain", frequency: "monthly" },
+  { code: "FRED:PRICENPQUSDM", source: "fred", sourceId: "PRICENPQUSDM", name: "Global Price of Rice, Thailand", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "grain", frequency: "monthly" },
+  { code: "FRED:WPU012", source: "fred", sourceId: "WPU012", name: "PPI: Processed Foods & Feeds — Cereal & Bakery", unit: "index", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:WPU0121", source: "fred", sourceId: "WPU0121", name: "PPI: Cereal & Bakery Products", unit: "index", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:WPU0211", source: "fred", sourceId: "WPU0211", name: "PPI: Flour & Milling Products", unit: "index", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:PCU311811311811", source: "fred", sourceId: "PCU311811311811", name: "PPI: Retail Bakeries (NAICS 311811)", unit: "index", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:CUSR0000SAF111", source: "fred", sourceId: "CUSR0000SAF111", name: "CPI: Cereals & Bakery Products", unit: "index", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:APU0000701111", source: "fred", sourceId: "APU0000701111", name: "Avg Retail: Bread, White, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:APU0000702111", source: "fred", sourceId: "APU0000702111", name: "Avg Retail: Flour, White, All Purpose, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:APU0000703111", source: "fred", sourceId: "APU0000703111", name: "Avg Retail: Rice, White, Long Grain, Precooked, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "grain", frequency: "monthly" },
+  { code: "FRED:APU0000703112", source: "fred", sourceId: "APU0000703112", name: "Avg Retail: Rice, White, Long Grain, Uncooked, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "grain", frequency: "monthly" },
+  { code: "FRED:APU0000703211", source: "fred", sourceId: "APU0000703211", name: "Avg Retail: Spaghetti & Macaroni, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "grain", frequency: "monthly" },
+
+  // --- Food inputs: Produce (fresh fruits & vegetables) ---
+  { code: "FRED:PORANGUSDM", source: "fred", sourceId: "PORANGUSDM", name: "Global Price of Oranges", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:PBANSOPUSDM", source: "fred", sourceId: "PBANSOPUSDM", name: "Global Price of Bananas", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:WPU0131", source: "fred", sourceId: "WPU0131", name: "PPI: Fresh Fruits & Melons", unit: "index", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:WPU0132", source: "fred", sourceId: "WPU0132", name: "PPI: Fresh & Dry Vegetables", unit: "index", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:WPU014", source: "fred", sourceId: "WPU014", name: "PPI: Processed Fruits & Vegetables", unit: "index", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:PCU311411311411", source: "fred", sourceId: "PCU311411311411", name: "PPI: Frozen Fruit, Juice & Vegetable Mfg (NAICS 311411)", unit: "index", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:PCU311421311421", source: "fred", sourceId: "PCU311421311421", name: "PPI: Fruit & Vegetable Canning (NAICS 311421)", unit: "index", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:APU0000706111", source: "fred", sourceId: "APU0000706111", name: "Avg Retail: Potatoes, White, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:APU0000711111", source: "fred", sourceId: "APU0000711111", name: "Avg Retail: Tomatoes, Field Grown, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:APU0000711211", source: "fred", sourceId: "APU0000711211", name: "Avg Retail: Oranges, Navel, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:APU0000711311", source: "fred", sourceId: "APU0000711311", name: "Avg Retail: Lettuce, Iceberg, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:APU0000711411", source: "fred", sourceId: "APU0000711411", name: "Avg Retail: Broccoli, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+  { code: "FRED:WPU013", source: "fred", sourceId: "WPU013", name: "PPI: Fruits & Vegetables (composite)", unit: "index", industryTags: ["restaurant"], costBucket: "produce", frequency: "monthly" },
+
+  // --- Food inputs: Oils, Fats, Sugar ---
+  { code: "FRED:PSMEAUSDM", source: "fred", sourceId: "PSMEAUSDM", name: "Global Price of Soybean Meal", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "oils", frequency: "monthly" },
+  { code: "FRED:PSUGAISAUSDM", source: "fred", sourceId: "PSUGAISAUSDM", name: "Global Price of Sugar, ISA", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "sugar", frequency: "monthly" },
+  { code: "FRED:PSUGAUSAUSDM", source: "fred", sourceId: "PSUGAUSAUSDM", name: "Global Price of Sugar, US", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "sugar", frequency: "monthly" },
+  { code: "FRED:WPU026", source: "fred", sourceId: "WPU026", name: "PPI: Fats & Oils", unit: "index", industryTags: ["restaurant"], costBucket: "oils", frequency: "monthly" },
+  { code: "FRED:WPU024", source: "fred", sourceId: "WPU024", name: "PPI: Sugar & Confectionery", unit: "index", industryTags: ["restaurant"], costBucket: "sugar", frequency: "monthly" },
+  { code: "FRED:PCU311230311230", source: "fred", sourceId: "PCU311230311230", name: "PPI: Breakfast Cereal Manufacturing (NAICS 311230)", unit: "index", industryTags: ["restaurant"], costBucket: "bakery", frequency: "monthly" },
+  { code: "FRED:APU0000712112", source: "fred", sourceId: "APU0000712112", name: "Avg Retail: Sugar, White, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "sugar", frequency: "monthly" },
+
+  // --- Food inputs: Beverages (coffee / tea / cocoa / alcohol) ---
+  { code: "FRED:PCOFFROBUSDM", source: "fred", sourceId: "PCOFFROBUSDM", name: "Global Price of Coffee, Robusta", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "coffee", frequency: "monthly" },
+  { code: "FRED:PCOCOUSDM", source: "fred", sourceId: "PCOCOUSDM", name: "Global Price of Cocoa", unit: "USD/mt", industryTags: ["restaurant"], costBucket: "beverages", frequency: "monthly" },
+  { code: "FRED:PTEAUSDM", source: "fred", sourceId: "PTEAUSDM", name: "Global Price of Tea", unit: "USD/kg", industryTags: ["restaurant"], costBucket: "beverages", frequency: "monthly" },
+  { code: "FRED:WPU028", source: "fred", sourceId: "WPU028", name: "PPI: Beverages & Beverage Materials", unit: "index", industryTags: ["restaurant"], costBucket: "beverages", frequency: "monthly" },
+  { code: "FRED:WPU029", source: "fred", sourceId: "WPU029", name: "PPI: Miscellaneous Processed Foods", unit: "index", industryTags: ["restaurant"], costBucket: "inflation", frequency: "monthly" },
+  { code: "FRED:APU0000717311", source: "fred", sourceId: "APU0000717311", name: "Avg Retail: Coffee, 100%, Ground Roast, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "coffee", frequency: "monthly" },
+  { code: "FRED:APU0000717312", source: "fred", sourceId: "APU0000717312", name: "Avg Retail: Coffee, Instant, per 16 oz", unit: "USD/16oz", industryTags: ["restaurant"], costBucket: "coffee", frequency: "monthly" },
+  { code: "FRED:APU0000FL2101", source: "fred", sourceId: "APU0000FL2101", name: "Avg Retail: Coffee, 100%, Ground Roast, All Sizes, per lb", unit: "USD/lb", industryTags: ["restaurant"], costBucket: "coffee", frequency: "monthly" },
+  { code: "FRED:APU000072610", source: "fred", sourceId: "APU000072610", name: "Avg Retail: Malt Beverages Incl Beer & Ale, per 16 oz", unit: "USD/16oz", industryTags: ["restaurant"], costBucket: "beverages", frequency: "monthly" },
+  { code: "FRED:APU000072611", source: "fred", sourceId: "APU000072611", name: "Avg Retail: Beer, Ale & Other Malt Beverages, 16 oz", unit: "USD/16oz", industryTags: ["restaurant"], costBucket: "beverages", frequency: "monthly" },
+  { code: "FRED:CUSR0000SEFW", source: "fred", sourceId: "CUSR0000SEFW", name: "CPI: Alcoholic Beverages Away From Home", unit: "index", industryTags: ["restaurant"], costBucket: "beverages", frequency: "monthly" },
+
+  // --- Food inputs: Other misc processed ---
+  { code: "FRED:WPU017", source: "fred", sourceId: "WPU017", name: "PPI: Processed Foods & Feeds — Other", unit: "index", industryTags: ["restaurant"], costBucket: "inflation", frequency: "monthly" },
+
+  // --- Labor: food-service employment, wages, JOLTS ---
+  { code: "FRED:CEU7000000003", source: "fred", sourceId: "CEU7000000003", name: "Avg Hourly Earnings: Leisure & Hospitality, NSA", unit: "USD/hour", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES0500000003", source: "fred", sourceId: "CES0500000003", name: "Avg Hourly Earnings: Total Private", unit: "USD/hour", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS7000JOL", source: "fred", sourceId: "JTS7000JOL", name: "JOLTS: Accommodation & Food Svcs, Job Openings", unit: "thousands", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS7000QUR", source: "fred", sourceId: "JTS7000QUR", name: "JOLTS: Accommodation & Food Svcs, Quits Rate", unit: "%", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS7000HIR", source: "fred", sourceId: "JTS7000HIR", name: "JOLTS: Accommodation & Food Svcs, Hires Rate", unit: "%", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTU7000JOL", source: "fred", sourceId: "JTU7000JOL", name: "JOLTS: Accommodation & Food Svcs, Job Openings, NSA", unit: "thousands", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTU7000QUR", source: "fred", sourceId: "JTU7000QUR", name: "JOLTS: Accommodation & Food Svcs, Quits Rate, NSA", unit: "%", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:ECIWAG", source: "fred", sourceId: "ECIWAG", name: "Employment Cost Index: Wages & Salaries", unit: "index", industryTags: ["restaurant"], costBucket: "labor", frequency: "quarterly" },
+  { code: "FRED:CIU2010000000000I", source: "fred", sourceId: "CIU2010000000000I", name: "ECI: Wages & Salaries, Private Industry, NSA", unit: "index", industryTags: ["restaurant"], costBucket: "labor", frequency: "quarterly" },
+  { code: "FRED:LNS12032194", source: "fred", sourceId: "LNS12032194", name: "Employment-Population Ratio, 25-54", unit: "%", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:ICSA", source: "fred", sourceId: "ICSA", name: "Initial Unemployment Claims", unit: "persons", industryTags: ["restaurant"], costBucket: "labor", frequency: "weekly" },
+  { code: "FRED:USWTRADE", source: "fred", sourceId: "USWTRADE", name: "All Employees, Wholesale Trade", unit: "thousands of persons", industryTags: ["restaurant"], costBucket: "labor", frequency: "monthly" },
+
+  // NOTE: 12 state minimum-wage series (STTMINWG{CA,NY,TX,FL,IL,AZ,CO,GA,MA,NC,OH,PA})
+  // were verified in FRED but are annual-frequency only; frequency enum supports
+  // daily/weekly/monthly/quarterly. Deferred until enum extension decision.
+
+  // --- Energy & ops (fuel / crude / refined / PPI energy / CPI fuel) ---
+  { code: "FRED:GASDESW", source: "fred", sourceId: "GASDESW", name: "US Diesel Retail, All Types, Weekly", unit: "USD/gal", industryTags: ["restaurant"], costBucket: "fuel", frequency: "weekly" },
+  { code: "FRED:DCOILWTICO", source: "fred", sourceId: "DCOILWTICO", name: "Crude Oil Prices: WTI", unit: "USD/bbl", industryTags: ["restaurant"], costBucket: "fuel", frequency: "daily" },
+  { code: "FRED:DCOILBRENTEU", source: "fred", sourceId: "DCOILBRENTEU", name: "Crude Oil Prices: Brent Europe", unit: "USD/bbl", industryTags: ["restaurant"], costBucket: "fuel", frequency: "daily" },
+  { code: "FRED:MCOILWTICO", source: "fred", sourceId: "MCOILWTICO", name: "Crude Oil Prices: WTI, Monthly", unit: "USD/bbl", industryTags: ["restaurant"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:MHOILNYH", source: "fred", sourceId: "MHOILNYH", name: "Heating Oil No. 2, NY Harbor, Monthly", unit: "USD/gal", industryTags: ["restaurant"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:WPU0531", source: "fred", sourceId: "WPU0531", name: "PPI: Gas Fuels", unit: "index", industryTags: ["restaurant"], costBucket: "energy", frequency: "monthly" },
+  { code: "FRED:WPU0561", source: "fred", sourceId: "WPU0561", name: "PPI: Crude Petroleum", unit: "index", industryTags: ["restaurant"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:WPU0571", source: "fred", sourceId: "WPU0571", name: "PPI: Refined Petroleum Products", unit: "index", industryTags: ["restaurant"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:CUSR0000SETB", source: "fred", sourceId: "CUSR0000SETB", name: "CPI: Motor Fuel", unit: "index", industryTags: ["restaurant"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:CUSR0000SETB01", source: "fred", sourceId: "CUSR0000SETB01", name: "CPI: Gasoline (All Types)", unit: "index", industryTags: ["restaurant"], costBucket: "fuel", frequency: "monthly" },
+
+  // --- Energy: state-level commercial electricity (EIA) ---
+  { code: "EIA:ELEC.PRICE.CA-COM.M", source: "eia", sourceId: "ELEC.PRICE.CA-COM.M", name: "CA Commercial Electricity Retail Price", unit: "¢/kWh", industryTags: ["restaurant"], costBucket: "energy", frequency: "monthly" },
+  { code: "EIA:ELEC.PRICE.NY-COM.M", source: "eia", sourceId: "ELEC.PRICE.NY-COM.M", name: "NY Commercial Electricity Retail Price", unit: "¢/kWh", industryTags: ["restaurant"], costBucket: "energy", frequency: "monthly" },
+  { code: "EIA:ELEC.PRICE.TX-COM.M", source: "eia", sourceId: "ELEC.PRICE.TX-COM.M", name: "TX Commercial Electricity Retail Price", unit: "¢/kWh", industryTags: ["restaurant"], costBucket: "energy", frequency: "monthly" },
+  { code: "EIA:ELEC.PRICE.FL-COM.M", source: "eia", sourceId: "ELEC.PRICE.FL-COM.M", name: "FL Commercial Electricity Retail Price", unit: "¢/kWh", industryTags: ["restaurant"], costBucket: "energy", frequency: "monthly" },
+  { code: "EIA:ELEC.PRICE.IL-COM.M", source: "eia", sourceId: "ELEC.PRICE.IL-COM.M", name: "IL Commercial Electricity Retail Price", unit: "¢/kWh", industryTags: ["restaurant"], costBucket: "energy", frequency: "monthly" },
+
+  // --- Real estate & rent (CPI shelter, HPI, supply) ---
+  { code: "FRED:CUSR0000SAH1", source: "fred", sourceId: "CUSR0000SAH1", name: "CPI: Shelter", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CUSR0000SEHA", source: "fred", sourceId: "CUSR0000SEHA", name: "CPI: Rent of Primary Residence", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CUSR0000SEHB", source: "fred", sourceId: "CUSR0000SEHB", name: "CPI: Lodging Away From Home", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CUSR0000SEHC", source: "fred", sourceId: "CUSR0000SEHC", name: "CPI: Owners' Equivalent Rent", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CUUR0000SEHA", source: "fred", sourceId: "CUUR0000SEHA", name: "CPI: Rent of Primary Residence, NSA", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CUUR0000SEHC", source: "fred", sourceId: "CUUR0000SEHC", name: "CPI: Owners' Equivalent Rent, NSA", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CUUR0000SEHC01", source: "fred", sourceId: "CUUR0000SEHC01", name: "CPI: Owners' Equivalent Rent, Primary Residence, NSA", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CSUSHPINSA", source: "fred", sourceId: "CSUSHPINSA", name: "S&P/Case-Shiller US National Home Price Index", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MSACSR", source: "fred", sourceId: "MSACSR", name: "Monthly Supply of New Houses", unit: "months", industryTags: ["restaurant"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:USSTHPI", source: "fred", sourceId: "USSTHPI", name: "FHFA All-Transactions HPI, US", unit: "index", industryTags: ["restaurant"], costBucket: "housing", frequency: "quarterly" },
+  { code: "FRED:BOGZ1FL075035503Q", source: "fred", sourceId: "BOGZ1FL075035503Q", name: "Nonfinancial Business CRE Debt, Commercial Mortgages", unit: "USD millions", industryTags: ["restaurant"], costBucket: "housing", frequency: "quarterly" },
+
+  // --- Consumer demand (retail, sentiment, income, PCE, SNAP) ---
+  { code: "FRED:RSFSDP", source: "fred", sourceId: "RSFSDP", name: "Retail Sales: Food Svcs & Drinking Places", unit: "USD millions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:RSNSR", source: "fred", sourceId: "RSNSR", name: "Retail Sales: Non-Store Retailers", unit: "USD millions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:MRTSSM722USN", source: "fred", sourceId: "MRTSSM722USN", name: "Retail Trade: Food Svcs & Drinking Places, NSA", unit: "USD millions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:MRTSSM722USS", source: "fred", sourceId: "MRTSSM722USS", name: "Retail Trade: Food Svcs & Drinking Places, SA", unit: "USD millions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:CSCICP03USM665S", source: "fred", sourceId: "CSCICP03USM665S", name: "OECD Consumer Confidence Indicator, US", unit: "index", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:DSPI", source: "fred", sourceId: "DSPI", name: "Disposable Personal Income", unit: "USD billions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PCE", source: "fred", sourceId: "PCE", name: "Personal Consumption Expenditures", unit: "USD billions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PCEDG", source: "fred", sourceId: "PCEDG", name: "PCE: Durable Goods", unit: "USD billions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PCESV", source: "fred", sourceId: "PCESV", name: "PCE: Services", unit: "USD billions", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:DRCCLACBS", source: "fred", sourceId: "DRCCLACBS", name: "Delinquency Rate: Credit Card Loans", unit: "%", industryTags: ["restaurant"], costBucket: "consumer_credit", frequency: "quarterly" },
+  { code: "FRED:DRCLACBS", source: "fred", sourceId: "DRCLACBS", name: "Delinquency Rate: Consumer Loans", unit: "%", industryTags: ["restaurant"], costBucket: "consumer_credit", frequency: "quarterly" },
+  { code: "FRED:DRBLACBS", source: "fred", sourceId: "DRBLACBS", name: "Delinquency Rate: Business Loans", unit: "%", industryTags: ["restaurant"], costBucket: "credit", frequency: "quarterly" },
+  { code: "FRED:FODSP", source: "fred", sourceId: "FODSP", name: "SNAP Participation", unit: "persons", industryTags: ["restaurant"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:CUSR0000SEFV05", source: "fred", sourceId: "CUSR0000SEFV05", name: "CPI: Food From Vending Machines & Mobile Vendors", unit: "index", industryTags: ["restaurant"], costBucket: "menu_pricing", frequency: "monthly" },
+
+  // --- Financing & credit (rates, spreads, loans, FX) ---
+  { code: "FRED:FEDFUNDS", source: "fred", sourceId: "FEDFUNDS", name: "Federal Funds Effective Rate, Monthly", unit: "%", industryTags: ["restaurant"], costBucket: "interest_rates", frequency: "monthly" },
+  { code: "FRED:SOFR", source: "fred", sourceId: "SOFR", name: "Secured Overnight Financing Rate (SOFR)", unit: "%", industryTags: ["restaurant"], costBucket: "interest_rates", frequency: "daily" },
+  { code: "FRED:DGS2", source: "fred", sourceId: "DGS2", name: "2-Year Treasury Constant Maturity Rate", unit: "%", industryTags: ["restaurant"], costBucket: "interest_rates", frequency: "daily" },
+  { code: "FRED:BAMLC0A0CM", source: "fred", sourceId: "BAMLC0A0CM", name: "ICE BofA US Corporate Index OAS", unit: "%", industryTags: ["restaurant"], costBucket: "credit", frequency: "daily" },
+  { code: "FRED:BAMLC0A4CBBB", source: "fred", sourceId: "BAMLC0A4CBBB", name: "ICE BofA BBB US Corporate Index OAS", unit: "%", industryTags: ["restaurant"], costBucket: "credit", frequency: "daily" },
+  { code: "FRED:DRTSCILM", source: "fred", sourceId: "DRTSCILM", name: "Senior Loan Survey: Net % Tightening C&I Loans", unit: "%", industryTags: ["restaurant"], costBucket: "financing", frequency: "quarterly" },
+  { code: "FRED:BUSLOANS", source: "fred", sourceId: "BUSLOANS", name: "Commercial & Industrial Loans, All Commercial Banks", unit: "USD billions", industryTags: ["restaurant"], costBucket: "financing", frequency: "weekly" },
+  { code: "FRED:TOTCI", source: "fred", sourceId: "TOTCI", name: "Total Consumer Credit Outstanding", unit: "USD billions", industryTags: ["restaurant"], costBucket: "consumer_credit", frequency: "monthly" },
+  { code: "FRED:DEXCAUS", source: "fred", sourceId: "DEXCAUS", name: "Canada / US Foreign Exchange Rate", unit: "CAD per USD", industryTags: ["restaurant"], costBucket: "currency", frequency: "daily" },
+  { code: "FRED:DEXMXUS", source: "fred", sourceId: "DEXMXUS", name: "Mexico / US Foreign Exchange Rate", unit: "MXN per USD", industryTags: ["restaurant"], costBucket: "currency", frequency: "daily" },
+
+  // --- Macro / inflation (cross-reference) ---
+  { code: "FRED:CPILFESL", source: "fred", sourceId: "CPILFESL", name: "Core CPI (All Items Less Food & Energy)", unit: "index", industryTags: ["restaurant"], costBucket: "inflation", frequency: "monthly" },
+  { code: "FRED:CPIUFDSL", source: "fred", sourceId: "CPIUFDSL", name: "CPI: Food", unit: "index", industryTags: ["restaurant"], costBucket: "inflation", frequency: "monthly" },
+  { code: "FRED:PCEPI", source: "fred", sourceId: "PCEPI", name: "PCE Price Index", unit: "index", industryTags: ["restaurant"], costBucket: "inflation", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
   // Construction — materials, housing, wages, financing
   // ────────────────────────────────────────────────────────────────────────
   {
@@ -242,6 +424,251 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     costBucket: "demand",
     frequency: "monthly",
   },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // CONSTRUCTION — PROMPT 2 expansion (~165 new construction-tagged entries)
+  // Target operators: residential remodel, custom-home GC, small commercial,
+  // specialty trades (roofing, HVAC, electrical, plumbing), storm-chaser /
+  // restoration contractors. Roofing & disaster-risk coverage is emphasized.
+  // Series IDs verified via scripts/verify-construction-series.ts (FRED API).
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — lumber & wood
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU0811", source: "fred", sourceId: "WPU0811", name: "PPI: Softwood Lumber", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:WPU0812", source: "fred", sourceId: "WPU0812", name: "PPI: Hardwood Lumber", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:WPU083", source: "fred", sourceId: "WPU083", name: "PPI: Plywood", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:WPU0831", source: "fred", sourceId: "WPU0831", name: "PPI: Softwood Veneer & Plywood", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:PCU321219321219", source: "fred", sourceId: "PCU321219321219", name: "PPI: Reconstituted Wood Product Mfg (NAICS 321219)", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+  { code: "FRED:PCU321113321113", source: "fred", sourceId: "PCU321113321113", name: "PPI: Sawmills (NAICS 321113)", unit: "index", industryTags: ["construction"], costBucket: "lumber", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — concrete, cement, aggregate
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU132", source: "fred", sourceId: "WPU132", name: "PPI: Concrete Ingredients & Related Products", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU133", source: "fred", sourceId: "WPU133", name: "PPI: Concrete Products", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU1331", source: "fred", sourceId: "WPU1331", name: "PPI: Concrete Block & Brick", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU1322", source: "fred", sourceId: "WPU1322", name: "PPI: Hydraulic Cement", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:WPU134", source: "fred", sourceId: "WPU134", name: "PPI: Clay Construction Products (ex. refractories)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU327331327331", source: "fred", sourceId: "PCU327331327331", name: "PPI: Concrete Block & Brick Mfg (NAICS 327331)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU327390327390", source: "fred", sourceId: "PCU327390327390", name: "PPI: Other Concrete Product Mfg (NAICS 327390)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU327310327310", source: "fred", sourceId: "PCU327310327310", name: "PPI: Cement Mfg (NAICS 327310)", unit: "index", industryTags: ["construction"], costBucket: "concrete", frequency: "monthly" },
+  { code: "FRED:PCU212321212321", source: "fred", sourceId: "PCU212321212321", name: "PPI: Construction Sand & Gravel Mining (NAICS 212321)", unit: "index", industryTags: ["construction"], costBucket: "aggregate", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — drywall, gypsum, insulation
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU1371", source: "fred", sourceId: "WPU1371", name: "PPI: Gypsum Products", unit: "index", industryTags: ["construction"], costBucket: "drywall", frequency: "monthly" },
+  { code: "FRED:WPU137101", source: "fred", sourceId: "WPU137101", name: "PPI: Gypsum Products — detailed", unit: "index", industryTags: ["construction"], costBucket: "drywall", frequency: "monthly" },
+  { code: "FRED:PCU327420327420", source: "fred", sourceId: "PCU327420327420", name: "PPI: Gypsum Product Mfg (NAICS 327420)", unit: "index", industryTags: ["construction"], costBucket: "drywall", frequency: "monthly" },
+  { code: "FRED:WPU1392", source: "fred", sourceId: "WPU1392", name: "PPI: Insulation Materials", unit: "index", industryTags: ["construction"], costBucket: "insulation", frequency: "monthly" },
+  { code: "FRED:PCU327993327993", source: "fred", sourceId: "PCU327993327993", name: "PPI: Mineral Wool Mfg (NAICS 327993)", unit: "index", industryTags: ["construction"], costBucket: "insulation", frequency: "monthly" },
+  { code: "FRED:PCU326150326150", source: "fred", sourceId: "PCU326150326150", name: "PPI: Urethane & Other Foam Product Mfg (NAICS 326150)", unit: "index", industryTags: ["construction"], costBucket: "insulation", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — steel, iron, fabricated metal
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU101704", source: "fred", sourceId: "WPU101704", name: "PPI: Hot-Rolled Steel Bars, Plates & Structural Shapes", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:WPU101706", source: "fred", sourceId: "WPU101706", name: "PPI: Steel Pipe & Tube", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:WPU10170502", source: "fred", sourceId: "WPU10170502", name: "PPI: Steel Wire, Stainless Steel", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:PCU332312332312", source: "fred", sourceId: "PCU332312332312", name: "PPI: Fabricated Structural Metal Mfg (NAICS 332312)", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:PCU331110331110", source: "fred", sourceId: "PCU331110331110", name: "PPI: Iron & Steel Mills & Ferroalloy Mfg (NAICS 331110)", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:PCU332322332322", source: "fred", sourceId: "PCU332322332322", name: "PPI: Sheet Metal Work Mfg (NAICS 332322)", unit: "index", industryTags: ["construction"], costBucket: "steel", frequency: "monthly" },
+  { code: "FRED:WPU1026", source: "fred", sourceId: "WPU1026", name: "PPI: Nonferrous Wire & Cable", unit: "index", industryTags: ["construction"], costBucket: "wire", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — roofing & restoration (storm-chaser edge)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU324122324122", source: "fred", sourceId: "PCU324122324122", name: "PPI: Asphalt Shingle & Coating Materials Mfg (NAICS 324122)", unit: "index", industryTags: ["construction"], costBucket: "roofing", frequency: "monthly" },
+  { code: "FRED:PCU324121324121", source: "fred", sourceId: "PCU324121324121", name: "PPI: Asphalt Paving Mixture & Block Mfg (NAICS 324121)", unit: "index", industryTags: ["construction"], costBucket: "roofing", frequency: "monthly" },
+  { code: "FRED:PCU327992327992", source: "fred", sourceId: "PCU327992327992", name: "PPI: Ground or Treated Mineral & Earths Mfg (roofing granules)", unit: "index", industryTags: ["construction"], costBucket: "roofing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — windows, doors, glass, millwork
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU332321332321", source: "fred", sourceId: "PCU332321332321", name: "PPI: Metal Window & Door Mfg (NAICS 332321)", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU332321332321B", source: "fred", sourceId: "PCU332321332321B", name: "PPI: Metal Molding, Trim & Store Fronts", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU321911321911", source: "fred", sourceId: "PCU321911321911", name: "PPI: Wood Window & Door Mfg (NAICS 321911)", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU327211327211", source: "fred", sourceId: "PCU327211327211", name: "PPI: Flat Glass Mfg (NAICS 327211)", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+  { code: "FRED:PCU326199326199A", source: "fred", sourceId: "PCU326199326199A", name: "PPI: All Other Plastics Product Mfg — Reinforced/Fiberglass", unit: "index", industryTags: ["construction"], costBucket: "openings", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — flooring & interior finishes
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU321918321918", source: "fred", sourceId: "PCU321918321918", name: "PPI: Other Millwork, Including Flooring (NAICS 321918)", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:PCU326199326199C", source: "fred", sourceId: "PCU326199326199C", name: "PPI: All Other Plastics Product Mfg — Consumer/Commercial", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:PCU327120327120", source: "fred", sourceId: "PCU327120327120", name: "PPI: Clay Building Material & Refractories Mfg (NAICS 327120)", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:WPU0383", source: "fred", sourceId: "WPU0383", name: "PPI: Industrial & Fabricated Textile Products", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+  { code: "FRED:PCU314110314110", source: "fred", sourceId: "PCU314110314110", name: "PPI: Carpet & Rug Mills (NAICS 314110)", unit: "index", industryTags: ["construction"], costBucket: "flooring", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — paint, coatings, adhesives
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU0621", source: "fred", sourceId: "WPU0621", name: "PPI: Prepared Paint", unit: "index", industryTags: ["construction"], costBucket: "paint", frequency: "monthly" },
+  { code: "FRED:PCU325510325510", source: "fred", sourceId: "PCU325510325510", name: "PPI: Paint & Coating Mfg (NAICS 325510)", unit: "index", industryTags: ["construction"], costBucket: "paint", frequency: "monthly" },
+  { code: "FRED:PCU325520325520", source: "fred", sourceId: "PCU325520325520", name: "PPI: Adhesive Mfg (NAICS 325520)", unit: "index", industryTags: ["construction"], costBucket: "paint", frequency: "monthly" },
+  { code: "FRED:WPU0711", source: "fred", sourceId: "WPU0711", name: "PPI: Synthetic Rubber (SBR / EPDM)", unit: "index", industryTags: ["construction"], costBucket: "sealants", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — plumbing
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU331420331420", source: "fred", sourceId: "PCU331420331420", name: "PPI: Copper Rolling, Drawing, Extruding & Alloying (NAICS 331420)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+  { code: "FRED:PCU331420331420B", source: "fred", sourceId: "PCU331420331420B", name: "PPI: Copper & Alloy Mill Shapes (except wire/cable)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+  { code: "FRED:PCU326122326122", source: "fred", sourceId: "PCU326122326122", name: "PPI: Plastics Pipe & Pipe Fitting Mfg (NAICS 326122)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+  { code: "FRED:PCU332913332913", source: "fred", sourceId: "PCU332913332913", name: "PPI: Plumbing Fixture Fitting & Trim Mfg (NAICS 332913)", unit: "index", industryTags: ["construction"], costBucket: "plumbing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — electrical
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU335931335931", source: "fred", sourceId: "PCU335931335931", name: "PPI: Current-Carrying Wiring Device Mfg (NAICS 335931)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335932335932", source: "fred", sourceId: "PCU335932335932", name: "PPI: Noncurrent-Carrying Wiring Device Mfg (NAICS 335932)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335313335313", source: "fred", sourceId: "PCU335313335313", name: "PPI: Switchgear & Switchboard Apparatus Mfg (NAICS 335313)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335911335911", source: "fred", sourceId: "PCU335911335911", name: "PPI: Battery Mfg (NAICS 335911)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335122335122", source: "fred", sourceId: "PCU335122335122", name: "PPI: Nonresidential Electric Lighting Fixture Mfg (NAICS 335122)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU332618332618", source: "fred", sourceId: "PCU332618332618", name: "PPI: Other Fabricated Wire Product Mfg (NAICS 332618)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:PCU335110335110", source: "fred", sourceId: "PCU335110335110", name: "PPI: Electric Lamp Bulb & Part Mfg (NAICS 335110)", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+  { code: "FRED:WPU1175", source: "fred", sourceId: "WPU1175", name: "PPI: Switchgear, Switchboard & Industrial Controls Equipment", unit: "index", industryTags: ["construction"], costBucket: "electrical", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — HVAC / mechanical
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU333415333415", source: "fred", sourceId: "PCU333415333415", name: "PPI: AC, Refrigeration & Forced-Air Heating Equipment Mfg (NAICS 333415)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU333415333415A", source: "fred", sourceId: "PCU333415333415A", name: "PPI: AC Equipment Mfg — Compressors (ex. automotive)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU333414333414", source: "fred", sourceId: "PCU333414333414", name: "PPI: Heating Equipment Mfg (except warm-air furnaces, NAICS 333414)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU325120325120", source: "fred", sourceId: "PCU325120325120", name: "PPI: Industrial Gas Mfg (NAICS 325120) — refrigerant proxy", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+  { code: "FRED:PCU333912333912", source: "fred", sourceId: "PCU333912333912", name: "PPI: Air & Gas Compressor Mfg (NAICS 333912)", unit: "index", industryTags: ["construction"], costBucket: "hvac", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction materials — hardware & fasteners
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:PCU332722332722", source: "fred", sourceId: "PCU332722332722", name: "PPI: Bolt, Nut, Screw, Rivet & Washer Mfg (NAICS 332722)", unit: "index", industryTags: ["construction"], costBucket: "hardware", frequency: "monthly" },
+  { code: "FRED:PCU332510332510", source: "fred", sourceId: "PCU332510332510", name: "PPI: Hardware Mfg (NAICS 332510)", unit: "index", industryTags: ["construction"], costBucket: "hardware", frequency: "monthly" },
+  { code: "FRED:PCU332721332721", source: "fred", sourceId: "PCU332721332721", name: "PPI: Precision Turned Product Mfg (NAICS 332721)", unit: "index", industryTags: ["construction"], costBucket: "hardware", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction labor — national employment by subsector
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:USCONS", source: "fred", sourceId: "USCONS", name: "All Employees: Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023600001", source: "fred", sourceId: "CES2023600001", name: "All Employees: Construction of Buildings", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023610001", source: "fred", sourceId: "CES2023610001", name: "All Employees: Residential Building Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023620001", source: "fred", sourceId: "CES2023620001", name: "All Employees: Nonresidential Building Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023700001", source: "fred", sourceId: "CES2023700001", name: "All Employees: Heavy & Civil Engineering Construction", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CES2023800001", source: "fred", sourceId: "CES2023800001", name: "All Employees: Specialty Trade Contractors", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CEU2023700001", source: "fred", sourceId: "CEU2023700001", name: "All Employees, Heavy & Civil Engineering Construction (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CEU2023800001", source: "fred", sourceId: "CEU2023800001", name: "All Employees, Specialty Trade Contractors (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:AWHAECON", source: "fred", sourceId: "AWHAECON", name: "Avg Weekly Hours: Construction", unit: "hours", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:ECICONWAG", source: "fred", sourceId: "ECICONWAG", name: "Employment Cost Index: Wages & Salaries — Construction", unit: "index", industryTags: ["construction"], costBucket: "labor", frequency: "quarterly" },
+  { code: "FRED:LNU04032231", source: "fred", sourceId: "LNU04032231", name: "Unemployment Rate: Construction (NSA)", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:LNU03032231", source: "fred", sourceId: "LNU03032231", name: "Unemployment Level: Construction (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction labor — JOLTS (openings, hires, quits, separations)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:JTS2300JOL", source: "fred", sourceId: "JTS2300JOL", name: "JOLTS: Construction — Job Openings (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300HIL", source: "fred", sourceId: "JTS2300HIL", name: "JOLTS: Construction — Hires (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300QUL", source: "fred", sourceId: "JTS2300QUL", name: "JOLTS: Construction — Quits (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300TSL", source: "fred", sourceId: "JTS2300TSL", name: "JOLTS: Construction — Total Separations (level)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300JOR", source: "fred", sourceId: "JTS2300JOR", name: "JOLTS: Construction — Job Openings Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300HIR", source: "fred", sourceId: "JTS2300HIR", name: "JOLTS: Construction — Hires Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300QUR", source: "fred", sourceId: "JTS2300QUR", name: "JOLTS: Construction — Quits Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:JTS2300TSR", source: "fred", sourceId: "JTS2300TSR", name: "JOLTS: Construction — Total Separations Rate", unit: "%", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction labor — state employment (TX, FL, CA, AZ, NC)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:TXCONS", source: "fred", sourceId: "TXCONS", name: "All Employees: Construction in Texas (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:FLCONS", source: "fred", sourceId: "FLCONS", name: "All Employees: Construction in Florida (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CACONS", source: "fred", sourceId: "CACONS", name: "All Employees: Construction in California (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:AZCONS", source: "fred", sourceId: "AZCONS", name: "All Employees: Construction in Arizona (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:NCCONS", source: "fred", sourceId: "NCCONS", name: "All Employees: Construction in North Carolina (SA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:TXCONSN", source: "fred", sourceId: "TXCONSN", name: "All Employees: Construction in Texas (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:FLCONSN", source: "fred", sourceId: "FLCONSN", name: "All Employees: Construction in Florida (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:CACONSN", source: "fred", sourceId: "CACONSN", name: "All Employees: Construction in California (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:AZCONSN", source: "fred", sourceId: "AZCONSN", name: "All Employees: Construction in Arizona (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:NCCONSN", source: "fred", sourceId: "NCCONSN", name: "All Employees: Construction in North Carolina (NSA)", unit: "thousands", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+  { code: "FRED:SMU04000002000000008", source: "fred", sourceId: "SMU04000002000000008", name: "Avg Hourly Earnings of Production Employees: Construction in Arizona", unit: "USD/hour", industryTags: ["construction"], costBucket: "labor", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — housing starts & permits (national + regional)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:HOUST1F", source: "fred", sourceId: "HOUST1F", name: "Housing Starts: Single-Family Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUST2F", source: "fred", sourceId: "HOUST2F", name: "Housing Starts: Units in Buildings with 2-4 Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUST5F", source: "fred", sourceId: "HOUST5F", name: "Housing Starts: Units in Buildings with 5+ Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTNE", source: "fred", sourceId: "HOUSTNE", name: "Housing Starts: Northeast", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTMW", source: "fred", sourceId: "HOUSTMW", name: "Housing Starts: Midwest", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTS", source: "fred", sourceId: "HOUSTS", name: "Housing Starts: South", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:HOUSTW", source: "fred", sourceId: "HOUSTW", name: "Housing Starts: West", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PERMIT1", source: "fred", sourceId: "PERMIT1", name: "Building Permits: Single-Family Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PERMIT5", source: "fred", sourceId: "PERMIT5", name: "Building Permits: Units in Buildings with 5+ Units", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PERMITNSA", source: "fred", sourceId: "PERMITNSA", name: "Building Permits: Total Units (NSA)", unit: "thousands of units", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — home sales, supply, prices
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:HSN1F", source: "fred", sourceId: "HSN1F", name: "New One-Family Houses Sold: US", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:EXHOSLUSM495S", source: "fred", sourceId: "EXHOSLUSM495S", name: "Existing Home Sales", unit: "thousands of units (SAAR)", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:HOSSUPUSM673N", source: "fred", sourceId: "HOSSUPUSM673N", name: "Existing Home Sales: Months Supply", unit: "months", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MSPUS", source: "fred", sourceId: "MSPUS", name: "Median Sales Price of Houses Sold: US", unit: "USD", industryTags: ["construction"], costBucket: "housing", frequency: "quarterly" },
+  { code: "FRED:ASPUS", source: "fred", sourceId: "ASPUS", name: "Average Sales Price of Houses Sold: US", unit: "USD", industryTags: ["construction"], costBucket: "housing", frequency: "quarterly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — Case-Shiller national & 10/20-city composites
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:CSUSHPISA", source: "fred", sourceId: "CSUSHPISA", name: "S&P Case-Shiller US National Home Price Index (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SPCS20RSA", source: "fred", sourceId: "SPCS20RSA", name: "S&P Case-Shiller 20-City Composite HPI", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SPCS10RSA", source: "fred", sourceId: "SPCS10RSA", name: "S&P Case-Shiller 10-City Composite HPI", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — Case-Shiller metro HPI (17 metros)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:DAXRSA", source: "fred", sourceId: "DAXRSA", name: "Case-Shiller HPI — Dallas, TX (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MIXRSA", source: "fred", sourceId: "MIXRSA", name: "Case-Shiller HPI — Miami, FL (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:LXXRSA", source: "fred", sourceId: "LXXRSA", name: "Case-Shiller HPI — Los Angeles, CA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:PHXRSA", source: "fred", sourceId: "PHXRSA", name: "Case-Shiller HPI — Phoenix, AZ (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CRXRSA", source: "fred", sourceId: "CRXRSA", name: "Case-Shiller HPI — Charlotte, NC (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:ATXRSA", source: "fred", sourceId: "ATXRSA", name: "Case-Shiller HPI — Atlanta, GA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:TPXRSA", source: "fred", sourceId: "TPXRSA", name: "Case-Shiller HPI — Tampa, FL (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SFXRSA", source: "fred", sourceId: "SFXRSA", name: "Case-Shiller HPI — San Francisco, CA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CHXRSA", source: "fred", sourceId: "CHXRSA", name: "Case-Shiller HPI — Chicago, IL (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:DNXRSA", source: "fred", sourceId: "DNXRSA", name: "Case-Shiller HPI — Denver, CO (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:BOXRSA", source: "fred", sourceId: "BOXRSA", name: "Case-Shiller HPI — Boston, MA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:NYXRSA", source: "fred", sourceId: "NYXRSA", name: "Case-Shiller HPI — New York, NY (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:WDXRSA", source: "fred", sourceId: "WDXRSA", name: "Case-Shiller HPI — Washington, DC (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:SEXRSA", source: "fred", sourceId: "SEXRSA", name: "Case-Shiller HPI — Seattle, WA (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:POXRSA", source: "fred", sourceId: "POXRSA", name: "Case-Shiller HPI — Portland, OR (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:LVXRSA", source: "fred", sourceId: "LVXRSA", name: "Case-Shiller HPI — Las Vegas, NV (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:MNXRSA", source: "fred", sourceId: "MNXRSA", name: "Case-Shiller HPI — Minneapolis, MN (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+  { code: "FRED:CEXRSA", source: "fred", sourceId: "CEXRSA", name: "Case-Shiller HPI — Cleveland, OH (SA)", unit: "index", industryTags: ["construction"], costBucket: "housing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction demand — spending by segment (Census Value Put In Place)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:TLRESCONS", source: "fred", sourceId: "TLRESCONS", name: "Total Construction Spending: Residential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PRRESCONS", source: "fred", sourceId: "PRRESCONS", name: "Total Private Construction Spending: Residential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:PNRESCONS", source: "fred", sourceId: "PNRESCONS", name: "Total Private Construction Spending: Nonresidential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+  { code: "FRED:TLNRESCONS", source: "fred", sourceId: "TLNRESCONS", name: "Total Construction Spending: Nonresidential", unit: "USD millions (SAAR)", industryTags: ["construction"], costBucket: "demand", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction financing — mortgage rates & short-rate proxies
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:MORTGAGE15US", source: "fred", sourceId: "MORTGAGE15US", name: "15-Year Fixed Rate Mortgage Average", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "weekly" },
+  { code: "FRED:OBMMIFHA30YF", source: "fred", sourceId: "OBMMIFHA30YF", name: "30-Year Fixed Rate FHA Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIVA30YF", source: "fred", sourceId: "OBMMIVA30YF", name: "30-Year Fixed Rate VA Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIJUMBO30YF", source: "fred", sourceId: "OBMMIJUMBO30YF", name: "30-Year Fixed Rate Jumbo Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIC30YF", source: "fred", sourceId: "OBMMIC30YF", name: "30-Year Fixed Rate Conforming Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:OBMMIC15YF", source: "fred", sourceId: "OBMMIC15YF", name: "15-Year Fixed Rate Conforming Mortgage Index", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:DGS30", source: "fred", sourceId: "DGS30", name: "30-Year Treasury Constant Maturity Rate", unit: "%", industryTags: ["construction"], costBucket: "interest_rates", frequency: "daily" },
+  { code: "FRED:DPRIME", source: "fred", sourceId: "DPRIME", name: "Bank Prime Loan Rate (Daily)", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "daily" },
+  { code: "FRED:MPRIME", source: "fred", sourceId: "MPRIME", name: "Bank Prime Loan Rate (Monthly)", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "monthly" },
+  { code: "FRED:TERMCBAUTO48NS", source: "fred", sourceId: "TERMCBAUTO48NS", name: "Commercial Bank Consumer Installment Loan Rate: 48-mo New Auto (HELOC proxy)", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "monthly" },
+  { code: "FRED:TERMCBCCALLNS", source: "fred", sourceId: "TERMCBCCALLNS", name: "Commercial Bank Credit Card Interest Rate: All Accounts", unit: "%", industryTags: ["construction"], costBucket: "financing", frequency: "monthly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Construction fuel & energy — diesel/fuel oil (truck fleets, heaters)
+  // ────────────────────────────────────────────────────────────────────────
+  { code: "FRED:WPU057", source: "fred", sourceId: "WPU057", name: "PPI: Refined Petroleum Products (broad)", unit: "index", industryTags: ["construction"], costBucket: "fuel", frequency: "monthly" },
+  { code: "FRED:WPU0573", source: "fred", sourceId: "WPU0573", name: "PPI: Light Fuel Oils (diesel / heating oil)", unit: "index", industryTags: ["construction"], costBucket: "fuel", frequency: "monthly" },
 
   // ────────────────────────────────────────────────────────────────────────
   // Retail — demand, consumer health, input costs
@@ -518,6 +945,1953 @@ export const INDICATOR_REGISTRY: readonly IndicatorDefinition[] = [
     industryTags: ["construction"],
     costBucket: "materials",
     frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Treasury FiscalData — sovereign debt & cash position
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "TREASURY:debt_to_penny",
+    source: "treasury",
+    sourceId: "debt_to_penny",
+    name: "Total Public Debt Outstanding",
+    unit: "USD",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "sovereign_debt",
+    frequency: "daily",
+  },
+  {
+    code: "TREASURY:tga_operating_balance",
+    source: "treasury",
+    sourceId: "tga_operating_balance",
+    name: "Treasury General Account: Closing Operating Balance",
+    unit: "USD millions",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "sovereign_debt",
+    frequency: "daily",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // NOAA — active weather alerts (NWS) and climate baselines (NCEI)
+  // NWS alerts are snapshots: one data point per fetch with value = alert count.
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:ALL",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:ALL",
+    name: "NWS Active Alerts — National Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Hurricane Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Hurricane Warning",
+    name: "NWS Active Alerts — Hurricane Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Tornado Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Tornado Warning",
+    name: "NWS Active Alerts — Tornado Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  // Construction-specific alert types — storm-chaser / restoration signal.
+  // High Wind, Red Flag, Severe Thunderstorm, Flood, Winter Storm are the
+  // leading indicators for roofing claims, siding damage, pipe bursts, and
+  // wildfire-adjacent restoration demand.
+  { code: "NOAA:NWS:ALERTS:ACTIVE:High Wind Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:High Wind Warning", name: "NWS Active Alerts — High Wind Warnings", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Red Flag Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Red Flag Warning", name: "NWS Active Alerts — Red Flag Warnings (wildfire risk)", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Severe Thunderstorm Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Severe Thunderstorm Warning", name: "NWS Active Alerts — Severe Thunderstorm Warnings (hail proxy)", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Flood Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Flood Warning", name: "NWS Active Alerts — Flood Warnings", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+  { code: "NOAA:NWS:ALERTS:ACTIVE:Winter Storm Warning", source: "noaa", sourceId: "NWS:ALERTS:ACTIVE:Winter Storm Warning", name: "NWS Active Alerts — Winter Storm Warnings", unit: "count", industryTags: ["construction"], costBucket: "weather", frequency: "daily" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Census — international trade, monthly imports by HS2 commodity
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "CENSUS:IMPORTS:HS2:02",
+    source: "census",
+    sourceId: "IMPORTS:HS2:02",
+    name: "US Imports: Meat & Edible Meat Offal (HS 02)",
+    unit: "USD",
+    industryTags: ["restaurant"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:10",
+    source: "census",
+    sourceId: "IMPORTS:HS2:10",
+    name: "US Imports: Cereals (HS 10)",
+    unit: "USD",
+    industryTags: ["restaurant"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:27",
+    source: "census",
+    sourceId: "IMPORTS:HS2:27",
+    name: "US Imports: Mineral Fuels & Oils (HS 27)",
+    unit: "USD",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:72",
+    source: "census",
+    sourceId: "IMPORTS:HS2:72",
+    name: "US Imports: Iron & Steel (HS 72)",
+    unit: "USD",
+    industryTags: ["construction"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "CENSUS:IMPORTS:HS2:87",
+    source: "census",
+    sourceId: "IMPORTS:HS2:87",
+    name: "US Imports: Vehicles (HS 87)",
+    unit: "USD",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // USDA AMS — daily wholesale livestock/meat/dairy
+  // Distinct from USDA NASS (farmer-received prices) in lib/data-sources/usda.ts
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "USDA_AMS:NATIONAL_BOXED_BEEF_CHOICE_DAILY",
+    source: "usda_ams",
+    sourceId: "NATIONAL_BOXED_BEEF_CHOICE_DAILY",
+    name: "National Daily Boxed Beef Cutout — Choice (600-900 lb)",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_meat",
+    frequency: "daily",
+  },
+  {
+    code: "USDA_AMS:NATIONAL_BOXED_BEEF_SELECT_DAILY",
+    source: "usda_ams",
+    sourceId: "NATIONAL_BOXED_BEEF_SELECT_DAILY",
+    name: "National Daily Boxed Beef Cutout — Select (600-900 lb)",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_meat",
+    frequency: "daily",
+  },
+  {
+    code: "USDA_AMS:NATIONAL_BONELESS_PROCESSING_BEEF_DAILY",
+    source: "usda_ams",
+    sourceId: "NATIONAL_BONELESS_PROCESSING_BEEF_DAILY",
+    name: "National Daily Boneless Processing Beef — Weighted Average",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_meat",
+    frequency: "daily",
+  },
+  {
+    code: "USDA_AMS:NATIONAL_DAILY_HOG_PURCHASED_SWINE",
+    source: "usda_ams",
+    sourceId: "NATIONAL_DAILY_HOG_PURCHASED_SWINE",
+    name: "National Daily Direct Hog — Barrows & Gilts Weighted Avg Net",
+    unit: "USD/cwt",
+    industryTags: ["restaurant"],
+    costBucket: "wholesale_pork",
+    frequency: "daily",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Federal Register — policy / regulatory event counts, weekly buckets
+  // INTERFACE-FIT: docs, not a time series. Stored as weekly counts where
+  // value = number of matching publications in the ISO week.
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FEDERAL_REGISTER:tariff",
+    source: "federal_register",
+    sourceId: "tariff",
+    name: "Federal Register: Weekly Tariff Publications",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+  {
+    code: "FEDERAL_REGISTER:import duty",
+    source: "federal_register",
+    sourceId: "import duty",
+    name: "Federal Register: Weekly Import-Duty Publications",
+    unit: "count",
+    industryTags: ["restaurant", "retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+  {
+    code: "FEDERAL_REGISTER:trade",
+    source: "federal_register",
+    sourceId: "trade",
+    name: "Federal Register: Weekly Trade Publications",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+  // Construction-specific policy signals: OSHA rulemaking, building-code
+  // amendments, contractor licensing notices, Davis-Bacon prevailing-wage
+  // determinations, and broad construction-related publications.
+  { code: "FEDERAL_REGISTER:osha", source: "federal_register", sourceId: "osha", name: "Federal Register: Weekly OSHA Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:building code", source: "federal_register", sourceId: "building code", name: "Federal Register: Weekly Building-Code Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:construction", source: "federal_register", sourceId: "construction", name: "Federal Register: Weekly Construction Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:contractor", source: "federal_register", sourceId: "contractor", name: "Federal Register: Weekly Contractor-Related Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+  { code: "FEDERAL_REGISTER:davis-bacon", source: "federal_register", sourceId: "davis-bacon", name: "Federal Register: Weekly Davis-Bacon (Prevailing Wage) Publications", unit: "count", industryTags: ["construction"], costBucket: "policy", frequency: "weekly" },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // FHFA — House Price Index, CSV-sourced
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FHFA:HPI_PO_MONTHLY_USA_SA",
+    source: "fhfa",
+    sourceId: "HPI_PO_MONTHLY_USA_SA",
+    name: "FHFA Purchase-Only HPI — National (SA, Monthly)",
+    unit: "index",
+    industryTags: ["construction", "retail"],
+    costBucket: "housing",
+    frequency: "monthly",
+  },
+  {
+    code: "FHFA:HPI_AT_QUARTERLY_USA_NSA",
+    source: "fhfa",
+    sourceId: "HPI_AT_QUARTERLY_USA_NSA",
+    name: "FHFA All-Transactions HPI — National (NSA, Quarterly)",
+    unit: "index",
+    industryTags: ["construction", "retail"],
+    costBucket: "housing",
+    frequency: "quarterly",
+  },
+  {
+    code: "FHFA:HPI_EXP_QUARTERLY_USA_NSA",
+    source: "fhfa",
+    sourceId: "HPI_EXP_QUARTERLY_USA_NSA",
+    name: "FHFA Expanded-Data HPI — National (NSA, Quarterly)",
+    unit: "index",
+    industryTags: ["construction", "retail"],
+    costBucket: "housing",
+    frequency: "quarterly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // FEMA — monthly disaster declaration counts (risk signal)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US",
+    name: "FEMA Disaster Declarations — US Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Hurricane",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Hurricane",
+    name: "FEMA Disaster Declarations — Hurricanes Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  // Construction-specific disaster types — restoration contractor demand.
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Severe Storm", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Severe Storm", name: "FEMA Disaster Declarations — Severe Storms Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Flood", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Flood", name: "FEMA Disaster Declarations — Floods Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Tornado", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Tornado", name: "FEMA Disaster Declarations — Tornadoes Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+  { code: "FEMA:DECLARATIONS:MONTHLY:US:Fire", source: "fema", sourceId: "DECLARATIONS:MONTHLY:US:Fire", name: "FEMA Disaster Declarations — Fires Monthly Count", unit: "count", industryTags: ["construction"], costBucket: "disaster_risk", frequency: "monthly" },
+
+  // ════════════════════════════════════════════════════════════════════════
+  // RETAIL INDICATORS — PROMPT 3 expansion (~156 new retail-tagged entries)
+  // Target operators: independent brick-and-mortar, small e-comm, specialty
+  // retail, apparel, home goods, sporting goods, hobby/gift, convenience.
+  // Series IDs verified via scripts/verify-retail-ids.ts against FRED metadata.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — consumer demand: retail sales by subsector (Census MRTS)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:RSXFS",
+    source: "fred",
+    sourceId: "RSXFS",
+    name: "Retail Sales: Retail Trade (Excluding Food Services)",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSCCAS",
+    source: "fred",
+    sourceId: "RSCCAS",
+    name: "Retail Sales: Clothing & Clothing Accessory Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSEAS",
+    source: "fred",
+    sourceId: "RSEAS",
+    name: "Retail Sales: Electronics & Appliance Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSSGHBMS",
+    source: "fred",
+    sourceId: "RSSGHBMS",
+    name: "Retail Sales: Sporting Goods, Hobby, Musical Instrument & Book Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSFHFS",
+    source: "fred",
+    sourceId: "RSFHFS",
+    name: "Retail Sales: Furniture & Home Furnishings Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSGMS",
+    source: "fred",
+    sourceId: "RSGMS",
+    name: "Retail Sales: General Merchandise Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSDBS",
+    source: "fred",
+    sourceId: "RSDBS",
+    name: "Retail Sales: Food & Beverage Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSNSR",
+    source: "fred",
+    sourceId: "RSNSR",
+    name: "Retail Sales: Nonstore Retailers (E-Commerce-Heavy)",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSFSDP",
+    source: "fred",
+    sourceId: "RSFSDP",
+    name: "Retail Sales: Food Services & Drinking Places",
+    unit: "USD millions",
+    industryTags: ["restaurant", "retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSHPCS",
+    source: "fred",
+    sourceId: "RSHPCS",
+    name: "Retail Sales: Health & Personal Care Stores",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSMVPD",
+    source: "fred",
+    sourceId: "RSMVPD",
+    name: "Retail Sales: Motor Vehicle & Parts Dealers",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSGASS",
+    source: "fred",
+    sourceId: "RSGASS",
+    name: "Retail Sales: Gasoline Stations",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSBMGESD",
+    source: "fred",
+    sourceId: "RSBMGESD",
+    name: "Retail Sales: Building Materials, Garden Equipment & Supplies Dealers",
+    unit: "USD millions",
+    industryTags: ["construction", "retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RSMSR",
+    source: "fred",
+    sourceId: "RSMSR",
+    name: "Retail Sales: Miscellaneous Store Retailers",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:MRTSSM44X72USS",
+    source: "fred",
+    sourceId: "MRTSSM44X72USS",
+    name: "Retail Sales: Retail Trade & Food Services (SA)",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RRSFS",
+    source: "fred",
+    sourceId: "RRSFS",
+    name: "Advance Real Retail & Food Services Sales",
+    unit: "USD millions (chained)",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CMRMTSPL",
+    source: "fred",
+    sourceId: "CMRMTSPL",
+    name: "Real Manufacturing & Trade Industries Sales",
+    unit: "USD millions (chained)",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — consumer sentiment & leading indicators
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:MICH",
+    source: "fred",
+    sourceId: "MICH",
+    name: "U. Michigan: 1-Year Inflation Expectation (Median)",
+    unit: "%",
+    industryTags: ["restaurant", "retail"],
+    costBucket: "inflation_expectations",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CSCICP03USM665S",
+    source: "fred",
+    sourceId: "CSCICP03USM665S",
+    name: "OECD Composite Consumer Confidence Indicator — United States",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:USSLIND",
+    source: "fred",
+    sourceId: "USSLIND",
+    name: "Leading Index for the United States",
+    unit: "%",
+    industryTags: ["retail", "construction"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — household income, PCE, savings
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:DSPI",
+    source: "fred",
+    sourceId: "DSPI",
+    name: "Disposable Personal Income (Nominal)",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PI",
+    source: "fred",
+    sourceId: "PI",
+    name: "Personal Income",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:W875RX1",
+    source: "fred",
+    sourceId: "W875RX1",
+    name: "Real Personal Income Excluding Transfer Receipts",
+    unit: "USD billions (chained)",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCE",
+    source: "fred",
+    sourceId: "PCE",
+    name: "Personal Consumption Expenditures",
+    unit: "USD billions",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCEC96",
+    source: "fred",
+    sourceId: "PCEC96",
+    name: "Real Personal Consumption Expenditures",
+    unit: "USD billions (chained)",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCEDG",
+    source: "fred",
+    sourceId: "PCEDG",
+    name: "PCE: Durable Goods",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCEND",
+    source: "fred",
+    sourceId: "PCEND",
+    name: "PCE: Nondurable Goods",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCES",
+    source: "fred",
+    sourceId: "PCES",
+    name: "PCE: Services",
+    unit: "USD billions",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — consumer credit & delinquency
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:REVOLSL",
+    source: "fred",
+    sourceId: "REVOLSL",
+    name: "Revolving Consumer Credit Outstanding",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:NONREVSL",
+    source: "fred",
+    sourceId: "NONREVSL",
+    name: "Nonrevolving Consumer Credit Outstanding",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:DRCCLACBS",
+    source: "fred",
+    sourceId: "DRCCLACBS",
+    name: "Delinquency Rate on Credit Card Loans, All Commercial Banks",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:CORCCACBS",
+    source: "fred",
+    sourceId: "CORCCACBS",
+    name: "Charge-Off Rate on Credit Card Loans, All Commercial Banks",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:DRCLACBS",
+    source: "fred",
+    sourceId: "DRCLACBS",
+    name: "Delinquency Rate on Consumer Loans, All Commercial Banks",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:CCLACBW027SBOG",
+    source: "fred",
+    sourceId: "CCLACBW027SBOG",
+    name: "Credit Cards & Other Revolving Plans, All Commercial Banks",
+    unit: "USD billions",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "weekly",
+  },
+  {
+    code: "FRED:TERMCBCCALLNS",
+    source: "fred",
+    sourceId: "TERMCBCCALLNS",
+    name: "Commercial Bank Interest Rate on Credit Card Plans — All Accounts",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:TERMCBCCINTNS",
+    source: "fred",
+    sourceId: "TERMCBCCINTNS",
+    name: "Commercial Bank Interest Rate on Credit Card Plans — Accounts Assessed Interest",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — inventories / inventory-to-sales
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:RETAILIMSA",
+    source: "fred",
+    sourceId: "RETAILIMSA",
+    name: "Retailers Inventories",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "inventory",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RETAILIRSA",
+    source: "fred",
+    sourceId: "RETAILIRSA",
+    name: "Retailers Inventories-to-Sales Ratio",
+    unit: "ratio",
+    industryTags: ["retail"],
+    costBucket: "inventory",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:ISRATIO",
+    source: "fred",
+    sourceId: "ISRATIO",
+    name: "Total Business: Inventories-to-Sales Ratio",
+    unit: "ratio",
+    industryTags: ["retail"],
+    costBucket: "inventory",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:BUSINV",
+    source: "fred",
+    sourceId: "BUSINV",
+    name: "Total Business Inventories",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "inventory",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — discretionary demand proxies
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:DGORDER",
+    source: "fred",
+    sourceId: "DGORDER",
+    name: "Manufacturers' New Orders: Durable Goods",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:NEWORDER",
+    source: "fred",
+    sourceId: "NEWORDER",
+    name: "Manufacturers' New Orders: Nondefense Capital Goods ex Aircraft",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:ACOGNO",
+    source: "fred",
+    sourceId: "ACOGNO",
+    name: "Manufacturers' New Orders: Consumer Goods",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:AMTMNO",
+    source: "fred",
+    sourceId: "AMTMNO",
+    name: "Manufacturers' New Orders: Total Manufacturing",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:TOTALSA",
+    source: "fred",
+    sourceId: "TOTALSA",
+    name: "Total Vehicle Sales",
+    unit: "millions of units (SAAR)",
+    industryTags: ["retail"],
+    costBucket: "demand",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — household balance-sheet pressure
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:TDSP",
+    source: "fred",
+    sourceId: "TDSP",
+    name: "Household Debt Service Payments as % of Disposable Income",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:FODSP",
+    source: "fred",
+    sourceId: "FODSP",
+    name: "Household Financial Obligations as % of Disposable Income (Historical)",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "quarterly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — labor: CES subsector employment
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:USTRADE",
+    source: "fred",
+    sourceId: "USTRADE",
+    name: "All Employees: Retail Trade",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4244100001",
+    source: "fred",
+    sourceId: "CES4244100001",
+    name: "All Employees: Motor Vehicle & Parts Dealers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4244200001",
+    source: "fred",
+    sourceId: "CES4244200001",
+    name: "All Employees: Furniture & Home Furnishings Retailers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4244300001",
+    source: "fred",
+    sourceId: "CES4244300001",
+    name: "All Employees: Electronics & Appliance Retailers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4244600001",
+    source: "fred",
+    sourceId: "CES4244600001",
+    name: "All Employees: Health & Personal Care Retailers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4244700001",
+    source: "fred",
+    sourceId: "CES4244700001",
+    name: "All Employees: Gasoline Stations & Fuel Dealers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4245100001",
+    source: "fred",
+    sourceId: "CES4245100001",
+    name: "All Employees: Sporting Goods, Hobby, Musical Instrument, Book & Misc Retailers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4245200001",
+    source: "fred",
+    sourceId: "CES4245200001",
+    name: "All Employees: General Merchandise Retailers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — labor: hours, earnings
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:CES4200000003",
+    source: "fred",
+    sourceId: "CES4200000003",
+    name: "Average Hourly Earnings of All Employees: Retail Trade",
+    unit: "USD/hour",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4200000011",
+    source: "fred",
+    sourceId: "CES4200000011",
+    name: "Average Weekly Earnings of All Employees: Retail Trade",
+    unit: "USD/week",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:AWHAETP",
+    source: "fred",
+    sourceId: "AWHAETP",
+    name: "Average Weekly Hours of All Employees: Total Private",
+    unit: "hours",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES0500000003",
+    source: "fred",
+    sourceId: "CES0500000003",
+    name: "Average Hourly Earnings of All Employees: Total Private",
+    unit: "USD/hour",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — JOLTS: openings, hires, quits, separations
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:JTS4400JOL",
+    source: "fred",
+    sourceId: "JTS4400JOL",
+    name: "Job Openings: Retail Trade",
+    unit: "thousands",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:JTS4400HIL",
+    source: "fred",
+    sourceId: "JTS4400HIL",
+    name: "Hires: Retail Trade",
+    unit: "thousands",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:JTS4400QUL",
+    source: "fred",
+    sourceId: "JTS4400QUL",
+    name: "Quits: Retail Trade",
+    unit: "thousands",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:JTS4400TSL",
+    source: "fred",
+    sourceId: "JTS4400TSL",
+    name: "Total Separations: Retail Trade",
+    unit: "thousands",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — warehouse/fulfillment & logistics labor (e-commerce ops)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:CES4349300001",
+    source: "fred",
+    sourceId: "CES4349300001",
+    name: "All Employees: Warehousing & Storage",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4349200001",
+    source: "fred",
+    sourceId: "CES4349200001",
+    name: "All Employees: Couriers & Messengers",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:USTPU",
+    source: "fred",
+    sourceId: "USTPU",
+    name: "All Employees: Trade, Transportation & Utilities",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CES4348100001",
+    source: "fred",
+    sourceId: "CES4348100001",
+    name: "All Employees: Air Transportation (Parcel/Air Cargo Proxy)",
+    unit: "thousands of persons",
+    industryTags: ["retail"],
+    costBucket: "logistics",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — macro labor drivers (participation, min wage)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:CIVPART",
+    source: "fred",
+    sourceId: "CIVPART",
+    name: "Labor Force Participation Rate",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:EMRATIO",
+    source: "fred",
+    sourceId: "EMRATIO",
+    name: "Employment-Population Ratio",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:FEDMINNFRWG",
+    source: "fred",
+    sourceId: "FEDMINNFRWG",
+    name: "Federal Minimum Hourly Wage for Nonfarm Workers",
+    unit: "USD/hour",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "labor",
+    frequency: "monthly",
+  },
+  // STTMINWGCA (state min wage CA) dropped — FRED reports annual frequency,
+  // which is not in our frequencyEnum. Re-add if/when we extend the enum.
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — cost inputs: apparel & textile PPI/CPI
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:WPU0381",
+    source: "fred",
+    sourceId: "WPU0381",
+    name: "PPI: Textile Products & Apparel — Apparel",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "apparel",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CPIAPPSL",
+    source: "fred",
+    sourceId: "CPIAPPSL",
+    name: "CPI: Apparel",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "apparel",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUSR0000SAA1",
+    source: "fred",
+    sourceId: "CUSR0000SAA1",
+    name: "CPI: Men's & Boys' Apparel",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "apparel",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUSR0000SAA2",
+    source: "fred",
+    sourceId: "CUSR0000SAA2",
+    name: "CPI: Women's & Girls' Apparel",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "apparel",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — cost inputs: consumer electronics PPI/CPI
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:WPU1178",
+    source: "fred",
+    sourceId: "WPU1178",
+    name: "PPI: Electronic Components & Accessories",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "electronics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU334334",
+    source: "fred",
+    sourceId: "PCU334334",
+    name: "PPI by Industry: Computer & Electronic Product Manufacturing",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "electronics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUSR0000SEEE",
+    source: "fred",
+    sourceId: "CUSR0000SEEE",
+    name: "CPI: Information Technology, Hardware & Services",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "electronics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUSR0000SEEE01",
+    source: "fred",
+    sourceId: "CUSR0000SEEE01",
+    name: "CPI: Computers, Peripherals & Smart Home Assistants",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "electronics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUSR0000SERA",
+    source: "fred",
+    sourceId: "CUSR0000SERA",
+    name: "CPI: Video & Audio",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "electronics",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — cost inputs: furniture & home furnishings PPI/CPI
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:WPU121",
+    source: "fred",
+    sourceId: "WPU121",
+    name: "PPI: Furniture & Household Durables — Household Furniture",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "furniture",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU1211",
+    source: "fred",
+    sourceId: "WPU1211",
+    name: "PPI: Metal Household Furniture",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "furniture",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU337337",
+    source: "fred",
+    sourceId: "PCU337337",
+    name: "PPI by Industry: Furniture & Related Product Manufacturing",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "furniture",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUSR0000SAH3",
+    source: "fred",
+    sourceId: "CUSR0000SAH3",
+    name: "CPI: Household Furnishings & Operations",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "furniture",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — cost inputs: toys, sporting goods, jewelry PPI
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:WPU1511",
+    source: "fred",
+    sourceId: "WPU1511",
+    name: "PPI: Toys, Games & Children's Vehicles",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "toys",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU159402",
+    source: "fred",
+    sourceId: "WPU159402",
+    name: "PPI: Jewelry (Gold & Platinum) & Silverware",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "jewelry",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — cost inputs: packaging (pulp, paper, plastic, glass)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:WPU0911",
+    source: "fred",
+    sourceId: "WPU0911",
+    name: "PPI: Pulp, Paper & Allied Products — Wood Pulp",
+    unit: "index",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "packaging",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU0913",
+    source: "fred",
+    sourceId: "WPU0913",
+    name: "PPI: Pulp, Paper & Allied Products — Paper",
+    unit: "index",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "packaging",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU0915",
+    source: "fred",
+    sourceId: "WPU0915",
+    name: "PPI: Converted Paper & Paperboard Products",
+    unit: "index",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "packaging",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU072",
+    source: "fred",
+    sourceId: "WPU072",
+    name: "PPI: Rubber & Plastic Products — Plastic Products",
+    unit: "index",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "packaging",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU1381",
+    source: "fred",
+    sourceId: "WPU1381",
+    name: "PPI: Nonmetallic Mineral Products — Glass Containers",
+    unit: "index",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "packaging",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — cost inputs: import & export prices (tariff/sourcing impact)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:IR",
+    source: "fred",
+    sourceId: "IR",
+    name: "Import Price Index (End Use): All Commodities",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:IR400",
+    source: "fred",
+    sourceId: "IR400",
+    name: "Import Price Index: Apparel, Footwear & Household Goods",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CHNTOT",
+    source: "fred",
+    sourceId: "CHNTOT",
+    name: "Import Price Index by Origin (NAICS): All Industries — China",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:MEXTOT",
+    source: "fred",
+    sourceId: "MEXTOT",
+    name: "Import Price Index by Origin (NAICS): All Industries — Mexico",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:IQ",
+    source: "fred",
+    sourceId: "IQ",
+    name: "Export Price Index (End Use): All Commodities",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:IQAG",
+    source: "fred",
+    sourceId: "IQAG",
+    name: "Export Price Index (End Use): Agricultural Commodities",
+    unit: "index",
+    industryTags: ["retail", "restaurant"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:IMPCH",
+    source: "fred",
+    sourceId: "IMPCH",
+    name: "US Imports of Goods by Customs Basis from China",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "trade_flow",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — logistics: fuel & freight rates
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:GASDESW",
+    source: "fred",
+    sourceId: "GASDESW",
+    name: "US Diesel Sales Price (Weekly)",
+    unit: "USD/gal",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "fuel",
+    frequency: "weekly",
+  },
+  {
+    code: "FRED:DCOILWTICO",
+    source: "fred",
+    sourceId: "DCOILWTICO",
+    name: "Crude Oil Prices: West Texas Intermediate (WTI) — Cushing, OK",
+    unit: "USD/barrel",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "fuel",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:DCOILBRENTEU",
+    source: "fred",
+    sourceId: "DCOILBRENTEU",
+    name: "Crude Oil Prices: Brent — Europe",
+    unit: "USD/barrel",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "fuel",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:WJFUELUSGULF",
+    source: "fred",
+    sourceId: "WJFUELUSGULF",
+    name: "Kerosene-Type Jet Fuel Prices: US Gulf Coast",
+    unit: "USD/gal",
+    industryTags: ["retail"],
+    costBucket: "fuel",
+    frequency: "weekly",
+  },
+  {
+    code: "FRED:PCU484484",
+    source: "fred",
+    sourceId: "PCU484484",
+    name: "PPI by Industry: Truck Transportation",
+    unit: "index",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "freight",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU4841214841212",
+    source: "fred",
+    sourceId: "PCU4841214841212",
+    name: "PPI: General Freight Trucking, Long-Distance Truckload",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "freight",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU4841224841221",
+    source: "fred",
+    sourceId: "PCU4841224841221",
+    name: "PPI: General Freight Trucking, Long-Distance Less-Than-Truckload",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "freight",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU482482",
+    source: "fred",
+    sourceId: "PCU482482",
+    name: "PPI by Industry: Rail Transportation",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "freight",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU493493",
+    source: "fred",
+    sourceId: "PCU493493",
+    name: "PPI by Industry: Warehousing & Storage",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "logistics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU492492",
+    source: "fred",
+    sourceId: "PCU492492",
+    name: "PPI by Industry: Couriers & Messengers",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "logistics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU4911149111",
+    source: "fred",
+    sourceId: "PCU4911149111",
+    name: "PPI by Industry: US Postal Service",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "logistics",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:RAILFRTINTERMODAL",
+    source: "fred",
+    sourceId: "RAILFRTINTERMODAL",
+    name: "Rail Freight Intermodal Traffic",
+    unit: "carloads",
+    industryTags: ["retail"],
+    costBucket: "freight",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:TRUCKD11",
+    source: "fred",
+    sourceId: "TRUCKD11",
+    name: "Truck Tonnage Index",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "freight",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — real estate: commercial rent, housing, CRE price index
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:CUUR0000SEHA",
+    source: "fred",
+    sourceId: "CUUR0000SEHA",
+    name: "CPI: Rent of Primary Residence",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "real_estate",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CUUR0000SEHC01",
+    source: "fred",
+    sourceId: "CUUR0000SEHC01",
+    name: "CPI: Owners' Equivalent Rent of Primary Residence",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "real_estate",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU531120531120",
+    source: "fred",
+    sourceId: "PCU531120531120",
+    name: "PPI by Industry: Lessors of Nonresidential Buildings",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "real_estate",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:WPU3911",
+    source: "fred",
+    sourceId: "WPU3911",
+    name: "PPI: Credit Intermediation Services (Partial) — Business Loans",
+    unit: "index",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "financing",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:BOGZ1FL075035503Q",
+    source: "fred",
+    sourceId: "BOGZ1FL075035503Q",
+    name: "Commercial Real Estate Price Index, Level",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "real_estate",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:CSUSHPINSA",
+    source: "fred",
+    sourceId: "CSUSHPINSA",
+    name: "S&P Case-Shiller US National Home Price Index (NSA)",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "housing",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:CSUSHPISA",
+    source: "fred",
+    sourceId: "CSUSHPISA",
+    name: "S&P Case-Shiller US National Home Price Index (SA)",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "housing",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:SPCS20RSA",
+    source: "fred",
+    sourceId: "SPCS20RSA",
+    name: "S&P Case-Shiller 20-City Composite Home Price Index",
+    unit: "index",
+    industryTags: ["retail", "construction"],
+    costBucket: "housing",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:TLCOMCONS",
+    source: "fred",
+    sourceId: "TLCOMCONS",
+    name: "Total Construction Spending: Commercial",
+    unit: "USD millions (SAAR)",
+    industryTags: ["retail", "construction"],
+    costBucket: "real_estate",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PRRESCONS",
+    source: "fred",
+    sourceId: "PRRESCONS",
+    name: "Total Private Construction Spending: Residential",
+    unit: "USD millions (SAAR)",
+    industryTags: ["retail", "construction"],
+    costBucket: "housing",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:TLPRVCONS",
+    source: "fred",
+    sourceId: "TLPRVCONS",
+    name: "Total Private Construction Spending",
+    unit: "USD millions (SAAR)",
+    industryTags: ["retail", "construction"],
+    costBucket: "real_estate",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:ASPUS",
+    source: "fred",
+    sourceId: "ASPUS",
+    name: "Average Sales Price of Houses Sold (US)",
+    unit: "USD",
+    industryTags: ["retail", "construction"],
+    costBucket: "housing",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:MSPUS",
+    source: "fred",
+    sourceId: "MSPUS",
+    name: "Median Sales Price of Houses Sold (US)",
+    unit: "USD",
+    industryTags: ["retail", "construction"],
+    costBucket: "housing",
+    frequency: "quarterly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — financing: rates, spreads, bank standards
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:SOFR",
+    source: "fred",
+    sourceId: "SOFR",
+    name: "Secured Overnight Financing Rate",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "interest_rates",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:DPRIME",
+    source: "fred",
+    sourceId: "DPRIME",
+    name: "Bank Prime Loan Rate",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "interest_rates",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:DCPF3M",
+    source: "fred",
+    sourceId: "DCPF3M",
+    name: "90-Day AA Financial Commercial Paper Interest Rate",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "interest_rates",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:DCPN3M",
+    source: "fred",
+    sourceId: "DCPN3M",
+    name: "90-Day AA Nonfinancial Commercial Paper Interest Rate",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "interest_rates",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:BAMLC0A0CM",
+    source: "fred",
+    sourceId: "BAMLC0A0CM",
+    name: "ICE BofA US Corporate Index Option-Adjusted Spread (IG)",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "credit",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:BAMLC0A4CBBB",
+    source: "fred",
+    sourceId: "BAMLC0A4CBBB",
+    name: "ICE BofA BBB US Corporate Index Option-Adjusted Spread",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "credit",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:T10Y2Y",
+    source: "fred",
+    sourceId: "T10Y2Y",
+    name: "10-Year minus 2-Year Treasury Constant Maturity Spread",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "interest_rates",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:T10Y3M",
+    source: "fred",
+    sourceId: "T10Y3M",
+    name: "10-Year minus 3-Month Treasury Constant Maturity Spread",
+    unit: "%",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "interest_rates",
+    frequency: "daily",
+  },
+  {
+    code: "FRED:DRTSCILM",
+    source: "fred",
+    sourceId: "DRTSCILM",
+    name: "SLOOS: Net % Banks Tightening Standards on C&I Loans — Large & Middle-Market",
+    unit: "%",
+    industryTags: ["retail", "construction"],
+    costBucket: "credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:DRTSCIS",
+    source: "fred",
+    sourceId: "DRTSCIS",
+    name: "SLOOS: Net % Banks Tightening Standards on C&I Loans — Small Firms",
+    unit: "%",
+    industryTags: ["retail", "construction"],
+    costBucket: "credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:DRTSCLCC",
+    source: "fred",
+    sourceId: "DRTSCLCC",
+    name: "SLOOS: Net % Banks Tightening Standards on Credit Card Loans",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "consumer_credit",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:DRISCFLM",
+    source: "fred",
+    sourceId: "DRISCFLM",
+    name: "SLOOS: Net % Banks Increasing Spreads on C&I Loans — Large & Middle-Market",
+    unit: "%",
+    industryTags: ["retail", "construction"],
+    costBucket: "credit",
+    frequency: "quarterly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — bank lending aggregates
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:H8B1058NCBCMG",
+    source: "fred",
+    sourceId: "H8B1058NCBCMG",
+    name: "Deposits, All Commercial Banks (H.8)",
+    unit: "USD billions",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "credit",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:BUSLOANS",
+    source: "fred",
+    sourceId: "BUSLOANS",
+    name: "Commercial & Industrial Loans, All Commercial Banks",
+    unit: "USD billions",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "credit",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:TOTLL",
+    source: "fred",
+    sourceId: "TOTLL",
+    name: "Loans & Leases in Bank Credit, All Commercial Banks",
+    unit: "USD billions",
+    industryTags: ["retail", "restaurant", "construction"],
+    costBucket: "credit",
+    frequency: "weekly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — e-commerce: share of retail, nonstore sales, ad-tech costs
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FRED:ECOMPCTNSA",
+    source: "fred",
+    sourceId: "ECOMPCTNSA",
+    name: "E-Commerce Retail Sales as % of Total Retail Sales (NSA)",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:ECOMPCTSA",
+    source: "fred",
+    sourceId: "ECOMPCTSA",
+    name: "E-Commerce Retail Sales as % of Total Retail Sales (SA)",
+    unit: "%",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:ECOMSA",
+    source: "fred",
+    sourceId: "ECOMSA",
+    name: "E-Commerce Retail Sales (SA)",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:ECOMNSA",
+    source: "fred",
+    sourceId: "ECOMNSA",
+    name: "E-Commerce Retail Sales (NSA)",
+    unit: "USD millions",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "quarterly",
+  },
+  {
+    code: "FRED:PCU518210518210",
+    source: "fred",
+    sourceId: "PCU518210518210",
+    name: "PPI by Industry: Data Processing, Hosting & Related Services",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "monthly",
+  },
+  {
+    code: "FRED:PCU541810541810",
+    source: "fred",
+    sourceId: "PCU541810541810",
+    name: "PPI by Industry: Advertising Agencies",
+    unit: "index",
+    industryTags: ["retail"],
+    costBucket: "ecommerce",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — risk: FEMA disaster declaration types (store closure / insurance)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Fire",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Fire",
+    name: "FEMA Disaster Declarations — Fires Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Flood",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Flood",
+    name: "FEMA Disaster Declarations — Floods Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Severe Storm",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Severe Storm",
+    name: "FEMA Disaster Declarations — Severe Storms Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Severe Ice Storm",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Severe Ice Storm",
+    name: "FEMA Disaster Declarations — Severe Ice Storms Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Snowstorm",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Snowstorm",
+    name: "FEMA Disaster Declarations — Snowstorms Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+  {
+    code: "FEMA:DECLARATIONS:MONTHLY:US:Tornado",
+    source: "fema",
+    sourceId: "DECLARATIONS:MONTHLY:US:Tornado",
+    name: "FEMA Disaster Declarations — Tornadoes Monthly Count",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "disaster_risk",
+    frequency: "monthly",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — risk: NOAA NWS active alerts (foot traffic / seasonal demand)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Winter Storm Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Winter Storm Warning",
+    name: "NWS Active Alerts — Winter Storm Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Flood Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Flood Warning",
+    name: "NWS Active Alerts — Flood Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Heat Advisory",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Heat Advisory",
+    name: "NWS Active Alerts — Heat Advisories",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+  {
+    code: "NOAA:NWS:ALERTS:ACTIVE:Severe Thunderstorm Warning",
+    source: "noaa",
+    sourceId: "NWS:ALERTS:ACTIVE:Severe Thunderstorm Warning",
+    name: "NWS Active Alerts — Severe Thunderstorm Warnings",
+    unit: "count",
+    industryTags: ["restaurant", "construction", "retail"],
+    costBucket: "weather",
+    frequency: "daily",
+  },
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Retail — risk: Federal Register (retail-specific regulatory flow)
+  // ────────────────────────────────────────────────────────────────────────
+  {
+    code: "FEDERAL_REGISTER:consumer product safety",
+    source: "federal_register",
+    sourceId: "consumer product safety",
+    name: "Federal Register: Weekly Consumer Product Safety Publications",
+    unit: "count",
+    industryTags: ["retail"],
+    costBucket: "policy",
+    frequency: "weekly",
+  },
+  {
+    code: "FEDERAL_REGISTER:Federal Trade Commission",
+    source: "federal_register",
+    sourceId: "Federal Trade Commission",
+    name: "Federal Register: Weekly FTC Publications",
+    unit: "count",
+    industryTags: ["retail"],
+    costBucket: "policy",
+    frequency: "weekly",
   },
 ];
 

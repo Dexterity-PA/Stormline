@@ -1,7 +1,18 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+import { BlsAdapter } from "../../data-sources/bls";
+import { CensusTradeAdapter } from "../../data-sources/census-trade";
+import { EiaAdapter } from "../../data-sources/eia";
+import { FederalRegisterAdapter } from "../../data-sources/federal-register";
+import { FemaAdapter } from "../../data-sources/fema";
+import { FhfaAdapter } from "../../data-sources/fhfa";
 import { FredAdapter } from "../../data-sources/fred";
+import { NoaaAdapter } from "../../data-sources/noaa";
+import { TreasuryAdapter } from "../../data-sources/treasury";
+import type { DataSourceAdapter } from "../../data-sources/types";
+import { UsdaAdapter } from "../../data-sources/usda";
+import { UsdaAmsAdapter } from "../../data-sources/usda-ams";
 import { db } from "../../db";
 import { indicators } from "../../db/schema";
 import { getIndicator, INDICATOR_REGISTRY } from "../../indicators/registry";
@@ -12,22 +23,60 @@ import {
 } from "../../queries/observations";
 import { inngest } from "../../../inngest/client";
 
-export const BackfillEventSchema = z.object({
-  indicatorCode: z.string().min(1).optional(),
-  yearsBack: z.number().int().positive().max(50).default(10),
-});
+export const SUPPORTED_BACKFILL_SOURCES = [
+  "fred",
+  "eia",
+  "usda",
+  "bls",
+  "treasury",
+  "federal_register",
+  "fema",
+  "fhfa",
+  "usda_ams",
+  "census",
+  "noaa",
+] as const;
+export type SupportedBackfillSource = (typeof SUPPORTED_BACKFILL_SOURCES)[number];
+
+export const BackfillEventSchema = z
+  .object({
+    indicatorCode: z.string().min(1).optional(),
+    source: z.enum(SUPPORTED_BACKFILL_SOURCES).optional(),
+    yearsBack: z.number().int().positive().max(50).default(10),
+  })
+  .refine(
+    (d) => !(d.indicatorCode && d.source),
+    "indicatorCode and source are mutually exclusive",
+  );
 
 export type BackfillEventData = z.infer<typeof BackfillEventSchema>;
 
 export interface BackfillResult {
   code: string;
+  source: SupportedBackfillSource;
   inserted: number;
   skipped: number;
   fetched: number;
   error?: string;
 }
 
-const FRED_RATE_LIMIT_SLEEP_MS = 600;
+// Per-source rate-limit sleeps between indicators. FRED allows 120 req/min.
+// NASS and EIA are generous but slow per request; BLS is 500/day unauth.
+// Treasury/FederalRegister/FEMA/FHFA/USDA-AMS/Census/NOAA all use unmetered
+// endpoints with internal backoff; we space modestly to be courteous.
+const RATE_LIMIT_SLEEP_MS: Record<SupportedBackfillSource, number> = {
+  fred: 600,
+  eia: 500,
+  usda: 500,
+  bls: 1000,
+  treasury: 500,
+  federal_register: 500,
+  fema: 500,
+  fhfa: 500,
+  usda_ams: 500,
+  census: 500,
+  noaa: 500,
+};
 
 function yearsAgo(years: number): Date {
   const now = new Date();
@@ -47,34 +96,101 @@ function toIsoDate(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-async function getIndicatorRowByCode(
-  code: string,
-): Promise<{ id: string } | undefined> {
+function isSupportedSource(
+  s: IndicatorDefinition["source"],
+): s is SupportedBackfillSource {
+  return (SUPPORTED_BACKFILL_SOURCES as readonly string[]).includes(s);
+}
+
+async function getOrCreateIndicatorRow(
+  def: IndicatorDefinition,
+): Promise<{ id: string }> {
+  const [existing] = await db
+    .select({ id: indicators.id })
+    .from(indicators)
+    .where(eq(indicators.code, def.code))
+    .limit(1);
+  if (existing) return existing;
+
+  const [inserted] = await db
+    .insert(indicators)
+    .values({
+      code: def.code,
+      source: def.source,
+      sourceId: def.sourceId,
+      name: def.name,
+      unit: def.unit,
+      industryTags: [...def.industryTags] as string[],
+      costBucket: def.costBucket,
+      frequency: def.frequency,
+    })
+    .onConflictDoNothing({ target: indicators.code })
+    .returning({ id: indicators.id });
+
+  if (inserted) return inserted;
+
+  // Conflict raced us; re-select.
   const [row] = await db
     .select({ id: indicators.id })
     .from(indicators)
-    .where(eq(indicators.code, code))
+    .where(eq(indicators.code, def.code))
     .limit(1);
+  if (!row) {
+    throw new Error(`failed to seed indicator ${def.code}`);
+  }
   return row;
 }
+
+export type AdapterFactory = (
+  source: SupportedBackfillSource,
+) => DataSourceAdapter;
+
+export const defaultAdapterFactory: AdapterFactory = (source) => {
+  switch (source) {
+    case "fred":
+      return new FredAdapter();
+    case "eia":
+      return new EiaAdapter();
+    case "usda":
+      return new UsdaAdapter();
+    case "bls":
+      return new BlsAdapter();
+    case "treasury":
+      return new TreasuryAdapter();
+    case "federal_register":
+      return new FederalRegisterAdapter();
+    case "fema":
+      return new FemaAdapter();
+    case "fhfa":
+      return new FhfaAdapter();
+    case "usda_ams":
+      return new UsdaAmsAdapter();
+    case "census":
+      return new CensusTradeAdapter();
+    case "noaa":
+      return new NoaaAdapter();
+  }
+};
 
 export async function backfillIndicator(
   definition: IndicatorDefinition,
   since: Date,
-  fred: FredAdapter = new FredAdapter(),
+  adapter: DataSourceAdapter,
 ): Promise<BackfillResult> {
-  const row = await getIndicatorRowByCode(definition.code);
-  if (!row) {
+  if (!isSupportedSource(definition.source)) {
     return {
       code: definition.code,
+      source: definition.source as SupportedBackfillSource,
       inserted: 0,
       skipped: 0,
       fetched: 0,
-      error: "indicator not registered in DB",
+      error: `unsupported source: ${definition.source}`,
     };
   }
 
-  const fetched = await fred.fetchSeries(definition.sourceId, { since });
+  const row = await getOrCreateIndicatorRow(definition);
+
+  const fetched = await adapter.fetchSeries(definition.sourceId, { since });
   const points: UpsertObservationPoint[] = fetched.points.map((p) => ({
     date: toIsoDate(p.observedAt),
     value: p.value,
@@ -83,10 +199,30 @@ export async function backfillIndicator(
   const counts = await upsertObservations(row.id, points);
   return {
     code: definition.code,
+    source: definition.source,
     fetched: points.length,
     inserted: counts.inserted,
     skipped: counts.skipped,
   };
+}
+
+function resolveTargets(parsed: BackfillEventData): IndicatorDefinition[] {
+  if (parsed.indicatorCode) {
+    const def = getIndicator(parsed.indicatorCode);
+    if (!def)
+      throw new Error(`unknown indicator: ${parsed.indicatorCode}`);
+    if (!isSupportedSource(def.source)) {
+      throw new Error(
+        `indicator ${def.code} has unsupported source "${def.source}"`,
+      );
+    }
+    return [def];
+  }
+  if (parsed.source) {
+    const target = parsed.source;
+    return INDICATOR_REGISTRY.filter((d) => d.source === target);
+  }
+  return INDICATOR_REGISTRY.filter((d) => isSupportedSource(d.source));
 }
 
 export const backfillObservations = inngest.createFunction(
@@ -99,36 +235,35 @@ export const backfillObservations = inngest.createFunction(
   async ({ event, step, logger }) => {
     const parsed = BackfillEventSchema.parse(event.data ?? {});
     const since = yearsAgo(parsed.yearsBack);
-    const fred = new FredAdapter();
 
-    const targets: IndicatorDefinition[] = parsed.indicatorCode
-      ? (() => {
-          const def = getIndicator(parsed.indicatorCode!);
-          if (!def) throw new Error(`unknown indicator: ${parsed.indicatorCode}`);
-          if (def.source !== "fred") {
-            throw new Error(
-              `indicator ${def.code} is not a FRED series (source=${def.source})`,
-            );
-          }
-          return [def];
-        })()
-      : INDICATOR_REGISTRY.filter((d) => d.source === "fred");
+    const targets = resolveTargets(parsed);
+    const adapterCache = new Map<SupportedBackfillSource, DataSourceAdapter>();
+    const adapterFor = (source: SupportedBackfillSource): DataSourceAdapter => {
+      let a = adapterCache.get(source);
+      if (!a) {
+        a = defaultAdapterFactory(source);
+        adapterCache.set(source, a);
+      }
+      return a;
+    };
 
     const results: BackfillResult[] = [];
 
     for (const def of targets) {
+      const source = def.source as SupportedBackfillSource;
       const result = await step.run(`backfill:${def.code}`, async () => {
         try {
-          return await backfillIndicator(def, since, fred);
+          return await backfillIndicator(def, since, adapterFor(source));
         } catch (err) {
           const message =
             err instanceof Error ? err.message : "unknown error";
           logger.error(
-            { code: def.code, err: message },
+            { code: def.code, source, err: message },
             "backfill failed for indicator",
           );
           return {
             code: def.code,
+            source,
             fetched: 0,
             inserted: 0,
             skipped: 0,
@@ -140,6 +275,7 @@ export const backfillObservations = inngest.createFunction(
       logger.info(
         {
           code: result.code,
+          source: result.source,
           fetched: result.fetched,
           inserted: result.inserted,
           skipped: result.skipped,
@@ -153,18 +289,36 @@ export const backfillObservations = inngest.createFunction(
       if (targets.length > 1) {
         await step.sleep(
           `rate-limit:${def.code}`,
-          `${FRED_RATE_LIMIT_SLEEP_MS}ms`,
+          `${RATE_LIMIT_SLEEP_MS[source]}ms`,
         );
       }
+    }
+
+    const perSource: Record<
+      string,
+      { indicators: number; inserted: number; skipped: number; errors: number }
+    > = {};
+    for (const r of results) {
+      const bucket = (perSource[r.source] ??= {
+        indicators: 0,
+        inserted: 0,
+        skipped: 0,
+        errors: 0,
+      });
+      bucket.indicators++;
+      bucket.inserted += r.inserted;
+      bucket.skipped += r.skipped;
+      if (r.error) bucket.errors++;
     }
 
     return {
       totalIndicators: targets.length,
       totalInserted: results.reduce((sum, r) => sum + r.inserted, 0),
       totalSkipped: results.reduce((sum, r) => sum + r.skipped, 0),
+      perSource,
       errors: results
         .filter((r) => r.error)
-        .map((r) => ({ code: r.code, error: r.error })),
+        .map((r) => ({ code: r.code, source: r.source, error: r.error })),
     };
   },
 );

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Sidebar } from '@/components/shell/Sidebar';
 import { TopBar } from '@/components/shell/TopBar';
 import { MobileSidebar } from '@/components/shell/MobileSidebar';
+import { CommandPaletteProvider } from '@/components/command/CommandPaletteProvider';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       <MobileSidebar />
+
+      <Suspense fallback={null}>
+        <CommandPaletteProvider />
+      </Suspense>
     </div>
   );
 }

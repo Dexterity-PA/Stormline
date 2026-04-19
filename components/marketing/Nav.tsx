@@ -16,16 +16,16 @@ export default function Nav() {
         <Link
           href="/"
           aria-label="Stormline home"
-          className="group inline-flex items-center gap-2"
+          className="group inline-flex items-center"
         >
-          <span
-            aria-hidden
-            className="inline-block h-2 w-2 rounded-full"
-            style={{ background: 'var(--sl-accent)', boxShadow: 'var(--sl-glow-accent)' }}
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG, no benefit from next/image */}
+          <img
+            src="/brand/logo.svg"
+            alt="Stormline"
+            width={360}
+            height={72}
+            className="h-7 w-auto select-none"
           />
-          <span className="font-display text-base font-semibold tracking-tight text-fg">
-            Stormline
-          </span>
         </Link>
 
         <nav
