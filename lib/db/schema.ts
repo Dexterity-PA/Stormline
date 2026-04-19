@@ -224,16 +224,26 @@ export const alertDeliveries = pgTable("alert_deliveries", {
   openedAt: timestamp("opened_at", { withTimezone: true }),
 });
 
-export const dashboardSnapshots = pgTable("dashboard_snapshots", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  industry: industryEnum("industry").notNull(),
-  region: text("region").notNull(),
-  snapshotDate: date("snapshot_date").notNull(),
-  dataJson: jsonb("data_json").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const dashboardSnapshots = pgTable(
+  "dashboard_snapshots",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    industry: industryEnum("industry").notNull(),
+    region: text("region").notNull(),
+    snapshotDate: date("snapshot_date").notNull(),
+    dataJson: jsonb("data_json").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("dashboard_snapshots_industry_region_date_unique").on(
+      t.industry,
+      t.region,
+      t.snapshotDate,
+    ),
+  ],
+);
 
 export const feedback = pgTable("feedback", {
   id: uuid("id").primaryKey().defaultRandom(),
