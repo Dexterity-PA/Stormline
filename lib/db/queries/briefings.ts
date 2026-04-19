@@ -117,6 +117,19 @@ export async function publishBriefing(
   return row;
 }
 
+export async function updateBriefingBody(
+  id: string,
+  bodyMd: string,
+): Promise<Briefing> {
+  const [row] = await db
+    .update(briefings)
+    .set({ bodyMd, updatedAt: new Date() })
+    .where(eq(briefings.id, id))
+    .returning();
+  if (!row) throw new Error(`Briefing ${id} not found`);
+  return row;
+}
+
 export async function listDeliveries(
   briefingId: string,
 ): Promise<BriefingDelivery[]> {
