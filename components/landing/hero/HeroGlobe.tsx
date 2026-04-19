@@ -1,13 +1,17 @@
 'use client'
 
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
-import { Suspense, useMemo, useRef, useState } from 'react'
+import { Html, useTexture } from '@react-three/drei'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { MARKERS, MARKER_COLOR, MARKER_PULSE_COLOR, latLngToVec3 } from './markers'
 import LivePulse from '@/components/motion/LivePulse'
 
 const RADIUS = 1.4
+// NASA Blue Marble (natural earth daytime imagery), served from the
+// three-globe example bundle on unpkg — same source as globe.gl examples.
+const EARTH_TEXTURE_URL =
+  'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'
 
 // Soft fresnel atmosphere — rim glow with falloff. Power 2.5 = soft tail,
 // accent color at 20% saturation rendered at 30% opacity max so the halo
@@ -61,7 +65,33 @@ function FresnelAtmosphere() {
   )
 }
 
-function WireSphere() {
+function EarthSurface() {
+  const texture = useTexture(EARTH_TEXTURE_URL)
+
+  useEffect(() => {
+    if (!texture) return
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 8
+  }, [texture])
+
+  return (
+    <mesh>
+      <sphereGeometry args={[RADIUS, 96, 64]} />
+      {/* Daytime imagery, dark-mode tinted: emissive --sl-bg-1 (#0a0e13)
+         lifts continent legibility while the directional light handles the
+         day/night terminator. roughness 1 keeps oceans matte. */}
+      <meshStandardMaterial
+        map={texture}
+        emissive={new THREE.Color('#0a0e13')}
+        emissiveIntensity={0.55}
+        roughness={1}
+        metalness={0}
+      />
+    </mesh>
+  )
+}
+
+function EarthGroup() {
   const ref = useRef<THREE.Group>(null)
   useFrame((_, delta) => {
     if (!ref.current) return
@@ -70,16 +100,14 @@ function WireSphere() {
 
   return (
     <group ref={ref}>
-      {/* Filled, very low opacity sphere to give depth mask */}
-      <mesh>
-        <sphereGeometry args={[RADIUS - 0.005, 48, 48]} />
-        <meshBasicMaterial color="#0a0e13" transparent opacity={0.95} />
-      </mesh>
-      {/* Wireframe overlay */}
-      <mesh>
-        <sphereGeometry args={[RADIUS, 48, 24]} />
-        <meshBasicMaterial color="#1e2631" wireframe transparent opacity={0.75} />
-      </mesh>
+      <Suspense fallback={
+        <mesh>
+          <sphereGeometry args={[RADIUS, 48, 32]} />
+          <meshStandardMaterial color="#0e1822" roughness={1} metalness={0} />
+        </mesh>
+      }>
+        <EarthSurface />
+      </Suspense>
       <FresnelAtmosphere />
       <Markers />
     </group>
@@ -198,14 +226,18 @@ export default function HeroGlobe() {
     <Canvas
       dpr={[1, 1.6]}
       gl={{ antialias: true, alpha: true }}
-      camera={{ position: [0, 0.3, 3.6], fov: 45 }}
+      camera={{ position: [0, 0.3, 3.0], fov: 45 }}
       style={{ width: '100%', height: '100%' }}
     >
-      <ambientLight intensity={0.6} />
-      <pointLight position={[5, 3, 5]} intensity={0.8} color="#4ea8ff" />
+      {/* Ambient lifts the night side so continents stay readable; the
+          directional rig lights ~60% of the visible hemisphere from the
+          upper-front-right, leaving a soft terminator on the left. */}
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[3, 2, 4]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[-3, 1, -2]} intensity={0.18} color="#7aa9ff" />
       <Suspense fallback={null}>
         <Stars />
-        <WireSphere />
+        <EarthGroup />
       </Suspense>
     </Canvas>
   )
