@@ -2,12 +2,64 @@
 
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
-import { Suspense, useRef, useState } from 'react'
-import type * as THREE from 'three'
+import { Suspense, useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
 import { MARKERS, MARKER_COLOR, MARKER_PULSE_COLOR, latLngToVec3 } from './markers'
 import LivePulse from '@/components/motion/LivePulse'
 
 const RADIUS = 1.4
+
+// Soft fresnel atmosphere — rim glow with falloff. Power 2.5 = soft tail,
+// accent color at 20% saturation rendered at 30% opacity max so the halo
+// feels like a subtle horizon glow, not a hard ring.
+const atmosphereVertex = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewDir = normalize(-mvPosition.xyz);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`
+
+const atmosphereFragment = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uPower;
+  uniform float uOpacity;
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  void main() {
+    float rim = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), uPower);
+    gl_FragColor = vec4(uColor, rim * uOpacity);
+  }
+`
+
+function FresnelAtmosphere() {
+  const uniforms = useMemo(
+    () => ({
+      // --sl-accent (#4ea8ff) mixed with bg at ~20% saturation visually
+      uColor: { value: new THREE.Color('#9bc7ff') },
+      uPower: { value: 2.5 },
+      uOpacity: { value: 0.3 },
+    }),
+    [],
+  )
+  return (
+    <mesh scale={1.08}>
+      <sphereGeometry args={[RADIUS, 64, 32]} />
+      <shaderMaterial
+        vertexShader={atmosphereVertex}
+        fragmentShader={atmosphereFragment}
+        uniforms={uniforms}
+        transparent
+        side={THREE.BackSide}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </mesh>
+  )
+}
 
 function WireSphere() {
   const ref = useRef<THREE.Group>(null)
@@ -28,11 +80,7 @@ function WireSphere() {
         <sphereGeometry args={[RADIUS, 48, 24]} />
         <meshBasicMaterial color="#1e2631" wireframe transparent opacity={0.75} />
       </mesh>
-      {/* Atmosphere glow */}
-      <mesh scale={1.06}>
-        <sphereGeometry args={[RADIUS, 32, 32]} />
-        <meshBasicMaterial color="#4ea8ff" transparent opacity={0.04} depthWrite={false} />
-      </mesh>
+      <FresnelAtmosphere />
       <Markers />
     </group>
   )
