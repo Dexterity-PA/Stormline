@@ -1,11 +1,10 @@
 // inngest/functions/fetch-news.ts
-import { eq, isNull } from "drizzle-orm";
 import { inngest } from "@/inngest/client";
-import { db } from "@/lib/db";
-import { newsItems } from "@/lib/db/schema";
 import {
   insertNewsItems,
   getExistingSourceUrls,
+  getUntaggedNewsItems,
+  setNewsItemTag,
 } from "@/lib/db/queries/news";
 import { NEWS_SOURCES } from "@/lib/news/sources";
 import { fetchRawItems } from "@/lib/news/fetcher";
@@ -61,12 +60,7 @@ export const fetchNewsNightly = inngest.createFunction(
     );
 
     const tagCount = await step.run("tag-untagged-items", async () => {
-      const untagged = await db
-        .select()
-        .from(newsItems)
-        .where(isNull(newsItems.linkedIndicatorCode))
-        .orderBy(newsItems.createdAt)
-        .limit(MAX_TAG_PER_RUN);
+      const untagged = await getUntaggedNewsItems(MAX_TAG_PER_RUN);
 
       let tagged = 0;
       for (const item of untagged) {
@@ -77,13 +71,11 @@ export const fetchNewsNightly = inngest.createFunction(
             item.industry as "restaurant" | "construction" | "retail",
           );
           if (result.linkedIndicatorCode) {
-            await db
-              .update(newsItems)
-              .set({
-                linkedIndicatorCode: result.linkedIndicatorCode,
-                whyItMatters: result.whyItMatters,
-              })
-              .where(eq(newsItems.id, item.id));
+            await setNewsItemTag(
+              item.id,
+              result.linkedIndicatorCode,
+              result.whyItMatters,
+            );
             tagged++;
           }
         } catch {

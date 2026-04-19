@@ -2,7 +2,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
   NEWS_TAGGER_MODEL,
-  NEWS_TAGGER_VERSION,
   buildTaggingPrompt,
 } from "@/lib/llm/prompts/news-tagger";
 import { listIndicatorsByIndustry } from "@/lib/indicators/registry";
@@ -14,7 +13,6 @@ const MAX_INDICATORS = 80;
 export interface TagResult {
   linkedIndicatorCode: string | null;
   whyItMatters: string | null;
-  modelVersion: string;
 }
 
 function parseResponse(text: string): {
@@ -66,7 +64,6 @@ export async function tagHeadline(
     return {
       linkedIndicatorCode: null,
       whyItMatters: null,
-      modelVersion: NEWS_TAGGER_VERSION,
     };
   }
 
@@ -75,13 +72,11 @@ export async function tagHeadline(
     return {
       linkedIndicatorCode: null,
       whyItMatters: null,
-      modelVersion: NEWS_TAGGER_VERSION,
     };
   }
 
   return {
     linkedIndicatorCode: parsed.linked_indicator_code,
     whyItMatters: parsed.why_it_matters,
-    modelVersion: NEWS_TAGGER_VERSION,
   };
 }
