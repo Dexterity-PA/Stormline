@@ -5,6 +5,7 @@ import Section03Indictment from '@/components/landing/sections/Section03Indictme
 import Section04Pillars from '@/components/landing/sections/Section04Pillars'
 import Section05Industries from '@/components/landing/sections/Section05Industries'
 import Section06SampleBriefing from '@/components/landing/sections/Section06SampleBriefing'
+import Section07Pipeline from '@/components/landing/sections/Section07Pipeline'
 
 export const metadata: Metadata = {
   title: 'Stormline — Macro Intelligence for Operators',
@@ -21,7 +22,8 @@ export default function LandingPage() {
       <Section04Pillars />
       <Section05Industries />
       <Section06SampleBriefing />
-      {/* Sections 07–14 land in subsequent commits. */}
+      <Section07Pipeline />
+      {/* Sections 08–14 land in subsequent commits. */}
     </main>
   )
 }
