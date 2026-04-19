@@ -60,13 +60,15 @@ function DiagramMenuVsBeef({ progress }: { progress: number }) {
         strokeWidth={1.5}
         strokeDasharray="4 3"
       />
+      {/* Menu price label: anchored at 60% along the dashed line, sits below */}
       <text
-        x={width - 20}
-        y={menuY - 10}
+        x={20 + (width - 40) * 0.6}
+        y={menuY + 16}
         fontSize="11"
-        textAnchor="end"
+        textAnchor="middle"
         fill="var(--sl-fg-muted)"
         fontFamily="var(--sl-font-mono)"
+        style={{ maxWidth: 180 }}
       >
         Your menu price · flat
       </text>
@@ -82,13 +84,25 @@ function DiagramMenuVsBeef({ progress }: { progress: number }) {
         fill="url(#sl-d1-area)"
       />
       <circle cx={width - 20} cy={beefEnd} r={4} fill="var(--sl-crit)" />
+      {/* Subtle leader from beef label down to data point */}
+      <line
+        x1={width - 20}
+        x2={width - 20}
+        y1={beefEnd - 14}
+        y2={beefEnd - 6}
+        stroke="var(--sl-crit)"
+        strokeWidth={1}
+        opacity={0.5}
+      />
+      {/* Boxed beef label: 16px clearance above red line endpoint */}
       <text
-        x={width - 28}
-        y={beefEnd - 10}
+        x={width - 20}
+        y={beefEnd - 16}
         fontSize="11"
         textAnchor="end"
         fill="var(--sl-crit)"
         fontFamily="var(--sl-font-mono)"
+        style={{ maxWidth: 180 }}
       >
         Boxed beef +{(p * 14).toFixed(1)}% QoQ
       </text>
