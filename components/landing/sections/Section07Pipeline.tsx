@@ -80,7 +80,7 @@ function PipelineDesktop() {
         />
       </svg>
 
-      <div className="grid grid-cols-5 gap-6">
+      <div className="grid grid-cols-5 items-stretch gap-6">
         {STAGES.map((s) => (
           <StageCard key={s.num} stage={s} />
         ))}
@@ -127,7 +127,11 @@ function StageCard({ stage, mobile = false }: { stage: Stage; mobile?: boolean }
   return (
     <div
       ref={ref}
-      className={mobile ? 'relative flex items-start gap-4 pl-0' : 'relative'}
+      className={
+        mobile
+          ? 'relative flex items-start gap-4 pl-0'
+          : 'relative flex h-full flex-col'
+      }
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translate3d(0,0,0)' : 'translate3d(0, 12px, 0)',
@@ -182,8 +186,8 @@ function StageCard({ stage, mobile = false }: { stage: Stage; mobile?: boolean }
       <div
         className={
           mobile
-            ? 'flex-1 rounded-[var(--sl-radius-md)] border p-5'
-            : 'rounded-[var(--sl-radius-md)] border p-5'
+            ? 'flex flex-1 flex-col rounded-[var(--sl-radius-md)] border p-5'
+            : 'flex flex-1 flex-col rounded-[var(--sl-radius-md)] border p-5'
         }
         style={{
           borderColor: 'var(--sl-border)',
@@ -197,7 +201,7 @@ function StageCard({ stage, mobile = false }: { stage: Stage; mobile?: boolean }
           {stage.body}
         </p>
         <div
-          className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.15em]"
+          className="mt-auto inline-flex w-fit items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.15em]"
           style={{
             borderColor: 'var(--sl-border)',
             color: 'var(--sl-fg-dim)',
