@@ -44,7 +44,7 @@ export default function NumberRoll({
           }
         }
       },
-      { threshold: 0.4 },
+      { threshold: 0, rootMargin: '0px 0px -15% 0px' },
     )
     io.observe(el)
     return () => io.disconnect()
@@ -54,7 +54,7 @@ export default function NumberRoll({
     if (!started || prefersReduced) return
     const start = performance.now()
     let raf = 0
-    const ease = (t: number) => 1 - Math.pow(1 - t, 3)
+    const ease = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t))
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration)
       setDisplay(value * ease(t))

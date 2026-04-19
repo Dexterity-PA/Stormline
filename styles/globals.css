@@ -300,6 +300,18 @@ html.lenis body {
   100% { clip-path: inset(100% 0 0 0); opacity: 0; visibility: hidden; }
 }
 
+/* Crossfade swap (label swap-in) */
+@keyframes sl-crossfade {
+  0%   { opacity: 0; transform: translate3d(0, 4px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Alert slide-in from top */
+@keyframes sl-alert-slide-in {
+  0%   { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.98); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
 /* Accent underline draw-in */
 @keyframes sl-underline-draw {
   from { transform: scaleX(0); }

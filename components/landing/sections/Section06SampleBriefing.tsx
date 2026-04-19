@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SplitTextReveal } from '@/components/motion'
 
 type Paragraph = {
@@ -59,11 +59,11 @@ const BRIEFING: readonly Paragraph[] = [
     id: 'b-4',
     kind: 'p',
     text:
-      'Diesel at $3.847/gal eased 0.4% and freight spot rates held at $2.21/mi. Distribution cost pressure is contained this week; the prior two weeks\u2019 tightening has reversed.',
+      'Diesel at $3.847/gal eased 0.4% and freight spot rates held at $2.21/mi. Distribution cost pressure is contained this week; the prior two weeks’ tightening has reversed.',
     annotation: {
       tag: 'Distribution',
       title: 'Diesel + freight = your delivery bill',
-      body: 'Most distributors pass diesel moves within 2 weeks and freight tightness within 1. A stable or easing week in both is the signal your delivery line won\u2019t surprise you at month-end.',
+      body: 'Most distributors pass diesel moves within 2 weeks and freight tightness within 1. A stable or easing week in both is the signal your delivery line won’t surprise you at month-end.',
       source: 'EIA weekly diesel · DAT spot index',
       pattern: 'Two-week rolling window',
     },
@@ -89,7 +89,7 @@ const BRIEFING: readonly Paragraph[] = [
     annotation: {
       tag: 'Demand signal',
       title: 'The 4-week turn is the important line',
-      body: 'Single-week demand prints are noise. The rolling 4-week turning negative is the first durable signal we\u2019ve seen since the February soft patch. Watch traffic, not tickets.',
+      body: 'Single-week demand prints are noise. The rolling 4-week turning negative is the first durable signal we’ve seen since the February soft patch. Watch traffic, not tickets.',
       source: 'OpenTable · U-Michigan',
       pattern: '4-week moving average inflection',
     },
@@ -123,13 +123,13 @@ const BRIEFING: readonly Paragraph[] = [
 ]
 
 export default function Section06SampleBriefing() {
-  const paragraphRefs = useRef<(HTMLElement | null)[]>([])
+  const annotationRefs = useRef<(HTMLElement | null)[]>([])
   const [activeIdx, setActiveIdx] = useState(0)
 
   useEffect(() => {
     const observers: IntersectionObserver[] = []
     const visibility = new Map<number, number>()
-    paragraphRefs.current.forEach((el, idx) => {
+    annotationRefs.current.forEach((el, idx) => {
       if (!el) return
       const io = new IntersectionObserver(
         (entries) => {
@@ -148,7 +148,7 @@ export default function Section06SampleBriefing() {
         },
         {
           root: null,
-          rootMargin: '-40% 0px -40% 0px',
+          rootMargin: '-45% 0px -45% 0px',
           threshold: [0, 0.25, 0.5, 0.75, 1],
         },
       )
@@ -160,7 +160,6 @@ export default function Section06SampleBriefing() {
     }
   }, [])
 
-  const active = useMemo(() => BRIEFING[activeIdx], [activeIdx])
 
   return (
     <section
@@ -188,8 +187,9 @@ export default function Section06SampleBriefing() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-14">
-          <div className="relative">
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-14">
+          {/* LEFT — briefing, sticky inside section */}
+          <div className="relative lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
             <div
               className="rounded-[var(--sl-radius-lg)] border p-8 md:p-12"
               style={{
@@ -217,11 +217,8 @@ export default function Section06SampleBriefing() {
                 {BRIEFING.map((p, i) => {
                   const isActive = i === activeIdx
                   const common = {
-                    ref: (el: HTMLElement | null) => {
-                      paragraphRefs.current[i] = el
-                    },
                     style: {
-                      opacity: isActive ? 1 : 0.55,
+                      opacity: isActive ? 1 : 0.45,
                       transition: 'opacity 350ms var(--sl-ease-out-expo)',
                     },
                   }
@@ -240,7 +237,6 @@ export default function Section06SampleBriefing() {
                     return (
                       <aside
                         key={p.id}
-                        {...common}
                         className="rounded-[var(--sl-radius-sm)] border-l-2 px-4 py-3 text-[14px] leading-relaxed text-fg"
                         style={{
                           ...common.style,
@@ -263,94 +259,115 @@ export default function Section06SampleBriefing() {
                   )
                 })}
               </article>
+
+              <div
+                className="mt-8 flex items-center gap-1.5 border-t pt-5"
+                style={{ borderColor: 'var(--sl-border)' }}
+              >
+                {BRIEFING.map((p, i) => (
+                  <div
+                    key={p.id}
+                    className="h-[3px] flex-1 rounded-full transition-colors duration-[var(--sl-dur-md)]"
+                    style={{
+                      background:
+                        i === activeIdx
+                          ? 'var(--sl-accent)'
+                          : 'var(--sl-border-strong)',
+                      opacity: i === activeIdx ? 1 : 0.4,
+                    }}
+                  />
+                ))}
+              </div>
+              <div
+                className="mt-2 text-right font-mono text-[9px] uppercase tracking-[0.2em]"
+                style={{ color: 'var(--sl-fg-dim)' }}
+              >
+                {String(activeIdx + 1).padStart(2, '0')} / {String(BRIEFING.length).padStart(2, '0')}
+              </div>
             </div>
           </div>
 
+          {/* RIGHT — annotations scroll through */}
           <aside className="relative">
-            <div className="sticky top-24">
-              <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-fg-dim">
-                <span
-                  className="inline-block h-1 w-1 rounded-full"
-                  style={{ background: 'var(--sl-accent)' }}
-                />
-                Annotation · scroll to explore
-              </div>
-              <div
-                className="relative overflow-hidden rounded-[var(--sl-radius-lg)] border p-6"
-                style={{
-                  borderColor: 'var(--sl-border)',
-                  background: 'var(--sl-bg-elev)',
-                }}
-              >
-                <div
-                  key={active.id}
-                  style={{
-                    animation: 'sl-reveal-up 500ms var(--sl-ease-out-expo) both',
-                  }}
-                >
-                  <div
-                    className="mb-3 inline-block rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.2em]"
+            <div className="mb-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-fg-dim">
+              <span
+                className="inline-block h-1 w-1 rounded-full"
+                style={{ background: 'var(--sl-accent)' }}
+              />
+              Annotations · scroll to advance
+            </div>
+            <ol className="flex flex-col gap-[34vh] pb-[30vh] pt-[10vh]">
+              {BRIEFING.map((p, i) => {
+                const isActive = i === activeIdx
+                return (
+                  <li
+                    key={p.id}
+                    ref={(el) => {
+                      annotationRefs.current[i] = el
+                    }}
+                    className="relative rounded-[var(--sl-radius-lg)] border p-6 transition-all duration-[var(--sl-dur-md)]"
                     style={{
-                      borderColor: 'var(--sl-accent)',
-                      color: 'var(--sl-accent)',
+                      borderColor: isActive
+                        ? 'var(--sl-accent)'
+                        : 'var(--sl-border)',
+                      background: isActive
+                        ? 'color-mix(in oklab, var(--sl-accent) 6%, var(--sl-bg-elev))'
+                        : 'var(--sl-bg-elev)',
+                      opacity: isActive ? 1 : 0.55,
+                      transform: isActive ? 'translateY(0)' : 'translateY(4px)',
                     }}
                   >
-                    {active.annotation.tag}
-                  </div>
-                  <h4 className="mb-2 font-display text-base font-semibold text-fg">
-                    {active.annotation.title}
-                  </h4>
-                  <p className="mb-5 text-[13.5px] leading-relaxed text-fg-muted">
-                    {active.annotation.body}
-                  </p>
-
-                  <div
-                    className="mb-3 border-t pt-4"
-                    style={{ borderColor: 'var(--sl-border)' }}
-                  >
-                    <div className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-fg-dim">
-                      Source
-                    </div>
-                    <div className="text-[12px] text-fg">
-                      {active.annotation.source}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-fg-dim">
-                      Pattern
-                    </div>
-                    <div className="text-[12px] text-fg">
-                      {active.annotation.pattern}
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className="mt-6 flex items-center gap-1.5 border-t pt-4"
-                  style={{ borderColor: 'var(--sl-border)' }}
-                >
-                  {BRIEFING.map((p, i) => (
-                    <div
-                      key={p.id}
-                      className="h-[3px] flex-1 rounded-full transition-colors duration-[var(--sl-dur-md)]"
-                      style={{
-                        background:
-                          i === activeIdx
+                    <div className="mb-3 flex items-center justify-between">
+                      <div
+                        className="inline-block rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.2em]"
+                        style={{
+                          borderColor: isActive
                             ? 'var(--sl-accent)'
-                            : 'var(--sl-border-strong)',
-                        opacity: i === activeIdx ? 1 : 0.4,
-                      }}
-                    />
-                  ))}
-                </div>
-                <div
-                  className="mt-2 text-right font-mono text-[9px] uppercase tracking-[0.2em]"
-                  style={{ color: 'var(--sl-fg-dim)' }}
-                >
-                  {String(activeIdx + 1).padStart(2, '0')} / {String(BRIEFING.length).padStart(2, '0')}
-                </div>
-              </div>
-            </div>
+                            : 'var(--sl-border)',
+                          color: isActive
+                            ? 'var(--sl-accent)'
+                            : 'var(--sl-fg-dim)',
+                        }}
+                      >
+                        {p.annotation.tag}
+                      </div>
+                      <span
+                        className="font-mono text-[9px] uppercase tracking-[0.2em]"
+                        style={{ color: 'var(--sl-fg-dim)' }}
+                      >
+                        {String(i + 1).padStart(2, '0')} / {String(BRIEFING.length).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <h4 className="mb-2 font-display text-base font-semibold text-fg">
+                      {p.annotation.title}
+                    </h4>
+                    <p className="mb-5 text-[13.5px] leading-relaxed text-fg-muted">
+                      {p.annotation.body}
+                    </p>
+
+                    <div
+                      className="mb-3 border-t pt-4"
+                      style={{ borderColor: 'var(--sl-border)' }}
+                    >
+                      <div className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-fg-dim">
+                        Source
+                      </div>
+                      <div className="text-[12px] text-fg">
+                        {p.annotation.source}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="mb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-fg-dim">
+                        Pattern
+                      </div>
+                      <div className="text-[12px] text-fg">
+                        {p.annotation.pattern}
+                      </div>
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
           </aside>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { SplitTextReveal } from '@/components/motion'
+import { usePrefersReducedMotion } from '@/components/motion/usePrefersReducedMotion'
 
 type DiagramKind = 'a' | 'b' | 'c'
 
@@ -14,13 +15,22 @@ type SceneProps = {
   diagramKind: DiagramKind
 }
 
+// ease-out-expo: fast start, settled tail — matches the organic curve we want
+// for scroll-scrubbed chart endpoints.
+const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t))
+
 function DiagramMenuVsBeef({ progress }: { progress: number }) {
-  const p = Math.max(0, Math.min(1, (progress - 0.15) / 0.7))
+  const p = easeOutExpo(Math.max(0, Math.min(1, (progress - 0.15) / 0.7)))
   const width = 520
   const height = 240
   const menuY = 160
+  // Cubic bezier control points. c1 creates early restraint (curve sags
+  // slightly below baseline then accelerates up), c2 is the steep final rise.
   const beefEnd = 160 - p * 90
-  const beefMid = 160 - p * 40
+  const c1x = width * 0.28
+  const c1y = 160 - p * 10
+  const c2x = width * 0.72
+  const c2y = 160 - p * 70
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%" className="w-full">
       <defs>
@@ -61,14 +71,14 @@ function DiagramMenuVsBeef({ progress }: { progress: number }) {
         Your menu price · flat
       </text>
       <path
-        d={`M 20 ${menuY} Q ${width / 2} ${beefMid}, ${width - 20} ${beefEnd}`}
+        d={`M 20 ${menuY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${width - 20} ${beefEnd}`}
         stroke="var(--sl-crit)"
         strokeWidth={2.5}
         fill="none"
         strokeLinecap="round"
       />
       <path
-        d={`M 20 ${menuY} Q ${width / 2} ${beefMid}, ${width - 20} ${beefEnd} L ${width - 20} ${height - 20} L 20 ${height - 20} Z`}
+        d={`M 20 ${menuY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${width - 20} ${beefEnd} L ${width - 20} ${height - 20} L 20 ${height - 20} Z`}
         fill="url(#sl-d1-area)"
       />
       <circle cx={width - 20} cy={beefEnd} r={4} fill="var(--sl-crit)" />
@@ -90,7 +100,7 @@ function DiagramMenuVsBeef({ progress }: { progress: number }) {
 }
 
 function DiagramMarkupSplit({ progress }: { progress: number }) {
-  const p = Math.max(0, Math.min(1, (progress - 0.2) / 0.7))
+  const p = easeOutExpo(Math.max(0, Math.min(1, (progress - 0.2) / 0.7)))
   const width = 520
   const height = 240
   const splitX = 180
@@ -111,14 +121,7 @@ function DiagramMarkupSplit({ progress }: { progress: number }) {
           opacity={0.5}
         />
       ))}
-      <line
-        x1={20}
-        x2={splitX}
-        y1={midY}
-        y2={midY}
-        stroke="var(--sl-fg-muted)"
-        strokeWidth={2}
-      />
+      <line x1={20} x2={splitX} y1={midY} y2={midY} stroke="var(--sl-fg-muted)" strokeWidth={2} />
       <path
         d={`M ${splitX} ${midY} C ${splitX + 80} ${midY}, ${splitX + 160} ${topY}, ${width - 20} ${topY}`}
         stroke="var(--sl-warn)"
@@ -127,14 +130,7 @@ function DiagramMarkupSplit({ progress }: { progress: number }) {
         strokeLinecap="round"
       />
       <circle cx={width - 20} cy={topY} r={4} fill="var(--sl-warn)" />
-      <text
-        x={width - 24}
-        y={topY - 10}
-        fontSize="11"
-        textAnchor="end"
-        fill="var(--sl-warn)"
-        fontFamily="var(--sl-font-mono)"
-      >
+      <text x={width - 24} y={topY - 10} fontSize="11" textAnchor="end" fill="var(--sl-warn)" fontFamily="var(--sl-font-mono)">
         Supplier markup +{(p * 9).toFixed(1)}%
       </text>
       <path
@@ -145,14 +141,7 @@ function DiagramMarkupSplit({ progress }: { progress: number }) {
         strokeLinecap="round"
       />
       <circle cx={width - 20} cy={bottomY} r={4} fill="var(--sl-accent)" />
-      <text
-        x={width - 24}
-        y={bottomY + 18}
-        fontSize="11"
-        textAnchor="end"
-        fill="var(--sl-accent)"
-        fontFamily="var(--sl-font-mono)"
-      >
+      <text x={width - 24} y={bottomY + 18} fontSize="11" textAnchor="end" fill="var(--sl-accent)" fontFamily="var(--sl-font-mono)">
         Market baseline +{(p * 5).toFixed(1)}%
       </text>
       <text x={splitX + 6} y={midY - 8} fontSize="10" fill="var(--sl-fg-dim)" fontFamily="var(--sl-font-mono)">
@@ -162,8 +151,10 @@ function DiagramMarkupSplit({ progress }: { progress: number }) {
   )
 }
 
-function DiagramLumberDrawdown({ progress }: { progress: number }) {
-  const p = Math.max(0, Math.min(1, (progress - 0.15) / 0.7))
+function DiagramLumberDrawdown({ drawActive }: { drawActive: boolean }) {
+  const pathRef = useRef<SVGPathElement | null>(null)
+  const [pathLen, setPathLen] = useState(0)
+  const prefersReduced = usePrefersReducedMotion()
   const width = 520
   const height = 240
   const points: readonly (readonly [number, number])[] = [
@@ -181,12 +172,23 @@ function DiagramLumberDrawdown({ progress }: { progress: number }) {
     [460, 160],
     [500, 155],
   ] as const
-  const visible = Math.ceil(points.length * p)
-  const shown = points.slice(0, Math.max(2, visible))
-  const d = shown.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt[0]} ${pt[1]}`).join(' ')
+  const d = points
+    .map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt[0]} ${pt[1]}`)
+    .join(' ')
   const drawdownStart = 220
   const drawdownEnd = 380
-  const drawdownVisible = p > 0.35
+
+  useEffect(() => {
+    const el = pathRef.current
+    if (!el) return
+    setPathLen(el.getTotalLength())
+  }, [])
+
+  const dashArray = pathLen || 1200
+  const offsetActive = prefersReduced || drawActive ? 0 : dashArray
+  const regionOpacity = prefersReduced ? 1 : drawActive ? 1 : 0
+  const regionDelayMs = prefersReduced ? 0 : 1400
+
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%" className="w-full">
       {[0, 1, 2, 3].map((i) => (
@@ -201,7 +203,12 @@ function DiagramLumberDrawdown({ progress }: { progress: number }) {
           opacity={0.5}
         />
       ))}
-      {drawdownVisible && (
+      <g
+        style={{
+          opacity: regionOpacity,
+          transition: `opacity 600ms var(--sl-ease-out-expo) ${regionDelayMs}ms`,
+        }}
+      >
         <rect
           x={drawdownStart}
           y={40}
@@ -210,48 +217,51 @@ function DiagramLumberDrawdown({ progress }: { progress: number }) {
           fill="var(--sl-crit)"
           opacity={0.08}
         />
-      )}
-      {drawdownVisible && (
-        <>
-          <line
-            x1={drawdownStart}
-            x2={drawdownStart}
-            y1={40}
-            y2={220}
-            stroke="var(--sl-crit)"
-            strokeDasharray="3 3"
-            opacity={0.5}
-          />
-          <line
-            x1={drawdownEnd}
-            x2={drawdownEnd}
-            y1={40}
-            y2={220}
-            stroke="var(--sl-crit)"
-            strokeDasharray="3 3"
-            opacity={0.5}
-          />
-          <text
-            x={(drawdownStart + drawdownEnd) / 2}
-            y={55}
-            fontSize="11"
-            textAnchor="middle"
-            fill="var(--sl-crit)"
-            fontFamily="var(--sl-font-mono)"
-          >
-            9-month margin drawdown
-          </text>
-        </>
-      )}
+        <line
+          x1={drawdownStart}
+          x2={drawdownStart}
+          y1={40}
+          y2={220}
+          stroke="var(--sl-crit)"
+          strokeDasharray="3 3"
+          opacity={0.5}
+        />
+        <line
+          x1={drawdownEnd}
+          x2={drawdownEnd}
+          y1={40}
+          y2={220}
+          stroke="var(--sl-crit)"
+          strokeDasharray="3 3"
+          opacity={0.5}
+        />
+        <text
+          x={(drawdownStart + drawdownEnd) / 2}
+          y={55}
+          fontSize="11"
+          textAnchor="middle"
+          fill="var(--sl-crit)"
+          fontFamily="var(--sl-font-mono)"
+        >
+          9-month margin drawdown
+        </text>
+      </g>
       <path
+        ref={pathRef}
         d={d}
         stroke="var(--sl-accent)"
         strokeWidth={2.5}
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
+        style={{
+          strokeDasharray: dashArray,
+          strokeDashoffset: offsetActive,
+          transition: prefersReduced
+            ? undefined
+            : 'stroke-dashoffset 1400ms var(--sl-ease-out-expo)',
+        }}
       />
-      {visible >= 5 && <circle cx={points[4][0]} cy={points[4][1]} r={4} fill="var(--sl-accent)" />}
       <text x={20} y={30} fontSize="11" fill="var(--sl-fg-muted)" fontFamily="var(--sl-font-mono)">
         Lumber futures · illustrative
       </text>
@@ -264,7 +274,11 @@ function DiagramLumberDrawdown({ progress }: { progress: number }) {
 
 function Scene({ index, eyebrow, headline, body, sideLabel, diagramKind }: SceneProps) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const stickyRef = useRef<HTMLDivElement | null>(null)
   const [progress, setProgress] = useState(0)
+  const [pinned, setPinned] = useState(false)
+  const [subheadVisible, setSubheadVisible] = useState(false)
+  const prefersReduced = usePrefersReducedMotion()
 
   useEffect(() => {
     const el = ref.current
@@ -295,18 +309,51 @@ function Scene({ index, eyebrow, headline, body, sideLabel, diagramKind }: Scene
     }
   }, [])
 
+  // Scene-enter observer — fires exactly once the scene first pins in view.
+  // Drives the headline→subhead sequencing and the lumber draw-in.
+  useEffect(() => {
+    const el = stickyRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setPinned(true)
+            io.disconnect()
+          }
+        }
+      },
+      { threshold: 0.3 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  // Subhead waits until ~80% of headline reveal completes, then fades in
+  // 400ms below. Assumed headline reveal ≈ 1200ms total; 80% ≈ 960ms.
+  useEffect(() => {
+    if (!pinned) return
+    if (prefersReduced) {
+      setSubheadVisible(true)
+      return
+    }
+    const id = window.setTimeout(() => setSubheadVisible(true), 960)
+    return () => window.clearTimeout(id)
+  }, [pinned, prefersReduced])
+
   const diagram =
     diagramKind === 'a' ? (
       <DiagramMenuVsBeef progress={progress} />
     ) : diagramKind === 'b' ? (
       <DiagramMarkupSplit progress={progress} />
     ) : (
-      <DiagramLumberDrawdown progress={progress} />
+      <DiagramLumberDrawdown drawActive={pinned} />
     )
 
   return (
     <div ref={ref} className="relative h-[220vh]">
       <div
+        ref={stickyRef}
         className="sticky top-0 flex h-screen items-center overflow-hidden"
         style={{
           background:
@@ -331,17 +378,16 @@ function Scene({ index, eyebrow, headline, body, sideLabel, diagramKind }: Scene
               mode="word"
               text={headline}
               stagger={55}
-              duration={900}
+              duration={800}
               className="font-display text-[clamp(2rem,4.5vw,3.8rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-fg"
             />
             <p
-              className="mt-6 max-w-xl text-base leading-relaxed text-fg-muted md:text-lg"
+              className="mt-8 max-w-xl text-base leading-relaxed text-fg-muted md:text-lg"
               style={{
-                opacity: progress > 0.08 ? 1 : 0,
-                transform:
-                  progress > 0.08 ? 'translate3d(0,0,0)' : 'translate3d(0, 16px, 0)',
+                opacity: subheadVisible ? 1 : 0,
+                transform: subheadVisible ? 'translate3d(0,0,0)' : 'translate3d(0, 12px, 0)',
                 transition:
-                  'opacity 700ms var(--sl-ease-out-expo), transform 700ms var(--sl-ease-out-expo)',
+                  'opacity 400ms var(--sl-ease-out-expo), transform 400ms var(--sl-ease-out-expo)',
               }}
             >
               {body}
@@ -358,10 +404,7 @@ function Scene({ index, eyebrow, headline, body, sideLabel, diagramKind }: Scene
             </div>
             <div
               className="relative rounded-[var(--sl-radius-lg)] border p-6"
-              style={{
-                borderColor: 'var(--sl-border)',
-                background: 'var(--sl-bg-elev)',
-              }}
+              style={{ borderColor: 'var(--sl-border)', background: 'var(--sl-bg-elev)' }}
             >
               {diagram}
             </div>

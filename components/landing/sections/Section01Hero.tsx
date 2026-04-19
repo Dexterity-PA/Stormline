@@ -88,14 +88,14 @@ export default function Section01Hero() {
 
       <ActiveMarkerCount />
 
-      {/* Globe layer */}
+      {/* Globe layer — padded so the full sphere is always visible */}
       <ParallaxLayer
         speed={0.3}
         max={16}
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute inset-0 flex items-center justify-center px-[120px] py-20"
       >
         <div
-          className="relative aspect-square w-full max-w-[min(920px,100vmin)] translate-y-[6%] opacity-0"
+          className="relative aspect-square w-full max-w-[min(780px,calc(100vmin-160px))] opacity-0"
           style={{
             animation: ready
               ? 'sl-reveal-up 1600ms var(--sl-ease-out-expo) 400ms forwards'
