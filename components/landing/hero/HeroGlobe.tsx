@@ -1,73 +1,134 @@
 'use client'
 
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
-import { Suspense, useRef, useState } from 'react'
-import type * as THREE from 'three'
+import { Suspense, useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
 import { MARKERS, MARKER_COLOR, MARKER_PULSE_COLOR, latLngToVec3 } from './markers'
 import LivePulse from '@/components/motion/LivePulse'
 
-const RADIUS = 1.4
+const RADIUS = 1.15
 
-function WireSphere() {
+// Bundled NASA Blue Marble night texture (and topology bump) served via the
+// three-globe package on jsDelivr — public domain imagery. Single request each,
+// cacheable, no CORS issues.
+const EARTH_TEXTURE_URL =
+  'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
+const EARTH_BUMP_URL =
+  'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png'
+
+function Earth() {
   const ref = useRef<THREE.Group>(null)
+  const [map, bump] = useLoader(THREE.TextureLoader, [
+    EARTH_TEXTURE_URL,
+    EARTH_BUMP_URL,
+  ])
+
+  // Soften the night texture a touch so glow rim + markers remain the focal point.
+  map.colorSpace = THREE.SRGBColorSpace
+  map.anisotropy = 8
+
   useFrame((_, delta) => {
     if (!ref.current) return
-    ref.current.rotation.y += delta * 0.06
+    ref.current.rotation.y += delta * 0.05
   })
 
   return (
     <group ref={ref}>
-      {/* Filled, very low opacity sphere to give depth mask */}
       <mesh>
-        <sphereGeometry args={[RADIUS - 0.005, 48, 48]} />
-        <meshBasicMaterial color="#0a0e13" transparent opacity={0.95} />
+        <sphereGeometry args={[RADIUS, 96, 64]} />
+        <meshStandardMaterial
+          map={map}
+          bumpMap={bump}
+          bumpScale={0.015}
+          roughness={0.95}
+          metalness={0.05}
+          color="#a8c4e8"
+        />
       </mesh>
-      {/* Wireframe overlay */}
-      <mesh>
-        <sphereGeometry args={[RADIUS, 48, 24]} />
-        <meshBasicMaterial color="#1e2631" wireframe transparent opacity={0.75} />
-      </mesh>
-      {/* Atmosphere glow */}
-      <mesh scale={1.06}>
-        <sphereGeometry args={[RADIUS, 32, 32]} />
-        <meshBasicMaterial color="#4ea8ff" transparent opacity={0.04} depthWrite={false} />
-      </mesh>
+      <Atmosphere />
       <Markers />
     </group>
   )
 }
 
+function Atmosphere() {
+  const mat = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          glowColor: { value: new THREE.Color('#4ea8ff') },
+          intensity: { value: 0.9 },
+        },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vViewPosition;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vViewPosition = -mvPosition.xyz;
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 glowColor;
+          uniform float intensity;
+          varying vec3 vNormal;
+          varying vec3 vViewPosition;
+          void main() {
+            vec3 viewDir = normalize(vViewPosition);
+            float fresnel = 1.0 - abs(dot(viewDir, vNormal));
+            fresnel = pow(fresnel, 2.5);
+            gl_FragColor = vec4(glowColor, fresnel * intensity);
+          }
+        `,
+        transparent: true,
+        side: THREE.BackSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    [],
+  )
+
+  return (
+    <mesh scale={1.06}>
+      <sphereGeometry args={[RADIUS, 64, 64]} />
+      <primitive object={mat} attach="material" />
+    </mesh>
+  )
+}
+
 function Markers() {
   const [hovered, setHovered] = useState<string | null>(null)
-
   return (
     <>
       {MARKERS.map((m) => {
-        const pos = latLngToVec3(m.lat, m.lng, RADIUS + 0.02)
+        const pos = latLngToVec3(m.lat, m.lng, RADIUS + 0.015)
         const color = MARKER_COLOR[m.kind]
         const isHovered = hovered === m.id
         return (
           <group key={m.id} position={pos}>
-            <mesh>
-              <sphereGeometry args={[0.018, 12, 12]} />
-              <meshBasicMaterial color={color} />
-            </mesh>
             <Html
               center
               distanceFactor={8}
-              occlude={false}
+              occlude="blending"
               style={{ pointerEvents: 'auto' }}
             >
               <div
                 onPointerEnter={() => setHovered(m.id)}
-                onPointerLeave={() => setHovered((h) => (h === m.id ? null : h))}
+                onPointerLeave={() =>
+                  setHovered((h) => (h === m.id ? null : h))
+                }
                 className="relative"
                 style={{ width: 28, height: 28 }}
               >
                 <div
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                   aria-hidden
+                  style={{
+                    filter:
+                      'drop-shadow(0 0 6px color-mix(in oklab, var(--sl-accent) 55%, transparent))',
+                  }}
                 >
                   <LivePulse color={MARKER_PULSE_COLOR[m.kind]} size={10} />
                 </div>
@@ -108,7 +169,6 @@ function Markers() {
 }
 
 const STAR_POSITIONS: Float32Array = (() => {
-  // Deterministic pseudo-random so render stays pure.
   let seed = 1337
   const rnd = () => {
     seed = (seed * 9301 + 49297) % 233280
@@ -128,19 +188,23 @@ const STAR_POSITIONS: Float32Array = (() => {
 })()
 
 function Stars() {
-  const positions = STAR_POSITIONS
-
   return (
     <points>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          args={[positions, 3]}
-          count={positions.length / 3}
+          args={[STAR_POSITIONS, 3]}
+          count={STAR_POSITIONS.length / 3}
           itemSize={3}
         />
       </bufferGeometry>
-      <pointsMaterial size={0.02} color="#5a6472" sizeAttenuation transparent opacity={0.6} />
+      <pointsMaterial
+        size={0.02}
+        color="#5a6472"
+        sizeAttenuation
+        transparent
+        opacity={0.6}
+      />
     </points>
   )
 }
@@ -148,16 +212,17 @@ function Stars() {
 export default function HeroGlobe() {
   return (
     <Canvas
-      dpr={[1, 1.6]}
+      dpr={[1, 3]}
       gl={{ antialias: true, alpha: true }}
-      camera={{ position: [0, 0.3, 3.6], fov: 45 }}
+      camera={{ position: [0, 0.15, 3.9], fov: 42 }}
       style={{ width: '100%', height: '100%' }}
     >
-      <ambientLight intensity={0.6} />
-      <pointLight position={[5, 3, 5]} intensity={0.8} color="#4ea8ff" />
+      <ambientLight intensity={0.35} />
+      <directionalLight position={[5, 3, 5]} intensity={1.1} color="#ffffff" />
+      <pointLight position={[-4, -2, -3]} intensity={0.4} color="#4ea8ff" />
       <Suspense fallback={null}>
         <Stars />
-        <WireSphere />
+        <Earth />
       </Suspense>
     </Canvas>
   )
