@@ -4,7 +4,10 @@
  * Inngest route is wired up.
  *
  * Usage:
- *   node --env-file=.env.local --import tsx scripts/run-backfill.ts [--source fred|eia|usda|bls] [--code CODE]
+ *   node --env-file=.env.local --import tsx scripts/run-backfill.ts [--source <s>] [--code CODE]
+ *
+ * Supported sources: fred | eia | usda | bls | treasury | federal_register |
+ *                    fema | fhfa | usda_ams | census | noaa
  *
  * Examples:
  *   # backfill all registered indicators across all supported sources
@@ -35,6 +38,13 @@ const RATE_LIMIT_SLEEP_MS: Record<SupportedBackfillSource, number> = {
   eia: 500,
   usda: 500,
   bls: 1000,
+  treasury: 500,
+  federal_register: 500,
+  fema: 500,
+  fhfa: 500,
+  usda_ams: 500,
+  census: 500,
+  noaa: 500,
 };
 
 function sleep(ms: number): Promise<void> {

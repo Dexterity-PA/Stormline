@@ -2,10 +2,17 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { BlsAdapter } from "../../data-sources/bls";
+import { CensusTradeAdapter } from "../../data-sources/census-trade";
 import { EiaAdapter } from "../../data-sources/eia";
+import { FederalRegisterAdapter } from "../../data-sources/federal-register";
+import { FemaAdapter } from "../../data-sources/fema";
+import { FhfaAdapter } from "../../data-sources/fhfa";
 import { FredAdapter } from "../../data-sources/fred";
+import { NoaaAdapter } from "../../data-sources/noaa";
+import { TreasuryAdapter } from "../../data-sources/treasury";
 import type { DataSourceAdapter } from "../../data-sources/types";
 import { UsdaAdapter } from "../../data-sources/usda";
+import { UsdaAmsAdapter } from "../../data-sources/usda-ams";
 import { db } from "../../db";
 import { indicators } from "../../db/schema";
 import { getIndicator, INDICATOR_REGISTRY } from "../../indicators/registry";
@@ -21,6 +28,13 @@ export const SUPPORTED_BACKFILL_SOURCES = [
   "eia",
   "usda",
   "bls",
+  "treasury",
+  "federal_register",
+  "fema",
+  "fhfa",
+  "usda_ams",
+  "census",
+  "noaa",
 ] as const;
 export type SupportedBackfillSource = (typeof SUPPORTED_BACKFILL_SOURCES)[number];
 
@@ -48,11 +62,20 @@ export interface BackfillResult {
 
 // Per-source rate-limit sleeps between indicators. FRED allows 120 req/min.
 // NASS and EIA are generous but slow per request; BLS is 500/day unauth.
+// Treasury/FederalRegister/FEMA/FHFA/USDA-AMS/Census/NOAA all use unmetered
+// endpoints with internal backoff; we space modestly to be courteous.
 const RATE_LIMIT_SLEEP_MS: Record<SupportedBackfillSource, number> = {
   fred: 600,
   eia: 500,
   usda: 500,
   bls: 1000,
+  treasury: 500,
+  federal_register: 500,
+  fema: 500,
+  fhfa: 500,
+  usda_ams: 500,
+  census: 500,
+  noaa: 500,
 };
 
 function yearsAgo(years: number): Date {
@@ -132,6 +155,20 @@ export const defaultAdapterFactory: AdapterFactory = (source) => {
       return new UsdaAdapter();
     case "bls":
       return new BlsAdapter();
+    case "treasury":
+      return new TreasuryAdapter();
+    case "federal_register":
+      return new FederalRegisterAdapter();
+    case "fema":
+      return new FemaAdapter();
+    case "fhfa":
+      return new FhfaAdapter();
+    case "usda_ams":
+      return new UsdaAmsAdapter();
+    case "census":
+      return new CensusTradeAdapter();
+    case "noaa":
+      return new NoaaAdapter();
   }
 };
 

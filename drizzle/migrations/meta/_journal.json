@@ -22,6 +22,13 @@
       "when": 1776573252736,
       "tag": "0002_faulty_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776581893432,
+      "tag": "0003_rich_tyger_tiger",
+      "breakpoints": true
     }
   ]
 }
