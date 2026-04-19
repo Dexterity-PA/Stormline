@@ -7,7 +7,9 @@ import {
 } from '@/lib/llm/prompts/onboarding-profiler-v1';
 import type { Industry } from '@/lib/indicators/types';
 
-export const PROFILER_GENERATED_BY = `profiler@${PROMPT_VERSION}`;
+const anthropic = new Anthropic();
+
+export const PROFILER_GENERATED_BY = `claude-sonnet-4@${PROMPT_VERSION}`;
 
 export interface ProfilerInput {
   industry: Industry;
@@ -34,8 +36,11 @@ export async function runProfiler(input: ProfilerInput): Promise<ProfilerOutput>
   }));
   const candidateCodeSet = new Set(candidateCodes.map((c) => c.code));
 
-  const client = new Anthropic();
-  const response = await client.messages.create({
+  if (candidateCodes.length === 0) {
+    throw new Error(`Profiler: no indicators found for industry "${input.industry}"`);
+  }
+
+  const response = await anthropic.messages.create({
     model: 'claude-sonnet-4',
     max_tokens: 1024,
     system: SYSTEM_PROMPT,
@@ -95,6 +100,10 @@ export async function runProfiler(input: ProfilerInput): Promise<ProfilerOutput>
   const aiRecommendedIndicators = (raw.aiRecommendedIndicators as unknown[]).filter(
     (c): c is string => typeof c === 'string' && candidateCodeSet.has(c),
   );
+
+  if (aiRecommendedIndicators.length === 0) {
+    throw new Error('Profiler: Claude returned no valid indicator codes from the candidate list');
+  }
 
   return { aiProfileTags, aiRecommendedIndicators, reasoning: raw.reasoning };
 }
