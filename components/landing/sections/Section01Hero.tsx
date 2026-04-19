@@ -150,7 +150,7 @@ export default function Section01Hero() {
         </div>
 
         <h1
-          className="max-w-4xl font-display text-[clamp(2.4rem,6vw,5.5rem)] font-semibold leading-[1.02] tracking-[-0.02em] text-fg opacity-0"
+          className="max-w-4xl font-display text-[clamp(2rem,4.5vw,4.25rem)] font-semibold leading-[1.0] tracking-[-0.02em] text-fg text-balance opacity-0"
           style={{
             animation:
               'sl-reveal-up 900ms var(--sl-ease-out-expo) 250ms forwards',

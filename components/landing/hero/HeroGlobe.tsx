@@ -161,78 +161,151 @@ function CameraIntro({
   return null
 }
 
-function Markers({ visible }: { visible: boolean }) {
-  const [hovered, setHovered] = useState<string | null>(null)
+type MarkerProps = {
+  m: (typeof MARKERS)[number]
+  index: number
+  visible: boolean
+  hovered: string | null
+  setHovered: (v: string | null | ((prev: string | null) => string | null)) => void
+}
+
+// Per-marker occlusion: marker's outward normal (its world position relative to
+// the globe center at origin) dotted with the view direction (camera - marker).
+// Positive → front-facing; negative → behind globe. Damped per-frame so the
+// transition reads as a ~180ms fade instead of a pop.
+function Marker({ m, index, visible, hovered, setHovered }: MarkerProps) {
+  const groupRef = useRef<THREE.Group>(null)
+  const meshRef = useRef<THREE.Mesh>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const facingRef = useRef(0)
+  const mountedAtRef = useRef<number | null>(null)
+  const { camera } = useThree()
+  const worldPos = useMemo(() => new THREE.Vector3(), [])
+  const normal = useMemo(() => new THREE.Vector3(), [])
+  const toCam = useMemo(() => new THREE.Vector3(), [])
+  const pos = useMemo(
+    () => latLngToVec3(m.lat, m.lng, RADIUS + 0.02),
+    [m.lat, m.lng],
+  )
+  const color = MARKER_COLOR[m.kind]
+
+  useEffect(() => {
+    if (visible && mountedAtRef.current === null) {
+      mountedAtRef.current = performance.now()
+    }
+  }, [visible])
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return
+
+    groupRef.current.getWorldPosition(worldPos)
+    normal.copy(worldPos).normalize()
+    toCam.copy(camera.position).sub(worldPos).normalize()
+    // Small positive bias so markers right on the silhouette fade out before
+    // they'd render edge-on (which reads as a visible leak).
+    const facingTarget = normal.dot(toCam) > 0.05 ? 1 : 0
+
+    // Exponential damp, ~180ms to reach ~95% of target. 1 - exp(-dt / tau).
+    const tau = 0.06
+    const k = 1 - Math.exp(-delta / tau)
+    facingRef.current += (facingTarget - facingRef.current) * k
+
+    let entrance = 0
+    if (visible && mountedAtRef.current !== null) {
+      const delay = index * 80
+      const duration = 600
+      const t = Math.max(0, performance.now() - mountedAtRef.current - delay)
+      const p = Math.min(1, t / duration)
+      entrance = 1 - Math.pow(1 - p, 3)
+    }
+
+    const finalOpacity = entrance * facingRef.current
+
+    if (meshRef.current) {
+      const mat = meshRef.current.material as THREE.MeshBasicMaterial
+      mat.opacity = finalOpacity
+    }
+    if (wrapperRef.current) {
+      wrapperRef.current.style.opacity = String(finalOpacity)
+      wrapperRef.current.style.pointerEvents =
+        facingRef.current > 0.5 ? 'auto' : 'none'
+    }
+  })
+
+  const isHovered = hovered === m.id
 
   return (
-    <>
-      {MARKERS.map((m, i) => {
-        const pos = latLngToVec3(m.lat, m.lng, RADIUS + 0.02)
-        const color = MARKER_COLOR[m.kind]
-        const isHovered = hovered === m.id
-        const delayMs = i * 80
-        return (
-          <group key={m.id} position={pos} visible={visible}>
-            <mesh>
-              <sphereGeometry args={[0.018, 12, 12]} />
-              <meshBasicMaterial color={color} transparent opacity={visible ? 1 : 0} />
-            </mesh>
-            <Html
-              center
-              distanceFactor={8}
-              occlude={false}
-              style={{ pointerEvents: 'auto' }}
+    <group ref={groupRef} position={pos}>
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[0.018, 12, 12]} />
+        <meshBasicMaterial color={color} transparent opacity={0} />
+      </mesh>
+      <Html
+        center
+        distanceFactor={8}
+        occlude={false}
+        style={{ pointerEvents: 'auto' }}
+      >
+        <div
+          ref={wrapperRef}
+          onPointerEnter={() => setHovered(m.id)}
+          onPointerLeave={() => setHovered((h) => (h === m.id ? null : h))}
+          className="relative"
+          style={{ width: 28, height: 28, opacity: 0 }}
+        >
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            aria-hidden
+          >
+            <LivePulse color={MARKER_PULSE_COLOR[m.kind]} size={10} />
+          </div>
+          {isHovered && (
+            <div
+              className="absolute left-1/2 top-full mt-2 w-[240px] -translate-x-1/2 rounded-md border p-3 text-left shadow-[var(--sl-glow-accent)]"
+              style={{
+                background: 'var(--sl-surface-glass)',
+                backdropFilter: 'blur(10px)',
+                borderColor: 'var(--sl-border-strong)',
+                zIndex: 10,
+              }}
             >
               <div
-                onPointerEnter={() => setHovered(m.id)}
-                onPointerLeave={() => setHovered((h) => (h === m.id ? null : h))}
-                className="relative"
-                style={{
-                  width: 28,
-                  height: 28,
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? 'scale(1)' : 'scale(0.6)',
-                  transition: `opacity 600ms var(--sl-ease-out-expo) ${delayMs}ms, transform 600ms var(--sl-ease-out-expo) ${delayMs}ms`,
-                }}
+                className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider"
+                style={{ color }}
               >
-                <div
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                  aria-hidden
-                >
-                  <LivePulse color={MARKER_PULSE_COLOR[m.kind]} size={10} />
-                </div>
-                {isHovered && (
-                  <div
-                    className="absolute left-1/2 top-full mt-2 w-[240px] -translate-x-1/2 rounded-md border p-3 text-left shadow-[var(--sl-glow-accent)]"
-                    style={{
-                      background: 'var(--sl-surface-glass)',
-                      backdropFilter: 'blur(10px)',
-                      borderColor: 'var(--sl-border-strong)',
-                      zIndex: 10,
-                    }}
-                  >
-                    <div
-                      className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider"
-                      style={{ color }}
-                    >
-                      {m.kind}
-                      <span className="text-fg-dim">·</span>
-                      <span className="text-fg-dim">{m.updated}</span>
-                    </div>
-                    <div className="mt-1.5 font-display text-sm font-semibold text-fg">
-                      {m.title}
-                    </div>
-                    <div className="mt-1 text-xs text-fg-muted">{m.summary}</div>
-                    <div className="mt-2 text-[11px] text-fg-dim">
-                      Affects: <span className="text-fg-muted">{m.affects}</span>
-                    </div>
-                  </div>
-                )}
+                {m.kind}
+                <span className="text-fg-dim">·</span>
+                <span className="text-fg-dim">{m.updated}</span>
               </div>
-            </Html>
-          </group>
-        )
-      })}
+              <div className="mt-1.5 font-display text-sm font-semibold text-fg">
+                {m.title}
+              </div>
+              <div className="mt-1 text-xs text-fg-muted">{m.summary}</div>
+              <div className="mt-2 text-[11px] text-fg-dim">
+                Affects: <span className="text-fg-muted">{m.affects}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </Html>
+    </group>
+  )
+}
+
+function Markers({ visible }: { visible: boolean }) {
+  const [hovered, setHovered] = useState<string | null>(null)
+  return (
+    <>
+      {MARKERS.map((m, i) => (
+        <Marker
+          key={m.id}
+          m={m}
+          index={i}
+          visible={visible}
+          hovered={hovered}
+          setHovered={setHovered}
+        />
+      ))}
     </>
   )
 }
