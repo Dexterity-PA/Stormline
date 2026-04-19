@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
@@ -43,6 +44,7 @@ export function DynamicProfileForm({
   }
 
   function handleSubmit(e: React.FormEvent) {
+    if (isPending) return;
     e.preventDefault();
     const newErrors: Record<string, string> = {};
     for (const field of fields) {
@@ -67,12 +69,13 @@ export function DynamicProfileForm({
     <form onSubmit={handleSubmit} className="space-y-5">
       {fields.map((field) => (
         <div key={field.key} className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-fg">
+          <label htmlFor={`field-${field.key}`} className="text-sm font-medium text-fg">
             {field.label}
             {field.required && <span className="text-crit ml-1">*</span>}
           </label>
           {field.helper && <p className="text-xs text-fg-muted">{field.helper}</p>}
           <FieldInput
+            id={`field-${field.key}`}
             field={field}
             value={values[field.key]}
             onChange={(v) => setValue(field.key, v)}
@@ -90,12 +93,13 @@ export function DynamicProfileForm({
 }
 
 interface FieldInputProps {
+  id: string;
   field: ProfileField;
   value: unknown;
   onChange: (v: unknown) => void;
 }
 
-function FieldInput({ field, value, onChange }: FieldInputProps) {
+function FieldInput({ id, field, value, onChange }: FieldInputProps): React.JSX.Element {
   const inputClass =
     'bg-bg-elev border border-border text-fg text-sm rounded-[var(--radius-sm)] px-2 py-1.5 focus:outline-none focus:border-accent';
 
@@ -103,6 +107,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
     case 'text':
       return (
         <input
+          id={id}
           type="text"
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value)}
@@ -113,6 +118,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
     case 'number':
       return (
         <input
+          id={id}
           type="number"
           value={typeof value === 'number' ? value : ''}
           onChange={(e) =>
@@ -138,7 +144,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
     }
 
     case 'multiselect': {
-      const selected = Array.isArray(value) ? (value as string[]) : [];
+      const selected = Array.isArray(value) ? value.filter((x): x is string => typeof x === 'string') : [];
       return (
         <div className="flex flex-wrap gap-3">
           {(field.options ?? []).map((opt) => {
@@ -174,5 +180,10 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
           label={value === true ? 'Yes' : 'No'}
         />
       );
+
+    default: {
+      const _exhaustive: never = field.type;
+      throw new Error(`Unhandled field type: ${String(_exhaustive)}`);
+    }
   }
 }
