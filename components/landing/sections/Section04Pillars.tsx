@@ -537,7 +537,12 @@ function AlertsPhone() {
   const ref = useRef<HTMLDivElement | null>(null)
   const [active, setActive] = useState(false)
   const [rotation, setRotation] = useState(0)
+  const [mounted, setMounted] = useState(false)
   const prefersReduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const el = ref.current
@@ -546,7 +551,7 @@ function AlertsPhone() {
       (entries) => {
         for (const e of entries) if (e.isIntersecting) setActive(true)
       },
-      { threshold: 0.3 },
+      { threshold: 0.2 },
     )
     io.observe(el)
     return () => io.disconnect()
@@ -566,49 +571,51 @@ function AlertsPhone() {
     stack.push(ALERTS[(rotation + i) % ALERTS.length])
   }
 
+  // Animate slot 0 only on rotation change after first mount, not initial render
+  const animateNewest = mounted && !prefersReduced && rotation > 0
+
   return (
     <div
       ref={ref}
-      className="relative flex h-full justify-center overflow-hidden rounded-[var(--sl-radius-lg)] border px-6 py-8"
+      className="relative flex h-full items-start justify-center overflow-hidden rounded-[var(--sl-radius-lg)] border px-6 pb-8 pt-10"
       style={{
         borderColor: 'var(--sl-border)',
         background:
           'radial-gradient(60% 60% at 50% 30%, color-mix(in oklab, var(--sl-accent) 8%, transparent), transparent), var(--sl-bg-elev)',
       }}
     >
-      <div className="relative w-full max-w-[300px]" style={{ aspectRatio: '9 / 18' }}>
+      <div
+        className="relative w-full max-w-[300px] rounded-[36px] border p-3"
+        style={{
+          borderColor: 'var(--sl-border-strong)',
+          background: 'var(--sl-bg-0)',
+          boxShadow:
+            '0 30px 60px -20px color-mix(in oklab, var(--sl-accent) 25%, transparent), 0 0 0 1px var(--sl-border) inset',
+        }}
+      >
         <div
-          className="absolute inset-0 rounded-[36px] border p-3"
-          style={{
-            borderColor: 'var(--sl-border-strong)',
-            background: 'var(--sl-bg-0)',
-            boxShadow:
-              '0 30px 60px -20px color-mix(in oklab, var(--sl-accent) 25%, transparent), 0 0 0 1px var(--sl-border) inset',
-          }}
+          aria-hidden
+          className="absolute left-1/2 top-2 h-[18px] w-24 -translate-x-1/2 rounded-full"
+          style={{ background: 'var(--sl-bg)' }}
+        />
+
+        <div
+          className="mb-3 mt-6 flex items-center justify-between px-3 font-mono text-[10px]"
+          style={{ color: 'var(--sl-fg-muted)' }}
         >
-          <div
-            className="absolute left-1/2 top-2 h-[18px] w-24 -translate-x-1/2 rounded-full"
-            style={{ background: 'var(--sl-bg)' }}
-          />
+          <span>9:41</span>
+          <span>Stormline</span>
+        </div>
 
-          <div
-            className="mt-6 mb-3 flex items-center justify-between px-3 font-mono text-[10px]"
-            style={{ color: 'var(--sl-fg-muted)' }}
-          >
-            <span>9:41</span>
-            <span>Stormline</span>
-          </div>
-
-          <div className="relative flex flex-col gap-2 px-1">
-            {stack.map((a, i) => (
-              <AlertCard
-                key={`${a.id}-${rotation}-${i}`}
-                alert={a}
-                slot={i}
-                prefersReduced={prefersReduced}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col gap-2 px-1 pb-1">
+          {stack.map((a, i) => (
+            <AlertCard
+              key={`slot-${i}-${a.id}`}
+              alert={a}
+              slot={i}
+              animateNewest={animateNewest}
+            />
+          ))}
         </div>
       </div>
     </div>
@@ -618,11 +625,11 @@ function AlertsPhone() {
 function AlertCard({
   alert,
   slot,
-  prefersReduced,
+  animateNewest,
 }: {
   alert: Alert
   slot: number
-  prefersReduced: boolean
+  animateNewest: boolean
 }) {
   const toneColor =
     alert.tone === 'crit'
@@ -630,8 +637,12 @@ function AlertCard({
       : alert.tone === 'warn'
         ? 'var(--sl-warn)'
         : 'var(--sl-accent)'
-  // Slot 0 = newest, fully bright. Later slots dim slightly. Last slot fades out.
-  const opacity = slot === STACK_SIZE - 1 ? 0.4 : slot === 0 ? 1 : 0.85
+  // Slot 0 = newest, fully bright. Later slots dim slightly. Last slot fades.
+  const opacity = slot === STACK_SIZE - 1 ? 0.45 : slot === 0 ? 1 : 0.85
+  const animation =
+    slot === 0 && animateNewest
+      ? 'sl-alert-slide-in 600ms var(--sl-ease-out-expo) both'
+      : undefined
   return (
     <div
       className="relative rounded-[14px] border px-3 py-2.5"
@@ -640,11 +651,7 @@ function AlertCard({
         background: 'color-mix(in oklab, var(--sl-bg-elev) 94%, transparent)',
         backdropFilter: 'blur(8px)',
         opacity,
-        transform: prefersReduced ? undefined : 'translate3d(0,0,0)',
-        animation:
-          prefersReduced || slot > 0
-            ? undefined
-            : 'sl-alert-slide-in 600ms var(--sl-ease-out-expo) both',
+        animation,
         transition: 'opacity 500ms var(--sl-ease-out-expo)',
       }}
     >
@@ -663,7 +670,7 @@ function AlertCard({
         </div>
         <span className="font-mono text-[9px] text-fg-dim">{alert.time}</span>
       </div>
-      <div className="mb-0.5 text-[11.5px] font-semibold text-fg leading-snug">
+      <div className="mb-0.5 text-[11.5px] font-semibold leading-snug text-fg">
         {alert.title}
       </div>
       <p className="text-[10.5px] leading-snug text-fg-muted">{alert.body}</p>
