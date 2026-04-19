@@ -1,167 +1,203 @@
 'use client'
 
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber'
-import { Html, Line } from '@react-three/drei'
-import { Suspense, useMemo, useRef, useState, type MutableRefObject } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Html, useTexture } from '@react-three/drei'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { MARKERS, MARKER_COLOR, MARKER_PULSE_COLOR, latLngToVec3 } from './markers'
-import { CASCADE_ALERTS, HORMUZ_LAT, HORMUZ_LNG } from './heroOpeningData'
 import LivePulse from '@/components/motion/LivePulse'
-import type { HeroAnimState } from './heroAnimState'
-import { DEFAULT_FINAL_STATE } from './heroAnimState'
+import { usePrefersReducedMotion } from '@/components/motion/usePrefersReducedMotion'
 
-const RADIUS = 1.15
-
+const RADIUS = 1.4
+// NASA Blue Marble (natural earth daytime imagery), served from the
+// three-globe example bundle on unpkg — same source as globe.gl examples.
 const EARTH_TEXTURE_URL =
-  'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
-const EARTH_BUMP_URL =
-  'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png'
+  'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'
 
-type AnimRef = MutableRefObject<HeroAnimState>
+// Soft fresnel atmosphere — rim glow with falloff. Power 2.5 = soft tail,
+// accent color at 20% saturation rendered at 30% opacity max so the halo
+// feels like a subtle horizon glow, not a hard ring.
+const atmosphereVertex = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewDir = normalize(-mvPosition.xyz);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`
 
-function CameraController({ animRef }: { animRef: AnimRef }) {
-  const { camera } = useThree()
-  useFrame(() => {
-    const s = animRef.current
-    camera.position.z = s.cameraZ
-    camera.position.y = s.cameraY
-    camera.lookAt(0, 0, 0)
-  })
-  return null
-}
+const atmosphereFragment = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uPower;
+  uniform float uOpacity;
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  void main() {
+    float rim = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), uPower);
+    gl_FragColor = vec4(uColor, rim * uOpacity);
+  }
+`
 
-function Earth({ animRef }: { animRef: AnimRef }) {
-  const ref = useRef<THREE.Group>(null)
-  const markerGroupRef = useRef<THREE.Group>(null)
-  const [map, bump] = useLoader(THREE.TextureLoader, [
-    EARTH_TEXTURE_URL,
-    EARTH_BUMP_URL,
-  ])
-
-  map.colorSpace = THREE.SRGBColorSpace
-  map.anisotropy = 8
-
-  useFrame((_, delta) => {
-    if (!ref.current) return
-    const s = animRef.current
-    ref.current.rotation.y = s.globeRotY + delta * 0 // base set, auto below
-    ref.current.rotation.x = s.globeRotX
-    ref.current.scale.setScalar(s.globeScale)
-    if (s.autoRotateSpeed > 0) {
-      ref.current.rotation.y = ref.current.rotation.y + delta * s.autoRotateSpeed
-      // write back to state so GSAP resumes from current value if it tweens again
-      s.globeRotY = ref.current.rotation.y
-    }
-    if (markerGroupRef.current) {
-      markerGroupRef.current.visible = s.markerOpacity > 0.01
-    }
-  })
-
-  return (
-    <group ref={ref}>
-      <mesh>
-        <sphereGeometry args={[RADIUS, 96, 64]} />
-        <meshStandardMaterial
-          map={map}
-          bumpMap={bump}
-          bumpScale={0.015}
-          roughness={0.95}
-          metalness={0.05}
-          color="#a8c4e8"
-        />
-      </mesh>
-      <Atmosphere />
-      <group ref={markerGroupRef}>
-        <Markers animRef={animRef} />
-      </group>
-      <CascadeArcs animRef={animRef} />
-      <CascadeCards animRef={animRef} />
-    </group>
-  )
-}
-
-function Atmosphere() {
-  const mat = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        uniforms: {
-          glowColor: { value: new THREE.Color('#4ea8ff') },
-          intensity: { value: 0.9 },
-        },
-        vertexShader: `
-          varying vec3 vNormal;
-          varying vec3 vViewPosition;
-          void main() {
-            vNormal = normalize(normalMatrix * normal);
-            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            vViewPosition = -mvPosition.xyz;
-            gl_Position = projectionMatrix * mvPosition;
-          }
-        `,
-        fragmentShader: `
-          uniform vec3 glowColor;
-          uniform float intensity;
-          varying vec3 vNormal;
-          varying vec3 vViewPosition;
-          void main() {
-            vec3 viewDir = normalize(vViewPosition);
-            float fresnel = 1.0 - abs(dot(viewDir, vNormal));
-            fresnel = pow(fresnel, 2.5);
-            gl_FragColor = vec4(glowColor, fresnel * intensity);
-          }
-        `,
-        transparent: true,
-        side: THREE.BackSide,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }),
+function FresnelAtmosphere() {
+  const uniforms = useMemo(
+    () => ({
+      // --sl-accent (#4ea8ff) mixed with bg at ~20% saturation visually
+      uColor: { value: new THREE.Color('#9bc7ff') },
+      uPower: { value: 2.5 },
+      uOpacity: { value: 0.3 },
+    }),
     [],
   )
-
   return (
-    <mesh scale={1.06}>
-      <sphereGeometry args={[RADIUS, 64, 64]} />
-      <primitive object={mat} attach="material" />
+    <mesh scale={1.08}>
+      <sphereGeometry args={[RADIUS, 64, 32]} />
+      <shaderMaterial
+        vertexShader={atmosphereVertex}
+        fragmentShader={atmosphereFragment}
+        uniforms={uniforms}
+        transparent
+        side={THREE.BackSide}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
     </mesh>
   )
 }
 
-function Markers({ animRef }: { animRef: AnimRef }) {
+function EarthSurface() {
+  const texture = useTexture(EARTH_TEXTURE_URL)
+
+  useEffect(() => {
+    if (!texture) return
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 8
+  }, [texture])
+
+  return (
+    <mesh>
+      <sphereGeometry args={[RADIUS, 96, 64]} />
+      {/* Daytime imagery, dark-mode tinted: emissive --sl-bg-1 (#0a0e13)
+         lifts continent legibility while the directional light handles the
+         day/night terminator. roughness 1 keeps oceans matte. */}
+      <meshStandardMaterial
+        map={texture}
+        emissive={new THREE.Color('#0a0e13')}
+        emissiveIntensity={0.55}
+        roughness={1}
+        metalness={0}
+      />
+    </mesh>
+  )
+}
+
+function EarthGroup({ markersOn }: { markersOn: boolean }) {
+  const ref = useRef<THREE.Group>(null)
+  useFrame((_, delta) => {
+    if (!ref.current) return
+    ref.current.rotation.y += delta * 0.06
+  })
+
+  return (
+    <group ref={ref}>
+      <Suspense fallback={
+        <mesh>
+          <sphereGeometry args={[RADIUS, 48, 32]} />
+          <meshStandardMaterial color="#0e1822" roughness={1} metalness={0} />
+        </mesh>
+      }>
+        <EarthSurface />
+      </Suspense>
+      <FresnelAtmosphere />
+      <Markers visible={markersOn} />
+    </group>
+  )
+}
+
+// Cinematic opening: camera starts close (z≈1.2) angled 15° around y, then
+// pulls back to z=3.0 over 2.4s with ease-out-expo while orbiting back to 0°.
+// Markers fade in once the camera settles (staggered 80ms).
+function CameraIntro({
+  onSettled,
+}: {
+  onSettled: (v: boolean) => void
+}) {
+  const { camera } = useThree()
+  const prefersReduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    if (prefersReduced) {
+      camera.position.set(0, 0.3, 3.0)
+      camera.lookAt(0, 0, 0)
+      onSettled(true)
+      return
+    }
+    const state = { angle: -(Math.PI * 15) / 180, dist: 1.2, y: 0 }
+    const apply = () => {
+      camera.position.set(
+        Math.sin(state.angle) * state.dist,
+        state.y,
+        Math.cos(state.angle) * state.dist,
+      )
+      camera.lookAt(0, 0, 0)
+    }
+    apply()
+    const tl = gsap.timeline({ onComplete: () => onSettled(true) })
+    tl.to(state, {
+      angle: 0,
+      dist: 3.0,
+      y: 0.3,
+      duration: 2.4,
+      ease: 'expo.out',
+      onUpdate: apply,
+    })
+    return () => {
+      tl.kill()
+    }
+  }, [camera, prefersReduced, onSettled])
+
+  return null
+}
+
+function Markers({ visible }: { visible: boolean }) {
   const [hovered, setHovered] = useState<string | null>(null)
+
   return (
     <>
-      {MARKERS.map((m) => {
-        const pos = latLngToVec3(m.lat, m.lng, RADIUS + 0.015)
+      {MARKERS.map((m, i) => {
+        const pos = latLngToVec3(m.lat, m.lng, RADIUS + 0.02)
         const color = MARKER_COLOR[m.kind]
         const isHovered = hovered === m.id
+        const delayMs = i * 80
         return (
-          <group key={m.id} position={pos}>
+          <group key={m.id} position={pos} visible={visible}>
+            <mesh>
+              <sphereGeometry args={[0.018, 12, 12]} />
+              <meshBasicMaterial color={color} transparent opacity={visible ? 1 : 0} />
+            </mesh>
             <Html
               center
               distanceFactor={8}
-              occlude="blending"
+              occlude={false}
               style={{ pointerEvents: 'auto' }}
             >
               <div
                 onPointerEnter={() => setHovered(m.id)}
-                onPointerLeave={() =>
-                  setHovered((h) => (h === m.id ? null : h))
-                }
+                onPointerLeave={() => setHovered((h) => (h === m.id ? null : h))}
                 className="relative"
                 style={{
                   width: 28,
                   height: 28,
-                  opacity: animRef.current.markerOpacity,
-                  transition: 'opacity 300ms linear',
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? 'scale(1)' : 'scale(0.6)',
+                  transition: `opacity 600ms var(--sl-ease-out-expo) ${delayMs}ms, transform 600ms var(--sl-ease-out-expo) ${delayMs}ms`,
                 }}
               >
                 <div
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                   aria-hidden
-                  style={{
-                    filter:
-                      'drop-shadow(0 0 6px color-mix(in oklab, var(--sl-accent) 55%, transparent))',
-                  }}
                 >
                   <LivePulse color={MARKER_PULSE_COLOR[m.kind]} size={10} />
                 </div>
@@ -201,122 +237,8 @@ function Markers({ animRef }: { animRef: AnimRef }) {
   )
 }
 
-// Great-circle arc from Hormuz to each cascade alert region, drawn as a 3D
-// Line along the globe surface so it rotates with the earth naturally.
-function arcPoints(from: [number, number], to: [number, number], segments = 64) {
-  const start = new THREE.Vector3(
-    ...latLngToVec3(from[0], from[1], RADIUS + 0.008),
-  )
-  const end = new THREE.Vector3(
-    ...latLngToVec3(to[0], to[1], RADIUS + 0.008),
-  )
-  const pts: THREE.Vector3[] = []
-  const axis = new THREE.Vector3().crossVectors(start, end).normalize()
-  const angle = start.angleTo(end)
-  // Arc lifts above the surface at its midpoint for a readable curve
-  const midLift = 0.22 + angle * 0.12
-  for (let i = 0; i <= segments; i++) {
-    const t = i / segments
-    const q = new THREE.Quaternion().setFromAxisAngle(axis, angle * t)
-    const p = start.clone().applyQuaternion(q)
-    const lift = Math.sin(Math.PI * t) * midLift
-    p.multiplyScalar(1 + lift / RADIUS)
-    pts.push(p)
-  }
-  return pts
-}
-
-function CascadeArcs({ animRef }: { animRef: AnimRef }) {
-  const groupRef = useRef<THREE.Group>(null)
-  const arcs = useMemo(
-    () =>
-      CASCADE_ALERTS.map((a) => ({
-        id: a.id,
-        pts: arcPoints([HORMUZ_LAT, HORMUZ_LNG], [a.lat, a.lng]),
-      })),
-    [],
-  )
-  useFrame(() => {
-    if (!groupRef.current) return
-    groupRef.current.visible = animRef.current.cascadeOpacity > 0.01
-  })
-  return (
-    <group ref={groupRef}>
-      {arcs.map((a) => (
-        <Line
-          key={a.id}
-          points={a.pts}
-          color="#ff5c5c"
-          transparent
-          opacity={0.28}
-          lineWidth={1}
-          dashed={false}
-        />
-      ))}
-    </group>
-  )
-}
-
-function CascadeCards({ animRef }: { animRef: AnimRef }) {
-  const groupRef = useRef<THREE.Group>(null)
-  useFrame(() => {
-    if (!groupRef.current) return
-    groupRef.current.visible = animRef.current.cascadeOpacity > 0.01
-  })
-  return (
-    <group ref={groupRef}>
-      {CASCADE_ALERTS.map((a) => {
-        const pos = latLngToVec3(a.lat, a.lng, RADIUS + 0.02)
-        const dotColor =
-          a.tone === 'cost' ? 'var(--sl-warn)' : 'var(--sl-good)'
-        return (
-          <group key={a.id} position={pos}>
-            <Html
-              center
-              distanceFactor={8}
-              style={{ pointerEvents: 'none' }}
-            >
-              <div
-                data-cascade-card={a.id}
-                className="pointer-events-none relative"
-                style={{
-                  width: 180,
-                  opacity: 0,
-                  transform: 'translate3d(0, 0, 0)',
-                  willChange: 'transform, opacity',
-                }}
-              >
-                <div
-                  className="rounded-md border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider shadow-[var(--sl-glow-accent)]"
-                  style={{
-                    background: 'var(--sl-surface-glass)',
-                    backdropFilter: 'blur(10px)',
-                    borderColor: 'var(--sl-border-strong)',
-                    color: 'var(--sl-fg)',
-                  }}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className="inline-block h-1.5 w-1.5 rounded-full"
-                      style={{ background: dotColor }}
-                    />
-                    <span className="text-fg-muted">{a.region}</span>
-                  </div>
-                  <div className="mt-0.5 flex items-baseline gap-1.5">
-                    <span className="text-fg">{a.indicator}</span>
-                    <span style={{ color: dotColor }}>{a.delta}</span>
-                  </div>
-                </div>
-              </div>
-            </Html>
-          </group>
-        )
-      })}
-    </group>
-  )
-}
-
 const STAR_POSITIONS: Float32Array = (() => {
+  // Deterministic pseudo-random so render stays pure.
   let seed = 1337
   const rnd = () => {
     seed = (seed * 9301 + 49297) % 233280
@@ -336,48 +258,42 @@ const STAR_POSITIONS: Float32Array = (() => {
 })()
 
 function Stars() {
+  const positions = STAR_POSITIONS
+
   return (
     <points>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          args={[STAR_POSITIONS, 3]}
-          count={STAR_POSITIONS.length / 3}
+          args={[positions, 3]}
+          count={positions.length / 3}
           itemSize={3}
         />
       </bufferGeometry>
-      <pointsMaterial
-        size={0.02}
-        color="#5a6472"
-        sizeAttenuation
-        transparent
-        opacity={0.6}
-      />
+      <pointsMaterial size={0.02} color="#5a6472" sizeAttenuation transparent opacity={0.6} />
     </points>
   )
 }
 
-type HeroGlobeProps = {
-  animRef?: AnimRef
-}
-
-export default function HeroGlobe({ animRef }: HeroGlobeProps = {}) {
-  const fallbackRef = useRef<HeroAnimState>({ ...DEFAULT_FINAL_STATE })
-  const state = animRef ?? fallbackRef
+export default function HeroGlobe() {
+  const [settled, setSettled] = useState(false)
   return (
     <Canvas
-      dpr={[1, 3]}
+      dpr={[1, 1.6]}
       gl={{ antialias: true, alpha: true }}
-      camera={{ position: [0, 0.15, 3.9], fov: 42 }}
+      camera={{ position: [0, 0, 1.2], fov: 45 }}
       style={{ width: '100%', height: '100%' }}
     >
-      <CameraController animRef={state} />
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[5, 3, 5]} intensity={1.1} color="#ffffff" />
-      <pointLight position={[-4, -2, -3]} intensity={0.4} color="#4ea8ff" />
+      {/* Ambient lifts the night side so continents stay readable; the
+          directional rig lights ~60% of the visible hemisphere from the
+          upper-front-right, leaving a soft terminator on the left. */}
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[3, 2, 4]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[-3, 1, -2]} intensity={0.18} color="#7aa9ff" />
+      <CameraIntro onSettled={setSettled} />
       <Suspense fallback={null}>
         <Stars />
-        <Earth animRef={state} />
+        <EarthGroup markersOn={settled} />
       </Suspense>
     </Canvas>
   )
