@@ -9,7 +9,6 @@ import type { Industry } from '@/lib/indicators/types';
 
 const anthropic = new Anthropic();
 
-export const PROFILER_GENERATED_BY = `claude-sonnet-4@${PROMPT_VERSION}`;
 
 export interface ProfilerInput {
   industry: Industry;

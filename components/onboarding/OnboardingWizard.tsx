@@ -93,32 +93,34 @@ export function OnboardingWizard({ initialStep, initialState, profileSchemas }: 
 
   function handleProfileSubmit(values: Record<string, unknown>) {
     startTransition(async () => {
-      await upsertOnboardingStateAction({
-        step: 'indicators',
-        businessDescription,
-        industryProfile: values,
-        keyInputs: [],
-      });
-      setIndustryProfile(values);
-
-      // Fire profiler non-blocking — wizard advances immediately
-      if (industry) {
-        void runProfilerAction({
-          industry,
-          industryProfile: values,
+      try {
+        await upsertOnboardingStateAction({
+          step: 'indicators',
           businessDescription,
+          industryProfile: values,
           keyInputs: [],
-          region: regionState,
-        }).catch(console.error);
-      }
+        });
+        setIndustryProfile(values);
 
-      // Load full indicator list for step 4
-      if (industry) {
-        const inds = await getIndustryIndicatorsAction(industry);
-        setAllIndicators(inds);
-      }
+        if (industry) {
+          void runProfilerAction({
+            industry,
+            industryProfile: values,
+            businessDescription,
+            keyInputs: [],
+            region: regionState,
+          }).catch(console.error);
+        }
 
-      setStep('indicators');
+        if (industry) {
+          const inds = await getIndustryIndicatorsAction(industry);
+          setAllIndicators(inds);
+        }
+
+        setStep('indicators');
+      } catch (err) {
+        console.error('[handleProfileSubmit] failed:', err);
+      }
     });
   }
 
