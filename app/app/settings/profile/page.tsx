@@ -1,58 +1,61 @@
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
+import { Suspense } from 'react';
+import { currentUser } from '@clerk/nextjs/server';
+import { ProfileCard } from '@/components/settings/ProfileCard';
+import { UsageCard } from '@/components/settings/UsageCard';
+import { NotificationPrefsCard } from '@/components/settings/NotificationPrefsCard';
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const user = await currentUser();
+
+  const name =
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ') || null;
+  const email = user?.primaryEmailAddress?.emailAddress ?? null;
+
+  const billingMeta = (user?.publicMetadata ?? {}) as {
+    planTier?: string;
+    nextBillingDate?: string;
+  };
+
   return (
-    <div className="max-w-lg">
+    <div className="max-w-5xl">
       <div className="mb-6">
         <h1 className="text-xl font-display font-semibold text-fg">Profile</h1>
         <p className="text-sm text-fg-muted mt-0.5">
-          Account details and organization settings.
+          Account, usage patterns, and alert routing.
         </p>
       </div>
 
-      <Card className="p-5 mb-4">
-        <h2 className="text-sm font-medium text-fg mb-4">Account</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs text-fg-muted mb-1">Name</label>
-            <p className="text-sm text-fg">—</p>
-          </div>
-          <div>
-            <label className="block text-xs text-fg-muted mb-1">Email</label>
-            <p className="text-sm text-fg">—</p>
-          </div>
-          <div>
-            <label className="block text-xs text-fg-muted mb-1">Role</label>
-            <p className="text-sm text-fg">Owner</p>
-          </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="flex flex-col gap-4">
+          <ProfileCard
+            name={name}
+            email={email}
+            industry="restaurant"
+            region="National (default)"
+            subscription="trial"
+          />
         </div>
-        <p className="text-xs text-fg-muted mt-4">
-          Account details are managed via Clerk. Click below to update your name or email.
-        </p>
-        <Button variant="outline" size="sm" className="mt-4" disabled>
-          Manage account
-        </Button>
-      </Card>
+        <div className="flex flex-col gap-4">
+          <UsageCard
+            briefingsReadThisMonth={null}
+            alertsReceivedThisMonth={null}
+            planTier={billingMeta.planTier ?? 'Trial'}
+            nextBillingDate={billingMeta.nextBillingDate ?? null}
+          />
+          <Suspense fallback={<PrefsSkeleton />}>
+            <NotificationPrefsCard />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      <Card className="p-5 mb-4">
-        <h2 className="text-sm font-medium text-fg mb-4">Organization</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs text-fg-muted mb-1">Industry</label>
-            <Badge variant="industry" label="restaurant" />
-          </div>
-          <div>
-            <label className="block text-xs text-fg-muted mb-1">Region</label>
-            <p className="text-sm text-fg">National (default)</p>
-          </div>
-          <div>
-            <label className="block text-xs text-fg-muted mb-1">Subscription</label>
-            <Badge variant="status" label="trial" />
-          </div>
-        </div>
-      </Card>
+function PrefsSkeleton() {
+  return (
+    <div className="bg-bg-elev border border-border rounded-[var(--radius-md)] p-5">
+      <div className="h-4 w-40 bg-bg-elev-2 rounded animate-pulse mb-3" />
+      <div className="h-24 w-full bg-bg-elev-2 rounded animate-pulse" />
     </div>
   );
 }
