@@ -5,29 +5,48 @@ import { ChartLive, SplitTextReveal } from '@/components/motion'
 import { usePrefersReducedMotion } from '@/components/motion/usePrefersReducedMotion'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Column 1 — Weekly Briefing (static anatomy + rotating "live update" line)
+// Column 1 — Weekly Briefing (multi-page crossfade + pinned sources footer)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BRIEFING_STATIC: readonly { kind: 'h' | 'p' | 'callout' | 'src'; text: string }[] = [
-  { kind: 'h', text: 'Monday briefing · Apr 20, 2026' },
-  { kind: 'p', text: 'Boxed beef closed Friday at $318.40/cwt, up 2.1% week-over-week and 8.4% above the 12-week trailing average.' },
-  { kind: 'callout', text: 'Operator context · Operators who repriced within 2 weeks historically preserved 180–220 bps of gross margin through similar cycles.' },
-  { kind: 'p', text: 'Diesel at $3.847/gal eased 0.4%. Freight spot rates held at $2.21/mi. Distribution pressure is contained this week.' },
-  { kind: 'src', text: 'Sources · USDA AMS LM_XB459 · EIA weekly diesel · BLS CPI-U food away' },
+type BriefingLine = { kind: 'p' | 'callout'; text: string }
+
+const BRIEFING_PAGES: readonly { header: string; paras: readonly BriefingLine[] }[] = [
+  {
+    header: 'Monday briefing · Apr 20, 2026',
+    paras: [
+      { kind: 'p', text: 'Boxed beef closed Friday at $318.40/cwt, up 2.1% week-over-week and 8.4% above the 12-week trailing average. Forward strip implies the next 4 weeks remain bid.' },
+      { kind: 'callout', text: 'Operator context · Operators who repriced within 2 weeks historically preserved 180–220 bps of gross margin through similar cycles.' },
+      { kind: 'p', text: 'Diesel at $3.847/gal eased 0.4%. Freight spot rates held at $2.21/mi. Distribution pressure is contained this week.' },
+      { kind: 'p', text: 'Eggs (Grade A) printed –4.2% WoW after HPAI containment improvements. Breakfast and bakery margin tailwind likely persists into Q2.' },
+    ],
+  },
+  {
+    header: 'Demand · seated diners',
+    paras: [
+      { kind: 'p', text: 'OpenTable seated diners 4-week average crossed below 100 for the first time since February — first durable demand signal in 9 weeks.' },
+      { kind: 'callout', text: 'Pattern recognition · The prior two negative crossings preceded ticket-size compression by 3–5 weeks. Historical pattern suggests watching traffic before tickets.' },
+      { kind: 'p', text: 'Restaurant traffic index held +0.8%. The divergence between traffic and seated diners suggests off-peak softness rather than whole-day decline.' },
+      { kind: 'p', text: 'Catering inquiries (Tock corporate) eased 3.1% — early signal that mid-market corporate spend is normalizing after Q1 strength.' },
+    ],
+  },
+  {
+    header: 'Macro · rates and credit',
+    paras: [
+      { kind: 'p', text: 'FOMC held this meeting. 30Y fixed mortgage stable at 6.74%. Remodel demand unchanged; light construction backlog reads steady through 6 weeks.' },
+      { kind: 'p', text: 'High-yield OAS widened +28bps in 48 hours. SMB credit conditions tightening on the margin — receivables and DSO worth a second look this week.' },
+      { kind: 'callout', text: 'Operator context · Construction operators in similar credit environments historically extended terms by 7–10 days. Working capital discipline matters here.' },
+    ],
+  },
 ]
 
-const LIVE_UPDATES: readonly string[] = [
-  'Eggs (Grade A) now –4.2% WoW — breakfast margin tailwind into Q2.',
-  'HY OAS +28bps in 48h. SMB credit conditions tightening on the margin.',
-  'OpenTable 4-week avg turns negative — first durable demand signal since February.',
-  'HRC tariff band widened 4pp — construction input passthrough lag is 3–5 weeks.',
-]
+const BRIEFING_SOURCES =
+  'Sources · USDA AMS LM_XB459 · EIA weekly diesel · BLS CPI-U food away · OpenTable · FRED'
 
 function BriefingPreview() {
   const ref = useRef<HTMLDivElement | null>(null)
   const prefersReduced = usePrefersReducedMotion()
   const [active, setActive] = useState(false)
-  const [liveIdx, setLiveIdx] = useState(0)
+  const [pageIdx, setPageIdx] = useState(0)
 
   useEffect(() => {
     const el = ref.current
@@ -45,10 +64,12 @@ function BriefingPreview() {
   useEffect(() => {
     if (!active || prefersReduced) return
     const id = window.setInterval(() => {
-      setLiveIdx((i) => (i + 1) % LIVE_UPDATES.length)
-    }, 8000)
+      setPageIdx((i) => (i + 1) % BRIEFING_PAGES.length)
+    }, 7000)
     return () => window.clearInterval(id)
   }, [active, prefersReduced])
+
+  const page = BRIEFING_PAGES[pageIdx]
 
   return (
     <div
@@ -70,71 +91,54 @@ function BriefingPreview() {
         <span>6:02am local</span>
       </div>
 
-      <div className="sl-mask-fade-y relative flex-1 overflow-hidden px-6 py-5" style={{ minHeight: 360 }}>
-        {BRIEFING_STATIC.map((line, i) => {
-          if (line.kind === 'h')
-            return (
-              <h4 key={i} className="mb-3 font-display text-base font-semibold text-fg">
-                {line.text}
-              </h4>
-            )
-          if (line.kind === 'callout')
-            return (
-              <div
-                key={i}
-                className="my-3 rounded-[var(--sl-radius-sm)] border-l-2 px-3 py-2 text-[13px] leading-relaxed text-fg"
-                style={{
-                  borderColor: 'var(--sl-accent)',
-                  background: 'color-mix(in oklab, var(--sl-accent) 6%, transparent)',
-                }}
-              >
-                {line.text}
-              </div>
-            )
-          if (line.kind === 'src')
-            return (
-              <p
-                key={i}
-                className="mb-4 mt-3 font-mono text-[10px] uppercase tracking-[0.15em] text-fg-dim"
-              >
-                {line.text}
-              </p>
-            )
-          return (
+      <div
+        key={pageIdx}
+        className="sl-mask-fade-y relative flex-1 overflow-hidden px-6 py-5"
+        style={{
+          animation: prefersReduced
+            ? undefined
+            : 'sl-crossfade 900ms var(--sl-ease-out-expo) both',
+        }}
+      >
+        <h4 className="mb-3 font-display text-base font-semibold text-fg">{page.header}</h4>
+        {page.paras.map((line, i) =>
+          line.kind === 'callout' ? (
+            <div
+              key={i}
+              className="my-3 rounded-[var(--sl-radius-sm)] border-l-2 px-3 py-2 text-[13px] leading-relaxed text-fg"
+              style={{
+                borderColor: 'var(--sl-accent)',
+                background: 'color-mix(in oklab, var(--sl-accent) 6%, transparent)',
+              }}
+            >
+              {line.text}
+            </div>
+          ) : (
             <p key={i} className="mb-3 text-[13px] leading-relaxed text-fg-muted">
               {line.text}
             </p>
-          )
-        })}
+          ),
+        )}
+      </div>
+
+      <div className="flex items-center justify-center gap-1.5 px-5 py-2" aria-hidden>
+        {BRIEFING_PAGES.map((_, i) => (
+          <span
+            key={i}
+            className="h-1 rounded-full transition-all duration-500"
+            style={{
+              width: pageIdx === i ? 18 : 6,
+              background: pageIdx === i ? 'var(--sl-accent)' : 'var(--sl-border-strong)',
+            }}
+          />
+        ))}
       </div>
 
       <div
-        className="flex items-center gap-3 border-t px-5 py-3"
+        className="border-t px-5 py-3 font-mono text-[10px] uppercase tracking-[0.15em] text-fg-dim"
         style={{ borderColor: 'var(--sl-border)' }}
       >
-        <span
-          className="inline-flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.2em]"
-          style={{ color: 'var(--sl-accent)' }}
-        >
-          <span className="relative inline-flex h-1.5 w-1.5">
-            <span
-              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-80"
-              style={{ background: 'var(--sl-accent)' }}
-            />
-            <span
-              className="relative inline-flex h-1.5 w-1.5 rounded-full"
-              style={{ background: 'var(--sl-accent)' }}
-            />
-          </span>
-          Live
-        </span>
-        <span
-          key={liveIdx}
-          className="min-w-0 flex-1 truncate text-[11.5px] text-fg-muted"
-          style={{ animation: prefersReduced ? undefined : 'sl-crossfade 800ms var(--sl-ease-out-expo) both' }}
-        >
-          {LIVE_UPDATES[liveIdx]}
-        </span>
+        {BRIEFING_SOURCES}
       </div>
     </div>
   )
