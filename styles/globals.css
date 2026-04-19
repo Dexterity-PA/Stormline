@@ -312,33 +312,6 @@ html.lenis body {
   100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
-/* Radar-sweep concentric ring — used by Phase 1 Hormuz overlay */
-@keyframes sl-radar-pulse {
-  0%   { transform: scale(0.35); opacity: 0; }
-  10%  { opacity: 0.65; }
-  100% { transform: scale(1.9); opacity: 0; }
-}
-
-/* Phase 1 — scan line sweeping the red corridor polygon */
-@keyframes sl-hormuz-scan {
-  0%   { background-position: -40% 0; }
-  100% { background-position: 140% 0; }
-}
-.sl-hormuz-scan {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in srgb, var(--sl-crit) 60%, transparent) 48%,
-    color-mix(in srgb, var(--sl-crit) 80%, transparent) 50%,
-    color-mix(in srgb, var(--sl-crit) 60%, transparent) 52%,
-    transparent 100%
-  );
-  background-size: 40% 100%;
-  background-repeat: no-repeat;
-  animation: sl-hormuz-scan 2.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-  mix-blend-mode: screen;
-}
-
 /* Accent underline draw-in */
 @keyframes sl-underline-draw {
   from { transform: scaleX(0); }
@@ -371,9 +344,6 @@ html.lenis body {
   .sl-pulse-ring {
     animation: none !important;
     opacity: 0.25 !important;
-  }
-  .sl-hormuz-scan {
-    animation: none !important;
   }
   .sl-path-draw {
     stroke-dashoffset: 0 !important;
