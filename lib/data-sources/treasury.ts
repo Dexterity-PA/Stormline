@@ -9,92 +9,118 @@ import {
 } from "./types";
 
 /**
- * Federal Register API (https://www.federalregister.gov/developers/api/v1).
+ * Treasury FiscalData API (https://fiscaldata.treasury.gov/services/api/fiscal_service).
  *
- * No API key required. Published rate guidance is "reasonable use" — we keep
- * a 20s timeout and exponential backoff. Pagination uses per_page up to 1000.
+ * No API key required. Rate limits are not formally published; Treasury
+ * guidance is "reasonable use" — we keep a 20s timeout and exponential
+ * backoff to avoid hammering the edge in the rare cases it rate-limits.
  *
- * INTERFACE-FIT NOTE: Federal Register returns discrete documents, not a time
- * series. We bucket documents by ISO week (Monday UTC start) and emit one
- * IndicatorPoint per week with value = count of matching docs published that
- * week. This preserves the DataSourceAdapter shape without extending it.
- *
- * sourceId is the search term queried via `conditions[term]`:
- *   "tariff"        — tariff notices
- *   "import duty"   — duty-related actions
- *   "trade"         — broader trade actions
- * New search terms can be added to the registry without code changes here.
+ * Stormline sourceId → Treasury series mapping:
+ *   debt_to_penny            → /v2/accounting/od/debt_to_penny.tot_pub_debt_out_amt
+ *   tga_operating_balance    → /v1/accounting/dts/dts_table_1.close_today_bal
+ *                              (filter: account_type eq "Treasury General Account (TGA)")
  */
-const FEDERAL_REGISTER_BASE_URL = "https://www.federalregister.gov/api/v1";
+const TREASURY_BASE_URL =
+  "https://api.fiscaldata.treasury.gov/services/api/fiscal_service";
 const USER_AGENT = "Stormline/1.0 (ops@stormline.app)";
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_BASE_BACKOFF_MS = 500;
 const DEFAULT_TIMEOUT_MS = 20_000;
-const PER_PAGE = 1_000;
-const MAX_PAGES = 5;
+const PAGE_SIZE = 1_000;
 
-const documentSchema = z.object({
-  publication_date: z.string(),
-});
+interface TreasurySeriesSpec {
+  path: string;
+  dateField: string;
+  valueField: string;
+  extraFilter?: string;
+}
+
+const TREASURY_SERIES: Record<string, TreasurySeriesSpec> = {
+  debt_to_penny: {
+    path: "/v2/accounting/od/debt_to_penny",
+    dateField: "record_date",
+    valueField: "tot_pub_debt_out_amt",
+  },
+  tga_operating_balance: {
+    path: "/v1/accounting/dts/dts_table_1",
+    dateField: "record_date",
+    valueField: "close_today_bal",
+    extraFilter: "account_type:eq:Treasury General Account (TGA)",
+  },
+};
 
 const responseSchema = z.object({
-  count: z.number(),
-  total_pages: z.number().optional(),
-  next_page_url: z.string().nullable().optional(),
-  results: z.array(documentSchema),
+  data: z.array(z.record(z.string(), z.unknown())),
+  meta: z
+    .object({
+      "total-count": z.number().optional(),
+      "total-pages": z.number().optional(),
+    })
+    .optional(),
 });
 
-export interface FederalRegisterAdapterOptions {
+export interface TreasuryAdapterOptions {
   fetchImpl?: typeof fetch;
   maxRetries?: number;
   baseBackoffMs?: number;
   timeoutMs?: number;
-  maxPages?: number;
 }
 
-export class FederalRegisterAdapter implements DataSourceAdapter {
-  readonly source = "federal_register" as const;
+export class TreasuryAdapter implements DataSourceAdapter {
+  readonly source = "treasury" as const;
 
   private readonly fetchImpl: typeof fetch;
   private readonly maxRetries: number;
   private readonly baseBackoffMs: number;
   private readonly timeoutMs: number;
-  private readonly maxPages: number;
 
-  constructor(options: FederalRegisterAdapterOptions = {}) {
+  constructor(options: TreasuryAdapterOptions = {}) {
     this.fetchImpl = options.fetchImpl ?? fetch;
     this.maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
     this.baseBackoffMs = options.baseBackoffMs ?? DEFAULT_BASE_BACKOFF_MS;
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-    this.maxPages = options.maxPages ?? MAX_PAGES;
   }
 
   async fetchSeries(
     sourceId: string,
     options: FetchSeriesOptions = {},
   ): Promise<IndicatorFetch> {
-    const dates: string[] = [];
-    let url: string | null = this.buildUrl(sourceId, options.since);
-    let pagesFetched = 0;
-
-    while (url && pagesFetched < this.maxPages) {
-      const payload = await this.fetchJsonWithRetry(url, options.signal);
-      const parsed = responseSchema.safeParse(payload);
-      if (!parsed.success) {
-        throw new DataSourceError(
-          `Federal Register returned unexpected payload shape for term '${sourceId}'`,
-          "federal_register",
-          parsed.error,
-        );
-      }
-      for (const doc of parsed.data.results) {
-        dates.push(doc.publication_date);
-      }
-      url = parsed.data.next_page_url ?? null;
-      pagesFetched += 1;
+    const spec = TREASURY_SERIES[sourceId];
+    if (!spec) {
+      throw new DataSourceError(
+        `Unknown Treasury series '${sourceId}'. Known: ${Object.keys(TREASURY_SERIES).join(", ")}`,
+        "treasury",
+      );
     }
 
-    const points = bucketByWeek(dates);
+    const url = this.buildUrl(spec, options.since);
+    const payload = await this.fetchJsonWithRetry(url, options.signal);
+
+    const parsed = responseSchema.safeParse(payload);
+    if (!parsed.success) {
+      throw new DataSourceError(
+        `Treasury returned unexpected payload shape for '${sourceId}'`,
+        "treasury",
+        parsed.error,
+      );
+    }
+
+    const points = parsed.data.data.reduce<IndicatorPoint[]>((acc, row) => {
+      const rawDate = row[spec.dateField];
+      const rawValue = row[spec.valueField];
+      if (typeof rawDate !== "string" || typeof rawValue !== "string") {
+        return acc;
+      }
+      if (rawValue === "" || rawValue === "null") return acc;
+      const value = Number(rawValue);
+      if (!Number.isFinite(value)) return acc;
+      const observedAt = parseIsoDate(rawDate);
+      if (!observedAt) return acc;
+      acc.push({ observedAt, value });
+      return acc;
+    }, []);
+
+    points.sort((a, b) => a.observedAt.getTime() - b.observedAt.getTime());
 
     return {
       source: this.source,
@@ -104,16 +130,23 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
     };
   }
 
-  private buildUrl(sourceId: string, since?: Date): string {
-    const params = new URLSearchParams();
-    params.set("conditions[term]", sourceId);
-    params.set("per_page", String(PER_PAGE));
-    params.set("order", "oldest");
-    params.set("fields[]", "publication_date");
+  private buildUrl(spec: TreasurySeriesSpec, since?: Date): string {
+    const params = new URLSearchParams({
+      fields: `${spec.dateField},${spec.valueField}`,
+      sort: `-${spec.dateField}`,
+      "page[size]": String(PAGE_SIZE),
+    });
+    const filterParts: string[] = [];
     if (since) {
-      params.set("conditions[publication_date][gte]", formatIsoDate(since));
+      filterParts.push(`${spec.dateField}:gte:${formatIsoDate(since)}`);
     }
-    return `${FEDERAL_REGISTER_BASE_URL}/documents.json?${params.toString()}`;
+    if (spec.extraFilter) {
+      filterParts.push(spec.extraFilter);
+    }
+    if (filterParts.length > 0) {
+      params.set("filter", filterParts.join(","));
+    }
+    return `${TREASURY_BASE_URL}${spec.path}?${params.toString()}`;
   }
 
   private async fetchJsonWithRetry(
@@ -144,14 +177,14 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
         if (response.status !== 429 && response.status < 500) {
           const body = await safeReadText(response);
           throw new DataSourceError(
-            `Federal Register request failed: ${response.status} ${response.statusText} — ${body}`,
-            "federal_register",
+            `Treasury request failed: ${response.status} ${response.statusText} — ${body}`,
+            "treasury",
           );
         }
 
         lastError = new DataSourceError(
-          `Federal Register request failed: ${response.status} ${response.statusText}`,
-          "federal_register",
+          `Treasury request failed: ${response.status} ${response.statusText}`,
+          "treasury",
         );
       } catch (err) {
         if (err instanceof DataSourceError && !isRetryableError(err)) {
@@ -168,8 +201,8 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
     }
 
     throw new DataSourceError(
-      `Federal Register request exhausted ${this.maxRetries + 1} attempts`,
-      "federal_register",
+      `Treasury request exhausted ${this.maxRetries + 1} attempts`,
+      "treasury",
       lastError,
     );
   }
@@ -178,35 +211,6 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
     const jitter = Math.random() * this.baseBackoffMs;
     return this.baseBackoffMs * 2 ** attempt + jitter;
   }
-}
-
-/**
- * Bucket publication dates into ISO weeks starting Monday UTC.
- * Returns one IndicatorPoint per week with value = document count.
- */
-function bucketByWeek(dates: string[]): IndicatorPoint[] {
-  const buckets = new Map<number, number>();
-  for (const iso of dates) {
-    const date = parseIsoDate(iso);
-    if (!date) continue;
-    const weekStart = startOfIsoWeek(date);
-    const key = weekStart.getTime();
-    buckets.set(key, (buckets.get(key) ?? 0) + 1);
-  }
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([ts, count]) => ({ observedAt: new Date(ts), value: count }));
-}
-
-function startOfIsoWeek(date: Date): Date {
-  const utc = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
-  );
-  // getUTCDay: Sunday=0, Monday=1, ..., Saturday=6. ISO weeks start Monday.
-  const day = utc.getUTCDay();
-  const offset = (day + 6) % 7; // 0 if Monday, 6 if Sunday
-  utc.setUTCDate(utc.getUTCDate() - offset);
-  return utc;
 }
 
 function parseIsoDate(iso: string): Date | null {

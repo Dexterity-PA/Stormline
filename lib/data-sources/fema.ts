@@ -9,42 +9,64 @@ import {
 } from "./types";
 
 /**
- * Federal Register API (https://www.federalregister.gov/developers/api/v1).
+ * OpenFEMA API (https://www.fema.gov/api/open).
  *
- * No API key required. Published rate guidance is "reasonable use" — we keep
- * a 20s timeout and exponential backoff. Pagination uses per_page up to 1000.
+ * No API key required. Per-request $top capped at 1000; FEMA does not
+ * publish a hard rate limit but recommends paginating responsibly. We
+ * page up to MAX_PAGES and apply exponential backoff on 429/5xx.
  *
- * INTERFACE-FIT NOTE: Federal Register returns discrete documents, not a time
- * series. We bucket documents by ISO week (Monday UTC start) and emit one
- * IndicatorPoint per week with value = count of matching docs published that
- * week. This preserves the DataSourceAdapter shape without extending it.
- *
- * sourceId is the search term queried via `conditions[term]`:
- *   "tariff"        — tariff notices
- *   "import duty"   — duty-related actions
- *   "trade"         — broader trade actions
- * New search terms can be added to the registry without code changes here.
+ * Adapter returns monthly counts of disaster declarations. sourceId scheme:
+ *   DECLARATIONS:MONTHLY:US       — all states
+ *   DECLARATIONS:MONTHLY:{STATE}  — per state (e.g., DECLARATIONS:MONTHLY:FL)
+ *   DECLARATIONS:MONTHLY:US:{INCIDENT_TYPE} — filtered by incident type
+ *     e.g., DECLARATIONS:MONTHLY:US:Hurricane
  */
-const FEDERAL_REGISTER_BASE_URL = "https://www.federalregister.gov/api/v1";
+const FEMA_BASE_URL =
+  "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries";
 const USER_AGENT = "Stormline/1.0 (ops@stormline.app)";
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_BASE_BACKOFF_MS = 500;
 const DEFAULT_TIMEOUT_MS = 20_000;
-const PER_PAGE = 1_000;
-const MAX_PAGES = 5;
+const PAGE_SIZE = 1_000;
+const MAX_PAGES = 10;
 
-const documentSchema = z.object({
-  publication_date: z.string(),
+const recordSchema = z.object({
+  declarationDate: z.string(),
+  state: z.string().optional(),
+  incidentType: z.string().optional(),
 });
 
 const responseSchema = z.object({
-  count: z.number(),
-  total_pages: z.number().optional(),
-  next_page_url: z.string().nullable().optional(),
-  results: z.array(documentSchema),
+  DisasterDeclarationsSummaries: z.array(recordSchema),
+  metadata: z
+    .object({
+      count: z.number().optional(),
+      skip: z.number().optional(),
+      top: z.number().optional(),
+    })
+    .optional(),
 });
 
-export interface FederalRegisterAdapterOptions {
+interface ParsedSourceId {
+  state: string | null;
+  incidentType: string | null;
+}
+
+function parseSourceId(sourceId: string): ParsedSourceId {
+  const parts = sourceId.split(":");
+  if (parts.length < 3 || parts[0] !== "DECLARATIONS" || parts[1] !== "MONTHLY") {
+    throw new DataSourceError(
+      `Unsupported FEMA sourceId '${sourceId}'. Expected 'DECLARATIONS:MONTHLY:{US|STATE}[:INCIDENT_TYPE]'`,
+      "fema",
+    );
+  }
+  const stateToken = parts[2];
+  const state = stateToken === "US" ? null : stateToken;
+  const incidentType = parts[3] ?? null;
+  return { state, incidentType };
+}
+
+export interface FemaAdapterOptions {
   fetchImpl?: typeof fetch;
   maxRetries?: number;
   baseBackoffMs?: number;
@@ -52,8 +74,8 @@ export interface FederalRegisterAdapterOptions {
   maxPages?: number;
 }
 
-export class FederalRegisterAdapter implements DataSourceAdapter {
-  readonly source = "federal_register" as const;
+export class FemaAdapter implements DataSourceAdapter {
+  readonly source = "fema" as const;
 
   private readonly fetchImpl: typeof fetch;
   private readonly maxRetries: number;
@@ -61,7 +83,7 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
   private readonly timeoutMs: number;
   private readonly maxPages: number;
 
-  constructor(options: FederalRegisterAdapterOptions = {}) {
+  constructor(options: FemaAdapterOptions = {}) {
     this.fetchImpl = options.fetchImpl ?? fetch;
     this.maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
     this.baseBackoffMs = options.baseBackoffMs ?? DEFAULT_BASE_BACKOFF_MS;
@@ -73,28 +95,26 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
     sourceId: string,
     options: FetchSeriesOptions = {},
   ): Promise<IndicatorFetch> {
+    const { state, incidentType } = parseSourceId(sourceId);
     const dates: string[] = [];
-    let url: string | null = this.buildUrl(sourceId, options.since);
-    let pagesFetched = 0;
 
-    while (url && pagesFetched < this.maxPages) {
+    for (let page = 0; page < this.maxPages; page++) {
+      const url = this.buildUrl(state, incidentType, options.since, page);
       const payload = await this.fetchJsonWithRetry(url, options.signal);
       const parsed = responseSchema.safeParse(payload);
       if (!parsed.success) {
         throw new DataSourceError(
-          `Federal Register returned unexpected payload shape for term '${sourceId}'`,
-          "federal_register",
+          `FEMA returned unexpected payload shape for '${sourceId}'`,
+          "fema",
           parsed.error,
         );
       }
-      for (const doc of parsed.data.results) {
-        dates.push(doc.publication_date);
-      }
-      url = parsed.data.next_page_url ?? null;
-      pagesFetched += 1;
+      const records = parsed.data.DisasterDeclarationsSummaries;
+      for (const rec of records) dates.push(rec.declarationDate);
+      if (records.length < PAGE_SIZE) break;
     }
 
-    const points = bucketByWeek(dates);
+    const points = bucketByMonth(dates);
 
     return {
       source: this.source,
@@ -104,16 +124,30 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
     };
   }
 
-  private buildUrl(sourceId: string, since?: Date): string {
-    const params = new URLSearchParams();
-    params.set("conditions[term]", sourceId);
-    params.set("per_page", String(PER_PAGE));
-    params.set("order", "oldest");
-    params.set("fields[]", "publication_date");
+  private buildUrl(
+    state: string | null,
+    incidentType: string | null,
+    since: Date | undefined,
+    page: number,
+  ): string {
+    const filterParts: string[] = [];
+    if (state) filterParts.push(`state eq '${escapeOdataValue(state)}'`);
+    if (incidentType)
+      filterParts.push(
+        `incidentType eq '${escapeOdataValue(incidentType)}'`,
+      );
     if (since) {
-      params.set("conditions[publication_date][gte]", formatIsoDate(since));
+      filterParts.push(`declarationDate ge '${since.toISOString()}'`);
     }
-    return `${FEDERAL_REGISTER_BASE_URL}/documents.json?${params.toString()}`;
+    const params = new URLSearchParams();
+    params.set("$select", "declarationDate,state,incidentType");
+    params.set("$orderby", "declarationDate");
+    params.set("$top", String(PAGE_SIZE));
+    params.set("$skip", String(page * PAGE_SIZE));
+    if (filterParts.length > 0) {
+      params.set("$filter", filterParts.join(" and "));
+    }
+    return `${FEMA_BASE_URL}?${params.toString()}`;
   }
 
   private async fetchJsonWithRetry(
@@ -144,14 +178,14 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
         if (response.status !== 429 && response.status < 500) {
           const body = await safeReadText(response);
           throw new DataSourceError(
-            `Federal Register request failed: ${response.status} ${response.statusText} — ${body}`,
-            "federal_register",
+            `FEMA request failed: ${response.status} ${response.statusText} — ${body}`,
+            "fema",
           );
         }
 
         lastError = new DataSourceError(
-          `Federal Register request failed: ${response.status} ${response.statusText}`,
-          "federal_register",
+          `FEMA request failed: ${response.status} ${response.statusText}`,
+          "fema",
         );
       } catch (err) {
         if (err instanceof DataSourceError && !isRetryableError(err)) {
@@ -168,8 +202,8 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
     }
 
     throw new DataSourceError(
-      `Federal Register request exhausted ${this.maxRetries + 1} attempts`,
-      "federal_register",
+      `FEMA request exhausted ${this.maxRetries + 1} attempts`,
+      "fema",
       lastError,
     );
   }
@@ -180,33 +214,25 @@ export class FederalRegisterAdapter implements DataSourceAdapter {
   }
 }
 
-/**
- * Bucket publication dates into ISO weeks starting Monday UTC.
- * Returns one IndicatorPoint per week with value = document count.
- */
-function bucketByWeek(dates: string[]): IndicatorPoint[] {
+function escapeOdataValue(value: string): string {
+  // OData single-quote escaping: double the quote.
+  return value.replace(/'/g, "''");
+}
+
+function bucketByMonth(dates: string[]): IndicatorPoint[] {
   const buckets = new Map<number, number>();
   for (const iso of dates) {
     const date = parseIsoDate(iso);
     if (!date) continue;
-    const weekStart = startOfIsoWeek(date);
-    const key = weekStart.getTime();
+    const monthStart = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1),
+    );
+    const key = monthStart.getTime();
     buckets.set(key, (buckets.get(key) ?? 0) + 1);
   }
   return Array.from(buckets.entries())
     .sort(([a], [b]) => a - b)
     .map(([ts, count]) => ({ observedAt: new Date(ts), value: count }));
-}
-
-function startOfIsoWeek(date: Date): Date {
-  const utc = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
-  );
-  // getUTCDay: Sunday=0, Monday=1, ..., Saturday=6. ISO weeks start Monday.
-  const day = utc.getUTCDay();
-  const offset = (day + 6) % 7; // 0 if Monday, 6 if Sunday
-  utc.setUTCDate(utc.getUTCDate() - offset);
-  return utc;
 }
 
 function parseIsoDate(iso: string): Date | null {
@@ -215,13 +241,6 @@ function parseIsoDate(iso: string): Date | null {
   const [, y, m, d] = match;
   const date = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
   return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function formatIsoDate(date: Date): string {
-  const y = date.getUTCFullYear();
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(date.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
 }
 
 function sleep(ms: number): Promise<void> {
