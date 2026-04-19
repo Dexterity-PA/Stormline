@@ -15,11 +15,11 @@ import { runProfiler, type ProfilerInput } from '@/lib/onboarding/profiler';
 import type { Indicator } from '@/lib/db/queries/indicators';
 import type { Industry } from '@/lib/indicators/types';
 
-async function resolveOrgId(): Promise<string> {
-  const { orgId: clerkOrgId } = await auth();
-  if (!clerkOrgId) throw new Error('No active organization');
-  const org = await getOrgByClerkId(clerkOrgId);
-  if (!org) throw new Error(`Organization not found for clerkOrgId ${clerkOrgId}`);
+async function resolveOrgId(clerkOrgId?: string | null): Promise<string> {
+  const id = clerkOrgId ?? (await auth()).orgId;
+  if (!id) throw new Error('No active organization');
+  const org = await getOrgByClerkId(id);
+  if (!org) throw new Error(`Organization not found for clerkOrgId ${id}`);
   return org.id;
 }
 
@@ -53,7 +53,7 @@ export async function completeOnboardingAction(phone?: string): Promise<void> {
   const { userId: clerkUserId, orgId: clerkOrgId } = await auth();
   if (!clerkUserId || !clerkOrgId) throw new Error('Not authenticated');
 
-  const orgId = await resolveOrgId();
+  const orgId = await resolveOrgId(clerkOrgId);
   const state = await getOnboardingState(orgId);
 
   await completeOnboarding(orgId);
